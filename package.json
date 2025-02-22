@@ -29,7 +29,7 @@
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js && zip -r aavemonitor.zip dist/",
     "watch": "webpack -w --config webpack.config.js"
   },
   "eslintConfig": {

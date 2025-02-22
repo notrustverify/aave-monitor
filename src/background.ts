@@ -29,7 +29,7 @@ async function updateHealthFactor() {
       return;
     }
 
-    console.log("updating badge", parseFloat(healthFactor).toFixed(2));
+    console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2));
     // Update badge
     let color = '#4CAF50';
     if (parseFloat(healthFactor) < 1) {
