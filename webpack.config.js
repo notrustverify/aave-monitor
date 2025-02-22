@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 module.exports = {
   entry: {
     index: "./src/index.tsx",
-    background: "./src/background.ts"
+    background: "./src/background.ts",
   },
   mode: "production",
   module: {
@@ -31,7 +31,10 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: "manifest.json", to: "../manifest.json" }],
+      patterns: [
+        { from: "manifest.json", to: "../manifest.json" },
+        { from: "public", to: "../public" }
+      ],
     }),
     ...getHtmlPlugins(["index"]),
   ],

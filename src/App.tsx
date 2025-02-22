@@ -10,36 +10,89 @@ const POOL_ABI = [
   "function getUserAccountData(address user) external view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)"
 ];
 
-function App() {
-  const [userData, setUserData] = useState<any>(null);
-  const [address, setAddress] = useState<string>('');
+// Add this helper function at the top of the file
+const formatNumber = (value: string | number) => {
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4
+  }).format(Number(value));
+};
 
-  // Load initial address from chrome storage
+function App() {
+  const [addresses, setAddresses] = useState<string[]>([]);
+  const [userData, setUserData] = useState<{[key: string]: any}>({});
+  const [isLoading, setIsLoading] = useState<{[key: string]: boolean}>({});
+  const [starredAddress, setStarredAddress] = useState<string>('');
+  const [newAddress, setNewAddress] = useState<string>('');
+
+  // Load initial addresses and starred address from chrome storage
   useEffect(() => {
-    chrome.storage.local.get(['lastAddress']).then(result => {
-      if (result.lastAddress) {
-        setAddress(result.lastAddress);
+    chrome.storage.local.get(['savedAddresses', 'starredAddress']).then(result => {
+      if (result.savedAddresses) {
+        setAddresses(result.savedAddresses);
+        result.savedAddresses.forEach((addr: string) => {
+          getUserData(addr);
+        });
+      }
+      if (result.starredAddress) {
+        setStarredAddress(result.starredAddress);
       }
     });
   }, []);
 
-  // Function to fetch data
+  const toggleStar = async (address: string) => {
+    const newStarred = starredAddress === address ? '' : address;
+    setStarredAddress(newStarred);
+    await chrome.storage.local.set({ starredAddress: newStarred });
+    
+    // Update badge with starred address data if exists
+    if (newStarred && userData[newStarred]) {
+      updateBadge(userData[newStarred].healthFactor);
+    } else {
+      chrome.action.setBadgeText({ text: '' });
+    }
+  };
+
+  const addAddress = async () => {
+    if (!newAddress || addresses.includes(newAddress)) return;
+    
+    const updatedAddresses = [...addresses, newAddress];
+    setAddresses(updatedAddresses);
+    await chrome.storage.local.set({ savedAddresses: updatedAddresses });
+    getUserData(newAddress);
+  };
+
+  const removeAddress = async (addressToRemove: string) => {
+    const updatedAddresses = addresses.filter(addr => addr !== addressToRemove);
+    setAddresses(updatedAddresses);
+    await chrome.storage.local.set({ savedAddresses: updatedAddresses });
+    
+    // Remove data for this address
+    const updatedUserData = { ...userData };
+    delete updatedUserData[addressToRemove];
+    setUserData(updatedUserData);
+
+    // Clear starred address if removed
+    if (addressToRemove === starredAddress) {
+      setStarredAddress('');
+      await chrome.storage.local.set({ starredAddress: '' });
+      chrome.action.setBadgeText({ text: '' });
+    }
+  };
+
   const getUserData = async (userAddress: string) => {
     if (!userAddress) return;
     
-    // Store address in chrome storage instead of localStorage
-    await chrome.storage.local.set({ lastAddress: userAddress });
-    setAddress(userAddress);
-
-    const provider = new ethers.providers.JsonRpcProvider('https://eth.public-rpc.com');
-    
-    const poolContract = new ethers.Contract(
-      '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
-      POOL_ABI,
-      provider
-    );
-
+    setIsLoading(prev => ({ ...prev, [userAddress]: true }));
     try {
+      const provider = new ethers.providers.JsonRpcProvider('https://eth.public-rpc.com');
+      
+      const poolContract = new ethers.Contract(
+        '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
+        POOL_ABI,
+        provider
+      );
+
       const data = await poolContract.getUserAccountData(userAddress);
       const formatted = {
         totalCollateral: formatUnits(data.totalCollateralBase, 8),
@@ -50,30 +103,30 @@ function App() {
         healthFactor: formatUnits(data.healthFactor, 18)
       };
       
-      setUserData(formatted);
-      updateBadge(formatted.healthFactor);
+      setUserData(prev => ({ ...prev, [userAddress]: formatted }));
+      
+      // Only update badge if this is the starred address
+      if (userAddress === starredAddress) {
+        updateBadge(formatted.healthFactor);
+      }
     } catch (error) {
       console.error('Error fetching user data:', error);
-      chrome.action.setBadgeText({ text: '' });
+      if (userAddress === starredAddress) {
+        chrome.action.setBadgeText({ text: '' });
+      }
+    } finally {
+      setIsLoading(prev => ({ ...prev, [userAddress]: false }));
     }
   };
 
-  // Load data on mount and set up refresh interval
-  useEffect(() => {
-    if (address) {
-      getUserData(address);
-
-      // Refresh every 10 minutes
-      const interval = setInterval(() => {
-        getUserData(address);
-      }, 10 * 60 * 1000); // 10 minutes in milliseconds
-
-      // Cleanup interval on unmount
-      return () => clearInterval(interval);
-    }
-  }, [address]); // Re-run effect if address changes
-
   const updateBadge = (healthFactor: string) => {
+    // Check if there's any debt in the starred address
+    if (starredAddress && userData[starredAddress] && parseFloat(userData[starredAddress].totalDebt) === 0) {
+      chrome.action.setBadgeText({ text: 'ND' }); // ND for "No Debt" since badge space is limited
+      chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' }); // Green for no debt
+      return;
+    }
+
     // Convert health factor to a simpler number for display
     const hf = parseFloat(healthFactor).toFixed(2);
     
@@ -93,47 +146,85 @@ function App() {
   return (
     <div className="App">
       <div className="input-container">
-        <input 
-          type="text" 
-          placeholder="Enter wallet address"
-          value={address}
-          onChange={(e) => getUserData(e.target.value)}
-        />
-      </div>
-      {userData && (
-        <div className="container">
-          <div className="data-row">
-            <span className="label">Address</span>
-            <span className="value">{address}</span>
-          </div>
-          <div className="data-row">
-            <span className="label">Total Collateral</span>
-            <span className="value">$ {parseFloat(userData.totalCollateral).toFixed(4)}</span>
-          </div>
-          <div className="data-row">
-            <span className="label">Total Debt</span>
-            <span className="value">$ {parseFloat(userData.totalDebt).toFixed(4)}</span>
-          </div>
-          <div className="data-row">
-            <span className="label">Available to Borrow</span>
-            <span className="value">$ {parseFloat(userData.availableBorrows).toFixed(4)}</span>
-          </div>
-          <div className="data-row">
-            <span className="label">Liquidation Threshold</span>
-            <span className="value">{userData.liquidationThreshold}%</span>
-          </div>
-          <div className="data-row">
-            <span className="label">LTV</span>
-            <span className="value">{userData.ltv}%</span>
-          </div>
-          <div className={`health-factor ${
-            parseFloat(userData.healthFactor) > 2 ? 'safe' : 
-            parseFloat(userData.healthFactor) > 1 ? 'warning' : 'danger'
-          }`}>
-            Health Factor: {parseFloat(userData.healthFactor).toFixed(2)}
-          </div>
+        <div className="input-with-button">
+          <input
+            type="text"
+            placeholder="Enter address"
+            value={newAddress}
+            onChange={(e) => setNewAddress(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') {
+                addAddress();
+              }
+            }}
+          />
+          <button 
+            className="add-button"
+            onClick={addAddress}
+          >
+            Add
+          </button>
         </div>
-      )}
+      </div>
+      <div className="addresses-container">
+        {addresses.map(address => (
+          <div key={address} className="address-data">
+            {isLoading[address] ? (
+              <div className="loading">Loading...</div>
+            ) : userData[address] && (
+              <div className="container">
+                <div className="address-header">
+                  <span className="address-value">{address}</span>
+                  <div className="address-actions">
+                    <button 
+                      className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                      onClick={() => toggleStar(address)}
+                    >
+                      {starredAddress === address ? '★' : '☆'}
+                    </button>
+                    <button 
+                      className="remove-button"
+                      onClick={() => removeAddress(address)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <div className="data-row">
+                  <span className="label">Total Collateral</span>
+                  <span className="value">$ {formatNumber(userData[address].totalCollateral)}</span>
+                </div>
+                <div className="data-row">
+                  <span className="label">Total Debt</span>
+                  <span className="value">$ {formatNumber(userData[address].totalDebt)}</span>
+                </div>
+                <div className="data-row">
+                  <span className="label">Available to Borrow</span>
+                  <span className="value">$ {formatNumber(userData[address].availableBorrows)}</span>
+                </div>
+                <div className="data-row">
+                  <span className="label">Liquidation Threshold</span>
+                  <span className="value">{userData[address].liquidationThreshold}%</span>
+                </div>
+                <div className="data-row">
+                  <span className="label">LTV</span>
+                  <span className="value">{userData[address].ltv}%</span>
+                </div>
+                <div className={`health-factor ${
+                  parseFloat(userData[address].healthFactor) > 2 ? 'safe' : 
+                  parseFloat(userData[address].healthFactor) > 1 ? 'warning' : 'danger'
+                }`}>
+                  Health Factor: {
+                    parseFloat(userData[address].totalDebt) === 0 
+                      ? "No debt"
+                      : formatNumber(userData[address].healthFactor)
+                  }
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

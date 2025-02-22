@@ -5,11 +5,9 @@ const POOL_ABI = [
 ];
 
 async function updateHealthFactor() {
-  const result = await chrome.storage.local.get(['lastAddress']);
-  const address = result.lastAddress;
+  const result = await chrome.storage.local.get(['starredAddress']);
+  const address = result.starredAddress;
   if (!address) return;
-
-  console.log(result);
 
 
   const provider = new ethers.providers.JsonRpcProvider('https://eth.public-rpc.com');
@@ -22,6 +20,15 @@ async function updateHealthFactor() {
   try {
     const data = await poolContract.getUserAccountData(address);
     const healthFactor = ethers.utils.formatUnits(data.healthFactor, 18);
+    const totalDebt = ethers.utils.formatUnits(data.totalDebtBase, 8);
+
+    // Check for no debt
+    if (parseFloat(totalDebt) === 0) {
+      chrome.action.setBadgeText({ text: 'ND' });
+      chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
+      return;
+    }
+
     console.log("updating badge", parseFloat(healthFactor).toFixed(2));
     // Update badge
     let color = '#4CAF50';
@@ -49,7 +56,7 @@ function startHealthCheck() {
   // Initial update
   updateHealthFactor();
   // Update every minute
-  healthCheckInterval = setInterval(updateHealthFactor, 1 * 60 * 1000);
+  healthCheckInterval = setInterval(updateHealthFactor, 5 * 60 * 1000);
 }
 
 // Start monitoring when the browser starts
@@ -59,4 +66,17 @@ chrome.runtime.onStartup.addListener(startHealthCheck);
 chrome.runtime.onInstalled.addListener(startHealthCheck);
 
 // Replace the existing interval and initial update with startHealthCheck()
-startHealthCheck(); 
+startHealthCheck();
+
+// Add storage change listener
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local' && changes.starredAddress) {
+    // If starred address was cleared, clear the badge
+    if (!changes.starredAddress.newValue) {
+      chrome.action.setBadgeText({ text: '' });
+      return;
+    }
+    // Update health factor for the new starred address
+    updateHealthFactor();
+  }
+}); 
