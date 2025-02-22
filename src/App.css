@@ -1,38 +1,141 @@
 .App {
+  color: white;
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  width: 100%;
+  min-width: 300px;  /* Minimum width for extension */
+  max-width: 360px;  /* Maximum width for extension */
+  height: auto;  /* Changed to auto height */
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  /* Darker, more neutral background gradient */
+  background: linear-gradient(
+    135deg,
+    #121212 0%,
+    #1e1e1e 50%,
+    #121212 100%
+  );
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  padding: 0.5rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 0.5rem;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+  margin-bottom: 0.5rem; /* Add space at bottom */
+}
+
+.container:hover {
+  transform: translateY(-5px);  /* Slight lift effect on hover */
+  box-shadow: 0 12px 40px rgba(107, 0, 128, 0.4);
+}
+
+.input-container {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+input {
+  width: 100%;
+  padding: 0.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.05);
   color: white;
+  font-size: 0.8rem;
+  box-sizing: border-box; /* Include padding in width calculation */
 }
 
-.App-link {
-  color: #61dafb;
+input:focus {
+  outline: none;
+  border-color: rgb(107, 0, 128);
+  box-shadow: 0 0 0 2px rgba(107, 0, 128, 0.2);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.data-container {
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 4px 24px -1px rgba(0, 0, 0, 0.3),
+    0 0 1px 0 rgba(255, 255, 255, 0.1) inset;
+}
+
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.75rem;
+  text-align: left;
+  flex: 1;
+}
+
+.value {
+  font-family: monospace;
+  font-size: 0.75rem;
+  text-align: right;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-factor {
+  width: 100%;
+  padding: 0.4rem;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.health-factor.safe {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+
+.health-factor.warning {
+  background: rgba(255, 152, 0, 0.2);
+  color: #ffa726;
+}
+
+.health-factor.danger {
+  background: rgba(244, 67, 54, 0.2);
+  color: #f44336;
 }
