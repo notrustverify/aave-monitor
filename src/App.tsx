@@ -42,9 +42,9 @@ function App() {
     try {
       const data = await poolContract.getUserAccountData(userAddress);
       const formatted = {
-        totalCollateral: formatUnits(data.totalCollateralBase, 18),
-        totalDebt: formatUnits(data.totalDebtBase, 18),
-        availableBorrows: formatUnits(data.availableBorrowsBase, 18),
+        totalCollateral: formatUnits(data.totalCollateralBase, 8),
+        totalDebt: formatUnits(data.totalDebtBase, 8),
+        availableBorrows: formatUnits(data.availableBorrowsBase, 8),
         liquidationThreshold: formatUnits(data.currentLiquidationThreshold, 2),
         ltv: formatUnits(data.ltv, 2),
         healthFactor: formatUnits(data.healthFactor, 18)
@@ -108,15 +108,15 @@ function App() {
           </div>
           <div className="data-row">
             <span className="label">Total Collateral</span>
-            <span className="value">{userData.totalCollateral} ETH</span>
+            <span className="value">$ {parseFloat(userData.totalCollateral).toFixed(4)}</span>
           </div>
           <div className="data-row">
             <span className="label">Total Debt</span>
-            <span className="value">{userData.totalDebt} ETH</span>
+            <span className="value">$ {parseFloat(userData.totalDebt).toFixed(4)}</span>
           </div>
           <div className="data-row">
             <span className="label">Available to Borrow</span>
-            <span className="value">{userData.availableBorrows} ETH</span>
+            <span className="value">$ {parseFloat(userData.availableBorrows).toFixed(4)}</span>
           </div>
           <div className="data-row">
             <span className="label">Liquidation Threshold</span>
