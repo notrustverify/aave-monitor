@@ -1,0 +1,22 @@
+{
+    "manifest_version": 3,
+    "name": "Aave Health Factor",
+    "version": "1.0",
+    "description": "Monitor Aave health factor",
+    "action": {
+        "default_popup": "js/index.html"
+    },
+    "permissions": [
+        "storage",
+        "background"
+    ],
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "icons": {
+        "16": "icon128.png",
+        "32": "icon128.png",
+        "48": "icon128.png",
+        "128": "icon128.png"
+    }
+}
