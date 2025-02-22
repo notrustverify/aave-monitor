@@ -51,7 +51,7 @@ function setupHealthCheck() {
   
   // Create an alarm that fires every 5 minutes
   chrome.alarms.create('healthCheck', {
-    periodInMinutes: 1
+    periodInMinutes: 10
   });
 }
 
