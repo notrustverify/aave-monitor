@@ -45,28 +45,31 @@ async function updateHealthFactor() {
   }
 }
 
-// Clear the interval if it exists (to prevent multiple intervals)
-let healthCheckInterval: NodeJS.Timeout;
-
-function startHealthCheck() {
-  // Clear any existing interval
-  if (healthCheckInterval) {
-    clearInterval(healthCheckInterval);
-  }
+function setupHealthCheck() {
   // Initial update
   updateHealthFactor();
-  // Update every minute
-  healthCheckInterval = setInterval(updateHealthFactor, 5 * 60 * 1000);
+  
+  // Create an alarm that fires every 5 minutes
+  chrome.alarms.create('healthCheck', {
+    periodInMinutes: 1
+  });
 }
 
+// Listen for alarm events
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'healthCheck') {
+    updateHealthFactor();
+  }
+});
+
 // Start monitoring when the browser starts
-chrome.runtime.onStartup.addListener(startHealthCheck);
+chrome.runtime.onStartup.addListener(setupHealthCheck);
 
 // Start monitoring when the extension is installed/updated
-chrome.runtime.onInstalled.addListener(startHealthCheck);
+chrome.runtime.onInstalled.addListener(setupHealthCheck);
 
-// Replace the existing interval and initial update with startHealthCheck()
-startHealthCheck();
+// Initial setup
+setupHealthCheck();
 
 // Add storage change listener
 chrome.storage.onChanged.addListener((changes, namespace) => {
