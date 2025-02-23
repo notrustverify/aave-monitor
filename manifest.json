@@ -19,5 +19,6 @@
         "32": "public/icon128.png",
         "48": "public/icon128.png",
         "128": "public/icon128.png"
-    }
+    },
+    "options_page": "public/options.html"
 }

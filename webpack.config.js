@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     index: "./src/index.tsx",
     background: "./src/background.ts",
+    options: "./src/options.tsx"
   },
   mode: "production",
   module: {
@@ -36,7 +37,7 @@ module.exports = {
         { from: "public", to: "../public" }
       ],
     }),
-    ...getHtmlPlugins(["index"]),
+    ...getHtmlPlugins(["index", "options"]),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],

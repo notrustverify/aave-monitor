@@ -24,10 +24,11 @@ function App() {
   const [isLoading, setIsLoading] = useState<{[key: string]: boolean}>({});
   const [starredAddress, setStarredAddress] = useState<string>('');
   const [newAddress, setNewAddress] = useState<string>('');
+  const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
 
   // Load initial addresses and starred address from chrome storage
   useEffect(() => {
-    chrome.storage.local.get(['savedAddresses', 'starredAddress']).then(result => {
+    chrome.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider']).then(result => {
       if (result.savedAddresses) {
         setAddresses(result.savedAddresses);
         result.savedAddresses.forEach((addr: string) => {
@@ -36,6 +37,9 @@ function App() {
       }
       if (result.starredAddress) {
         setStarredAddress(result.starredAddress);
+      }
+      if (result.rpcProvider) {
+        setRpcProvider(result.rpcProvider);
       }
     });
   }, []);
@@ -85,7 +89,7 @@ function App() {
     
     setIsLoading(prev => ({ ...prev, [userAddress]: true }));
     try {
-      const provider = new ethers.providers.JsonRpcProvider('https://eth.public-rpc.com');
+      const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
       
       const poolContract = new ethers.Contract(
         '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
@@ -165,6 +169,12 @@ function App() {
             Add
           </button>
         </div>
+        <button 
+          className="options-button"
+          onClick={() => chrome.runtime.openOptionsPage()}
+        >
+          Options
+        </button>
       </div>
       <div className="addresses-container">
         {addresses.map(address => (

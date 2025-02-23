@@ -5,20 +5,18 @@ const POOL_ABI = [
 ];
 
 async function updateHealthFactor() {
-  const result = await chrome.storage.local.get(['starredAddress']);
-  const address = result.starredAddress;
-  if (!address) return;
-
-
-  const provider = new ethers.providers.JsonRpcProvider('https://eth.public-rpc.com');
-  const poolContract = new ethers.Contract(
-    '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
-    POOL_ABI,
-    provider
-  );
-
   try {
-    const data = await poolContract.getUserAccountData(address);
+    const { starredAddress, rpcProvider } = await chrome.storage.local.get(['starredAddress', 'rpcProvider']);
+    if (!starredAddress) return;
+
+    const provider = new ethers.providers.JsonRpcProvider(rpcProvider || 'https://eth.public-rpc.com');
+    const poolContract = new ethers.Contract(
+      '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
+      POOL_ABI,
+      provider
+    );
+
+    const data = await poolContract.getUserAccountData(starredAddress);
     const healthFactor = ethers.utils.formatUnits(data.healthFactor, 18);
     const totalDebt = ethers.utils.formatUnits(data.totalDebtBase, 8);
 
@@ -29,7 +27,7 @@ async function updateHealthFactor() {
       return;
     }
 
-    console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2));
+    console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2), rpcProvider);
     // Update badge
     let color = '#4CAF50';
     if (parseFloat(healthFactor) < 1) {
@@ -40,18 +38,21 @@ async function updateHealthFactor() {
     chrome.action.setBadgeText({ text: parseFloat(healthFactor).toFixed(2) });
     chrome.action.setBadgeBackgroundColor({ color });
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error updating health factor:', error);
     chrome.action.setBadgeText({ text: '' });
   }
 }
 
-function setupHealthCheck() {
+async function setupHealthCheck() {
   // Initial update
   updateHealthFactor();
   
-  // Create an alarm that fires every 5 minutes
+  // Get update frequency from storage
+  const { updateFrequency } = await chrome.storage.local.get(['updateFrequency']);
+  
+  // Create an alarm that fires periodically (default: 5 minutes)
   chrome.alarms.create('healthCheck', {
-    periodInMinutes: 10
+    periodInMinutes: updateFrequency || 5 * 60 * 1000
   });
 }
 
@@ -73,13 +74,24 @@ setupHealthCheck();
 
 // Add storage change listener
 chrome.storage.onChanged.addListener((changes, namespace) => {
-  if (namespace === 'local' && changes.starredAddress) {
-    // If starred address was cleared, clear the badge
-    if (!changes.starredAddress.newValue) {
-      chrome.action.setBadgeText({ text: '' });
-      return;
+  if (namespace === 'local') {
+    if (changes.starredAddress) {
+      // If starred address was cleared, clear the badge
+      if (!changes.starredAddress.newValue) {
+        chrome.action.setBadgeText({ text: '' });
+        return;
+      }
+      // Update health factor for the new starred address
+      updateHealthFactor();
     }
-    // Update health factor for the new starred address
-    updateHealthFactor();
+    
+    // Update alarm when frequency changes
+    if (changes.updateFrequency) {
+      updateHealthFactor();
+      chrome.alarms.clear('healthCheck');
+      chrome.alarms.create('healthCheck', {
+        periodInMinutes: changes.updateFrequency.newValue || 5 * 60 * 1000
+      });
+    }
   }
 }); 

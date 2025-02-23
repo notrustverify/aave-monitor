@@ -215,3 +215,18 @@ input:focus {
 .star-button.starred {
   color: #ffd700;
 }
+
+.options-button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.options-button:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
