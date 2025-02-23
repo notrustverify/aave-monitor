@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Aave Health Factor",
-    "version": "2.2.1",
+    "version": "2.2.0",
     "description": "Monitor Aave health factor",
     "action": {
         "default_popup": "js/index.html"
@@ -11,7 +11,7 @@
         "alarms"
     ],
     "background": {
-        "service_worker": "js/background.js",
+        "scripts": ["js/background.js"],
         "type": "module"
     },
     "icons": {
@@ -23,10 +23,5 @@
     "options_ui": {
         "page": "public/options.html",
         "open_in_tab": true
-    },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "a417bf8d-0c46-4b46-9beb-806cf40e7d09@notrustverify.ch"
-        }
     }
 }

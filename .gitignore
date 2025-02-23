@@ -27,3 +27,4 @@ yarn-error.log*
 *.crx
 dist/
 cache/
+*.DS_Store

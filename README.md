@@ -1,46 +1,128 @@
-# Getting Started with Create React App
+# Aave Health Factor Extension
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A browser extension to monitor Aave health factors for multiple addresses. Compatible with both Chrome and Firefox.
+
+## Requirements
+
+- Node.js (v16.0.0 or higher)
+- npm (v7.0.0 or higher)
+- Git
+
+## Build Instructions
+
+1. Clone the repository
+   ```bash
+   git clone [your-repository-url]
+   cd aave-health-factor
+   ```
+
+2. Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. Build the extension
+   ```bash
+   npm run build
+   ```
+
+This will create a `build` directory with the extension files.
+
+## Development Setup
+
+### Chrome Development
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode" in the top right
+3. Click "Load unpacked" and select the `build` directory
+
+### Firefox Development
+1. Open Firefox and navigate to `about:debugging`
+2. Click "This Firefox" on the left sidebar
+3. Click "Load Temporary Add-on"
+4. Navigate to the `build` directory and select `manifest.json`
+
+## Project Structure
+
+```
+aave-health-factor/
+├── src/
+│ ├── App.tsx # Main popup component
+│ ├── background.ts # Background service worker
+│ ├── utils/
+│ │ └── browserAPI.ts # Browser compatibility layer
+│ └── pages/
+│ └── Options.tsx # Options page component
+├── public/
+│ ├── manifest.json # Extension manifest
+│ ├── options.html # Options page HTML
+│ └── icons/ # Extension icons
+└── package.json
+```
+
+
+## Build Environment Details
+
+### Operating System
+- The extension can be built on any operating system that supports Node.js (Windows, macOS, Linux)
+
+### Build Environment
+- Node.js environment
+- npm package manager
+- Create React App build system
+- TypeScript compiler
+- Webpack (included in Create React App)
+
+### Dependencies
+All dependencies are managed through npm and listed in package.json. Key dependencies include:
+- React 18.x
+- TypeScript 4.x
+- ethers.js 5.x
+- @types/chrome for Chrome extension type definitions
+
+## Production Build Process
+
+The production build process:
+1. Compiles TypeScript files
+2. Bundles modules with Webpack
+3. Minifies JavaScript and CSS
+4. Copies static assets
+5. Generates source maps
+6. Creates a production-ready build in the `build` directory
+
+## Firefox Add-on Specific Notes
+
+For Firefox distribution:
+1. Ensure you have a valid extension ID in manifest.json
+2. The build process creates a Firefox-compatible extension
+3. Test the extension in Firefox before submission
+4. Submit to Firefox Add-ons (AMO) using the built files
 
 ## Available Scripts
 
-In the project directory, you can run:
-
 ### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Runs the app in development mode with hot reload support.
+Note: This is mainly for component development and testing.
 
 ### `npm run build`
+Builds the extension for production:
+- Bundles and minifies the code
+- Optimizes assets
+- Creates the `build` directory with the final extension
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### `npm test`
+Runs the test suite.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### `npm run lint`
+Runs ESLint to check code quality.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Troubleshooting
 
-### `npm run eject`
+If you encounter build issues:
+1. Ensure all dependencies are installed: `npm install`
+2. Clear the build directory: `rm -rf build`
+3. Ensure you're using the correct Node.js version
+4. Check console for error messages
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## License
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+[Your License Information]

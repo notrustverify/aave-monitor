@@ -43,7 +43,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    path: process.env.NODE_ENV === "firefox" ? path.join(__dirname, "firefox_dist/js") : path.join(__dirname, "dist/js"),
+    path: path.join(__dirname, "dist/js"),
     filename: "[name].js",
   },
 };
