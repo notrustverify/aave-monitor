@@ -96,33 +96,3 @@ For Firefox distribution:
 2. The build process creates a Firefox-compatible extension
 3. Test the extension in Firefox before submission
 4. Submit to Firefox Add-ons (AMO) using the built files
-
-## Available Scripts
-
-### `npm start`
-Runs the app in development mode with hot reload support.
-Note: This is mainly for component development and testing.
-
-### `npm run build`
-Builds the extension for production:
-- Bundles and minifies the code
-- Optimizes assets
-- Creates the `build` directory with the final extension
-
-### `npm test`
-Runs the test suite.
-
-### `npm run lint`
-Runs ESLint to check code quality.
-
-## Troubleshooting
-
-If you encounter build issues:
-1. Ensure all dependencies are installed: `npm install`
-2. Clear the build directory: `rm -rf build`
-3. Ensure you're using the correct Node.js version
-4. Check console for error messages
-
-## License
-
-[Your License Information]
