@@ -51,9 +51,10 @@ async function setupHealthCheck() {
   // Get update frequency from storage
   const { updateFrequency } = await browserAPI.storage.local.get(['updateFrequency']);
   
+  browserAPI.alarms.clear('healthCheck');
   // Create an alarm that fires periodically (default: 5 minutes)
   browserAPI.alarms.create('healthCheck', {
-    periodInMinutes: updateFrequency || 5 * 60 * 1000
+    periodInMinutes: updateFrequency || 5
   });
 }
 
@@ -88,11 +89,11 @@ browserAPI.storage.onChanged.addListener((changes, namespace) => {
     
     // Update alarm when frequency changes
     if (changes.updateFrequency) {
-      updateHealthFactor();
       browserAPI.alarms.clear('healthCheck');
       browserAPI.alarms.create('healthCheck', {
-        periodInMinutes: changes.updateFrequency.newValue || 5 * 60 * 1000
+        periodInMinutes: changes.updateFrequency.newValue || 5
       });
+      updateHealthFactor();
     }
   }
 }); 
