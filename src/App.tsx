@@ -148,6 +148,12 @@ function App() {
     browserAPI.action.setBadgeBackgroundColor({ color: color });
   };
 
+  const refreshData = () => {
+    addresses.forEach((address) => {
+      getUserData(address);
+    });
+  };
+
   return (
     <div className="App">
       <div className="input-container">
@@ -170,6 +176,12 @@ function App() {
             Add
           </button>
         </div>
+        <button 
+          className="refresh-button icon-button"
+          onClick={refreshData}
+        >
+          <img src="../public/assets/refresh.svg" alt="Refresh" />
+        </button>
         <button 
           className="options-button"
           onClick={() => browserAPI.runtime.openOptionsPage()}

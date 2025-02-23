@@ -5,6 +5,11 @@ body, html {
   width: 100%;
   height: 100%;
   background: transparent;
+  font-family:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .App {
@@ -37,9 +42,13 @@ body, html {
 }
 
 .input-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align items to the left */
+  gap: 8px; /* Add space between elements */
   width: 100%;
   margin-bottom: 0.5rem;
-  box-sizing: border-box; /* Include padding in width calculation */
+  box-sizing: border-box;
 }
 
 .input-with-button {
@@ -229,4 +238,20 @@ input:focus {
 
 .options-button:hover {
   color: rgba(255, 255, 255, 0.9);
+}
+
+.icon-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-button img {
+  width: 20px;
+  height: 20px;
+  filter: invert(1);
 }
