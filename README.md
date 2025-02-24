@@ -1,5 +1,4 @@
 # Aave Health Factor Extension
-
 A browser extension to monitor Aave health factors for multiple addresses. Compatible with both Chrome and Firefox.
 
 Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
@@ -44,6 +43,7 @@ Install the Aave Account Monitor extension today and take control of your Aave a
    cd aave-health-factor
    ```
 
+
 2. Install dependencies
    ```bash
    npm install
@@ -55,6 +55,10 @@ Install the Aave Account Monitor extension today and take control of your Aave a
    ```
 
 This will create a `build` directory with the extension files.
+
+## Screenshots
+
+![](https://github.com/user-attachments/assets/3cf5fe5e-81c1-48ce-b58a-8c3b80d56cc2)
 
 ## Development Setup
 
