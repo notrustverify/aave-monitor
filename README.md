@@ -2,6 +2,34 @@
 
 A browser extension to monitor Aave health factors for multiple addresses. Compatible with both Chrome and Firefox.
 
+Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
+
+Features:
+* Real-Time Data: Automatically fetches and displays your Aave account data, including total collateral, total debt, available borrows, liquidation threshold, LTV, and health factor.
+* Starred Address: Highlight a specific address to monitor its health factor directly from your browser's toolbar.
+* Badge Notifications: Get visual alerts on your browser's badge for quick insights into your account's health status.
+* Easy Management: Add or remove Ethereum addresses with a simple interface, and save your preferences directly in your browser.
+* Customizable RPC Provider: Set your preferred Ethereum RPC provider for fetching data.
+* Privacy Mode: Option to hide the extension icon and badge when not in use.
+* Separator: Option to set the separator for the extension.
+
+How It Works:
+1. Add Addresses: Enter Ethereum addresses to monitor their Aave account data.
+2. Star an Address: Click the star icon to set an address as your primary focus, and receive badge updates for its health factor.
+3. Monitor Health Factor: The badge color changes based on the health factor, alerting you to potential risks:
+* Green: Healthy (> 2)
+* Orange: Warning (1 - 2)
+* Red: Danger (< 1)
+* No Debt Indicator: If an address has no debt, the badge will display "ND" for "No Debt."
+
+Why Use Aave Health Factor?
+* Convenience: Access your Aave account data without leaving your browser.
+* Security: Keep track of your account's health to avoid liquidation risks.
+* Efficiency: Quickly identify and respond to changes in your account status.
+
+Get Started:
+Install the Aave Account Monitor extension today and take control of your Aave account management with ease and confidence.
+
 ## Requirements
 
 - Node.js (v16.0.0 or higher)
