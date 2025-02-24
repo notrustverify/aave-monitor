@@ -11,14 +11,6 @@ const POOL_ABI = [
   "function getUserAccountData(address user) external view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)"
 ];
 
-// Add this helper function at the top of the file
-const formatNumber = (value: string | number) => {
-  return new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 4
-  }).format(Number(value));
-};
-
 function App() {
   const [addresses, setAddresses] = useState<string[]>([]);
   const [userData, setUserData] = useState<{[key: string]: any}>({});
@@ -26,10 +18,12 @@ function App() {
   const [starredAddress, setStarredAddress] = useState<string>('');
   const [newAddress, setNewAddress] = useState<string>('');
   const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
+  const [privacyMode, setPrivacyMode] = useState(false);
+  const [locale, setLocale] = useState(navigator.language);
 
-  // Load initial addresses and starred address from chrome storage
+  // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
-    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider']).then(result => {
+    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale']).then(result => {
       if (result.savedAddresses) {
         setAddresses(result.savedAddresses);
         result.savedAddresses.forEach((addr: string) => {
@@ -42,8 +36,30 @@ function App() {
       if (result.rpcProvider) {
         setRpcProvider(result.rpcProvider);
       }
+      if (result.locale) {
+        setLocale(result.locale);
+      }
     });
   }, []);
+
+  useEffect(() => {
+    // Load privacy mode state from storage
+    browserAPI.storage.local.get('privacyMode', (result) => {
+      if (result.privacyMode !== undefined) {
+        setPrivacyMode(result.privacyMode);
+      }
+    });
+  }, []);
+
+  const formatNumber = (value: string | number) => {
+    return new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      currency: 'USD',
+      currencyDisplay: 'code',
+      useGrouping: true
+    }).format(Number(value));
+  };
 
   const toggleStar = async (address: string) => {
     const newStarred = starredAddress === address ? '' : address;
@@ -154,6 +170,17 @@ function App() {
     });
   };
 
+  const togglePrivacyMode = () => {
+    const newPrivacyMode = !privacyMode;
+    setPrivacyMode(newPrivacyMode);
+    // Save privacy mode state to storage
+    browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
+  };
+
+  const formatAmount = (amount: string) => {
+    return privacyMode ? '****' : formatNumber(amount);
+  };
+
   return (
     <div className="App">
       <div className="input-container">
@@ -163,7 +190,7 @@ function App() {
             placeholder="Enter address"
             value={newAddress}
             onChange={(e) => setNewAddress(e.target.value)}
-            onKeyPress={(e) => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 addAddress();
               }
@@ -182,6 +209,13 @@ function App() {
         >
           <img src="../public/assets/refresh.svg" alt="Refresh" />
         </button>
+        <img 
+          src="../public/assets/eye.svg" 
+          alt="Toggle Privacy Mode" 
+          className="eye-icon"
+          onClick={togglePrivacyMode}
+          style={{ cursor: 'pointer', width: '24px', height: '24px' }}
+        />
         <button 
           className="options-button"
           onClick={() => browserAPI.runtime.openOptionsPage()}
@@ -189,6 +223,7 @@ function App() {
           Options
         </button>
       </div>
+
       <div className="addresses-container">
         {addresses.map(address => (
           <div key={address} className="address-data">
@@ -215,15 +250,15 @@ function App() {
                 </div>
                 <div className="data-row">
                   <span className="label">Total Collateral</span>
-                  <span className="value">$ {formatNumber(userData[address].totalCollateral)}</span>
+                  <span className="value">$ {formatAmount(userData[address].totalCollateral)}</span>
                 </div>
                 <div className="data-row">
                   <span className="label">Total Debt</span>
-                  <span className="value">$ {formatNumber(userData[address].totalDebt)}</span>
+                  <span className="value">$ {formatAmount(userData[address].totalDebt)}</span>
                 </div>
                 <div className="data-row">
                   <span className="label">Available to Borrow</span>
-                  <span className="value">$ {formatNumber(userData[address].availableBorrows)}</span>
+                  <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
                 </div>
                 <div className="data-row">
                   <span className="label">Liquidation Threshold</span>

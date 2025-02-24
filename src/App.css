@@ -255,3 +255,7 @@ input:focus {
   height: 20px;
   filter: invert(1);
 }
+
+.eye-icon {
+  filter: invert(1);
+}

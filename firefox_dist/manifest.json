@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Aave Health Factor",
-    "version": "2.2.2",
+    "version": "2.3.2",
     "description": "Monitor Aave health factor",
     "action": {
         "default_popup": "js/index.html"
@@ -15,9 +15,8 @@
         "type": "module"
     },
     "icons": {
-        "16": "public/icon128.png",
-        "32": "public/icon128.png",
-        "48": "public/icon128.png",
+        "16": "public/icon16.png",
+        "32": "public/icon32.png",
         "128": "public/icon128.png"
     },
     "options_ui": {

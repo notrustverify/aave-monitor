@@ -5,16 +5,20 @@ import browserAPI from '../utils/browserAPI';
 function Options() {
   const [updateFrequency, setUpdateFrequency] = useState(5);
   const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
+  const [locale, setLocale] = useState(navigator.language);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     // Load saved settings
-    browserAPI.storage.local.get(['updateFrequency', 'rpcProvider'], (result) => {
+    browserAPI.storage.local.get(['updateFrequency', 'rpcProvider', 'locale'], (result) => {
       if (result.updateFrequency) {
         setUpdateFrequency(result.updateFrequency);
       }
       if (result.rpcProvider) {
         setRpcProvider(result.rpcProvider);
+      }
+      if (result.locale) {
+        setLocale(result.locale);
       }
     });
   }, []);
@@ -23,7 +27,8 @@ function Options() {
     try {
       await browserAPI.storage.local.set({
         updateFrequency,
-        rpcProvider
+        rpcProvider,
+        locale
       });
       
       // Update the alarm interval
@@ -66,6 +71,19 @@ function Options() {
             onChange={(e) => setRpcProvider(e.target.value)}
             placeholder="Enter RPC URL"
           />
+        </label>
+      </div>
+
+      <div className="setting-group">
+        <label>
+          Select Locale:
+          <select value={locale} onChange={(e) => setLocale(e.target.value)} >
+            <option value="en-US">,</option>
+            <option value="fr-FR">Space</option>
+            <option value="de-DE">.</option>
+            <option value="de-CH">'</option>
+            {/* Add more locales as needed */}
+          </select>
         </label>
       </div>
 
