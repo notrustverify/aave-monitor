@@ -259,3 +259,8 @@ input:focus {
 .eye-icon {
   filter: invert(1);
 }
+
+.options-icon {
+  filter: invert(1);
+}
+

@@ -206,6 +206,8 @@ function App() {
         <button 
           className="refresh-button icon-button"
           onClick={refreshData}
+          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+
         >
           <img src="../public/assets/refresh.svg" alt="Refresh" />
         </button>
@@ -214,14 +216,15 @@ function App() {
           alt="Toggle Privacy Mode" 
           className="eye-icon"
           onClick={togglePrivacyMode}
-          style={{ cursor: 'pointer', width: '24px', height: '24px' }}
+          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
         />
-        <button 
-          className="options-button"
+        <img 
+          src="../public/assets/settings.svg" 
+          alt="Options" 
+          className="options-icon invert-color"
           onClick={() => browserAPI.runtime.openOptionsPage()}
-        >
-          Options
-        </button>
+          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+        />
       </div>
 
       <div className="addresses-container">
