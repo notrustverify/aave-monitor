@@ -6,11 +6,12 @@ function Options() {
   const [updateFrequency, setUpdateFrequency] = useState(5);
   const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
   const [locale, setLocale] = useState(navigator.language);
+  const [contractAddress, setContractAddress] = useState('0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2');
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     // Load saved settings
-    browserAPI.storage.local.get(['updateFrequency', 'rpcProvider', 'locale'], (result) => {
+    browserAPI.storage.local.get(['updateFrequency', 'rpcProvider', 'locale', 'contractAddress'], (result) => {
       if (result.updateFrequency) {
         setUpdateFrequency(result.updateFrequency);
       }
@@ -20,6 +21,9 @@ function Options() {
       if (result.locale) {
         setLocale(result.locale);
       }
+      if (result.contractAddress) {
+        setContractAddress(result.contractAddress);
+      }
     });
   }, []);
 
@@ -28,7 +32,8 @@ function Options() {
       await browserAPI.storage.local.set({
         updateFrequency,
         rpcProvider,
-        locale
+        locale,
+        contractAddress
       });
       
       // Update the alarm interval
@@ -76,7 +81,30 @@ function Options() {
 
       <div className="setting-group">
         <label>
-          Select Locale:
+          Contract Address:
+          <input
+            type="text"
+            value={contractAddress}
+            onChange={(e) => setContractAddress(e.target.value)}
+            placeholder="Enter Aave Pool Contract Address"
+          />
+        </label>
+        <p className="setting-description">
+          The Aave Pool contract address. Default: 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2 (Ethereum Mainnet)
+        </p>
+        <div className="button-group">
+          <button 
+            onClick={() => setContractAddress('0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2')}
+            className="reset-button"
+          >
+            Reset to Default
+          </button>
+        </div>
+      </div>
+
+      <div className="setting-group">
+        <label>
+          Select thousands separator:
           <select value={locale} onChange={(e) => setLocale(e.target.value)} >
             <option value="en-US">,</option>
             <option value="fr-FR">Space</option>

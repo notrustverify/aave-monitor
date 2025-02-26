@@ -15,20 +15,23 @@ function App() {
   const [addresses, setAddresses] = useState<string[]>([]);
   const [userData, setUserData] = useState<{[key: string]: any}>({});
   const [isLoading, setIsLoading] = useState<{[key: string]: boolean}>({});
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [globalError, setGlobalError] = useState<string>('');
   const [starredAddress, setStarredAddress] = useState<string>('');
   const [newAddress, setNewAddress] = useState<string>('');
   const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
   const [privacyMode, setPrivacyMode] = useState(false);
   const [locale, setLocale] = useState(navigator.language);
+  const [contractAddress, setContractAddress] = useState('0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2');
+  const [showContractInput, setShowContractInput] = useState(false);
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
-    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale']).then(result => {
+    let previousContractAddress = contractAddress;
+    
+    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress']).then(result => {
       if (result.savedAddresses) {
         setAddresses(result.savedAddresses);
-        result.savedAddresses.forEach((addr: string) => {
-          getUserData(addr);
-        });
       }
       if (result.starredAddress) {
         setStarredAddress(result.starredAddress);
@@ -39,8 +42,59 @@ function App() {
       if (result.locale) {
         setLocale(result.locale);
       }
+      if (result.contractAddress) {
+        // Check if contract address has changed
+        const contractChanged = previousContractAddress !== result.contractAddress;
+        setContractAddress(result.contractAddress);
+        
+        // If addresses exist, fetch data for them
+        if (result.savedAddresses && result.savedAddresses.length > 0) {
+          // If contract changed, refresh all data
+          if (contractChanged) {
+            console.log('Contract address changed, refreshing all data');
+            result.savedAddresses.forEach((addr: string) => {
+              getUserData(addr);
+            });
+          } else {
+            // Otherwise, just load data normally
+            result.savedAddresses.forEach((addr: string) => {
+              getUserData(addr);
+            });
+          }
+        }
+      } else {
+        // If no contract address in storage, fetch data with default
+        if (result.savedAddresses) {
+          result.savedAddresses.forEach((addr: string) => {
+            getUserData(addr);
+          });
+        }
+      }
     });
+    
+    console.log('Contract address:', contractAddress);
+    // Add listener for visibility changes to detect when popup is opened
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
+  
+  // Handle visibility change (popup opened)
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      console.log('Popup opened, checking contract address');
+      // Check if contract address has changed while popup was closed
+      browserAPI.storage.local.get('contractAddress', (result) => {
+        if (result.contractAddress && result.contractAddress !== contractAddress) {
+          console.log('Contract address changed while popup was closed');
+          setContractAddress(result.contractAddress);
+          refreshData();
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     // Load privacy mode state from storage
@@ -49,6 +103,30 @@ function App() {
         setPrivacyMode(result.privacyMode);
       }
     });
+
+    // Listen for changes to storage
+    const handleStorageChange = (changes: {[key: string]: any}, areaName: string) => {
+      if (areaName !== 'local') return;
+      
+      if (changes.rpcProvider) {
+        setRpcProvider(changes.rpcProvider.newValue);
+      }
+      if (changes.locale) {
+        setLocale(changes.locale.newValue);
+      }
+      if (changes.contractAddress) {
+        setContractAddress(changes.contractAddress.newValue);
+        // Refresh data when contract address changes
+        refreshData();
+      }
+    };
+
+    browserAPI.storage.onChanged.addListener(handleStorageChange);
+    
+    // Cleanup listener on unmount
+    return () => {
+      browserAPI.storage.onChanged.removeListener(handleStorageChange);
+    };
   }, []);
 
   const formatNumber = (value: string | number) => {
@@ -105,11 +183,15 @@ function App() {
     if (!userAddress) return;
     
     setIsLoading(prev => ({ ...prev, [userAddress]: true }));
+    // Clear any previous errors for this address
+    setErrors(prev => ({ ...prev, [userAddress]: '' }));
+    setGlobalError('');
+    
     try {
       const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
       
       const poolContract = new ethers.Contract(
-        '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
+        contractAddress,
         POOL_ABI,
         provider
       );
@@ -132,8 +214,31 @@ function App() {
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
+      
+      // Set specific error for this address
+      let errorMessage = 'Failed to load data';
+      
+      // Check for specific error types
+      if (error instanceof Error) {
+        if (error.message.includes('call revert exception')) {
+          errorMessage = 'Contract call failed. Invalid contract address or network issue.';
+          // Also set global error if this is the first address with an error
+          if (!globalError) {
+            setGlobalError(`Contract error: Please check if the contract address (${contractAddress.substring(0, 6)}...${contractAddress.substring(contractAddress.length - 4)}) is valid for the current network.`);
+          }
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error. Please check your connection.';
+          if (!globalError) {
+            setGlobalError('Network error: Unable to connect to the RPC provider. Please check your connection or RPC URL.');
+          }
+        }
+      }
+      
+      setErrors(prev => ({ ...prev, [userAddress]: errorMessage }));
+      
       if (userAddress === starredAddress) {
-        browserAPI.action.setBadgeText({ text: '' });
+        browserAPI.action.setBadgeText({ text: 'ERR' });
+        browserAPI.action.setBadgeBackgroundColor({ color: '#f44336' });
       }
     } finally {
       setIsLoading(prev => ({ ...prev, [userAddress]: false }));
@@ -165,6 +270,8 @@ function App() {
   };
 
   const refreshData = () => {
+    // Clear global error when refreshing
+    setGlobalError('');
     addresses.forEach((address) => {
       getUserData(address);
     });
@@ -183,6 +290,19 @@ function App() {
 
   return (
     <div className="App">
+      {globalError && (
+        <div className="global-error">
+          <div className="error-message">
+            {globalError}
+            <button 
+              className="close-error"
+              onClick={() => setGlobalError('')}
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
       <div className="input-container">
         <div className="input-with-button">
           <input
@@ -218,13 +338,29 @@ function App() {
           onClick={togglePrivacyMode}
           style={{ cursor: 'pointer', width: '20px', height: '20px' }}
         />
-        <img 
-          src="../public/assets/settings.svg" 
-          alt="Options" 
-          className="options-icon invert-color"
-          onClick={() => browserAPI.runtime.openOptionsPage()}
-          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
-        />
+        <div className="options-container">
+          <img 
+            src="../public/assets/settings.svg" 
+            alt="Options" 
+            className="options-icon invert-color"
+            onClick={() => browserAPI.runtime.openOptionsPage()}
+            style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+          />
+        </div>
+        {showContractInput && (
+          <div className="contract-input" style={{ marginTop: '10px' }}>
+            <input
+              type="text"
+              placeholder="Contract Address"
+              value={contractAddress}
+              onChange={(e) => {
+                setContractAddress(e.target.value);
+                browserAPI.storage.local.set({ contractAddress: e.target.value });
+              }}
+              style={{ width: '100%', padding: '5px' }}
+            />
+          </div>
+        )}
       </div>
 
       <div className="addresses-container">
@@ -232,6 +368,33 @@ function App() {
           <div key={address} className="address-data">
             {isLoading[address] ? (
               <div className="loading">Loading...</div>
+            ) : errors[address] ? (
+              <div className="error-container">
+                <div className="address-header">
+                  <span className="address-value">{address}</span>
+                  <div className="address-actions">
+                    <button 
+                      className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                      onClick={() => toggleStar(address)}
+                    >
+                      {starredAddress === address ? '★' : '☆'}
+                    </button>
+                    <button 
+                      className="remove-button"
+                      onClick={() => removeAddress(address)}
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <div className="error-message">{errors[address]}</div>
+                <button 
+                  className="retry-button"
+                  onClick={() => getUserData(address)}
+                >
+                  Retry
+                </button>
+              </div>
             ) : userData[address] && (
               <div className="container">
                 <div className="address-header">
