@@ -1,7 +1,6 @@
 /// <reference types="chrome"/>
 import 'reflect-metadata';
 import './App.css';
-import { formatUnits } from '@ethersproject/units';
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import browserAPI from './utils/browserAPI';
@@ -33,10 +32,11 @@ function App() {
   const [contractAddress, setContractAddress] = useState('0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2');
   const [showContractInput, setShowContractInput] = useState(false);
   const [showNetworkSelector, setShowNetworkSelector] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
-    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress', 'selectedNetwork']).then(result => {
+    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress', 'selectedNetwork', 'theme']).then(result => {
       if (result.savedAddresses) {
         // Convert old format to new format if needed
         if (Array.isArray(result.savedAddresses) && result.savedAddresses.length > 0 && typeof result.savedAddresses[0] === 'string') {
@@ -67,6 +67,9 @@ function App() {
       if (result.contractAddress) {
         setContractAddress(result.contractAddress);
       }
+      if (result.theme) {
+        setTheme(result.theme);
+      }
       
       // If addresses exist, fetch data for them
       if (result.savedAddresses && result.savedAddresses.length > 0) {
@@ -94,6 +97,11 @@ function App() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
+  
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
   
   // Handle visibility change (popup opened)
   const handleVisibilityChange = () => {
@@ -126,6 +134,9 @@ function App() {
       }
       if (changes.selectedNetwork) {
         setSelectedNetwork(changes.selectedNetwork.newValue);
+      }
+      if (changes.theme) {
+        setTheme(changes.theme.newValue);
       }
     };
 
@@ -220,7 +231,7 @@ function App() {
         throw new Error(`Network configuration not found for ${networkKey}`);
       }
       
-      const provider = new ethers.providers.JsonRpcProvider(networkConfig.defaultRpcUrl);
+      const provider = new ethers.JsonRpcProvider(networkConfig.defaultRpcUrl);
       
       const poolContract = new ethers.Contract(
         networkConfig.contractAddress,
@@ -230,12 +241,12 @@ function App() {
 
       const data = await poolContract.getUserAccountData(userAddress);
       const formatted = {
-        totalCollateral: formatUnits(data.totalCollateralBase, 8),
-        totalDebt: formatUnits(data.totalDebtBase, 8),
-        availableBorrows: formatUnits(data.availableBorrowsBase, 8),
-        liquidationThreshold: formatUnits(data.currentLiquidationThreshold, 2),
-        ltv: formatUnits(data.ltv, 2),
-        healthFactor: formatUnits(data.healthFactor, 18),
+        totalCollateral: ethers.formatUnits(data.totalCollateralBase, 8),
+        totalDebt: ethers.formatUnits(data.totalDebtBase, 8),
+        availableBorrows: ethers.formatUnits(data.availableBorrowsBase, 8),
+        liquidationThreshold: ethers.formatUnits(data.currentLiquidationThreshold, 2),
+        ltv: ethers.formatUnits(data.ltv, 2),
+        healthFactor: ethers.formatUnits(data.healthFactor, 18),
         network: networkKey
       };
       
@@ -327,6 +338,18 @@ function App() {
   // Get network symbol
   const getNetworkSymbol = (networkKey: string): string => {
     return networks[networkKey]?.nativeCurrency.symbol || 'ETH';
+  };
+
+  // Truncate address for display
+  const truncateAddress = (address: string): string => {
+    if (!address) return '';
+    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    browserAPI.storage.local.set({ theme: newTheme });
   };
 
   return (
@@ -421,7 +444,9 @@ function App() {
                 <div className="error-container">
                   <div className="address-header">
                     <div className="address-info">
-                      <span className="address-value">{address}</span>
+                      <span className="address-value truncated-address" title={address}>
+                        {truncateAddress(address)}
+                      </span>
                       <div className="network-badge">
                         <select
                           value={network}
@@ -468,7 +493,9 @@ function App() {
                 <div className="container">
                   <div className="address-header">
                     <div className="address-info">
-                      <span className="address-value">{address}</span>
+                      <span className="address-value truncated-address" title={address}>
+                        {truncateAddress(address)}
+                      </span>
                       <div className="network-badge">
                         <select
                           value={userData[address].network || network}

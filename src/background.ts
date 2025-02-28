@@ -34,7 +34,7 @@ async function updateHealthFactor() {
     }
 
     // Use network-specific RPC provider and contract address
-    const provider = new ethers.providers.JsonRpcProvider(networkConfig.defaultRpcUrl);
+    const provider = new ethers.JsonRpcProvider(networkConfig.defaultRpcUrl);
     const poolContract = new ethers.Contract(
       networkConfig.contractAddress,
       POOL_ABI,
@@ -42,8 +42,8 @@ async function updateHealthFactor() {
     );
 
     const data = await poolContract.getUserAccountData(starredAddress);
-    const healthFactor = ethers.utils.formatUnits(data.healthFactor, 18);
-    const totalDebt = ethers.utils.formatUnits(data.totalDebtBase, 8);
+    const healthFactor = ethers.formatUnits(data.healthFactor, 18);
+    const totalDebt = ethers.formatUnits(data.totalDebtBase, 8);
 
     // Check for no debt
     if (parseFloat(totalDebt) === 0) {

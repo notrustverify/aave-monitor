@@ -1,3 +1,46 @@
+/* Theme variables */
+:root {
+  /* Dark theme (default) */
+  --bg-primary: linear-gradient(135deg, #121212 0%, #1e1e1e 50%, #121212 100%);
+  --bg-secondary: rgba(0, 0, 0, 0.4);
+  --text-primary: white;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --button-bg: rgba(107, 0, 128, 0.2);
+  --button-border: rgba(107, 0, 128, 0.3);
+  --button-hover-bg: rgba(107, 0, 128, 0.3);
+  --button-hover-border: rgba(107, 0, 128, 0.4);
+  --health-safe-bg: rgba(76, 175, 80, 0.2);
+  --health-safe-color: #4CAF50;
+  --health-warning-bg: rgba(255, 152, 0, 0.2);
+  --health-warning-color: #ffa726;
+  --health-danger-bg: rgba(244, 67, 54, 0.2);
+  --health-danger-color: #f44336;
+  --icon-filter: invert(1);
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg-primary: linear-gradient(135deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%);
+  --bg-secondary: rgba(240, 240, 240, 0.8);
+  --text-primary: #333333;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.05);
+  --button-bg: rgba(107, 0, 128, 0.1);
+  --button-border: rgba(107, 0, 128, 0.2);
+  --button-hover-bg: rgba(107, 0, 128, 0.2);
+  --button-hover-border: rgba(107, 0, 128, 0.3);
+  --health-safe-bg: rgba(76, 175, 80, 0.1);
+  --health-safe-color: #2E7D32;
+  --health-warning-bg: rgba(255, 152, 0, 0.1);
+  --health-warning-color: #E65100;
+  --health-danger-bg: rgba(244, 67, 54, 0.1);
+  --health-danger-color: #C62828;
+  --icon-filter: invert(0);
+}
+
 /* Reset default margins and padding */
 body, html {
   margin: 0;
@@ -13,19 +56,14 @@ body, html {
 }
 
 .App {
-  color: white;
+  color: var(--text-primary);
   text-align: center;
   width: 400px;
   height: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(
-    135deg,
-    #121212 0%,
-    #1e1e1e 50%,
-    #121212 100%
-  );
+  background: var(--bg-primary);
   padding: 1rem;
   box-sizing: border-box;
   margin: 0;  /* Ensure no margin on App */
@@ -33,9 +71,9 @@ body, html {
 
 .container {
   width: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--bg-secondary);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   padding: 0.4rem;
   box-sizing: border-box;
   margin-bottom: 0.5rem;
@@ -60,9 +98,9 @@ body, html {
   flex: 1;
   padding: 8px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
   height: 100%;
   box-sizing: border-box;
 }
@@ -73,9 +111,9 @@ body, html {
 }
 
 .add-button {
-  background: rgba(107, 0, 128, 0.2);
-  border: 1px solid rgba(107, 0, 128, 0.3);
-  color: white;
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  color: var(--text-primary);
   padding: 8px 10px;
   border-radius: 4px;
   cursor: pointer;
@@ -88,17 +126,17 @@ body, html {
 }
 
 .add-button:hover {
-  background: rgba(107, 0, 128, 0.3);
-  border-color: rgba(107, 0, 128, 0.4);
+  background: var(--button-hover-bg);
+  border-color: var(--button-hover-border);
 }
 
 input {
   width: 100%;
   padding: 0.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 0.4rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: white;
+  background: var(--input-bg);
+  color: var(--text-primary);
   font-size: 0.8rem;
   box-sizing: border-box; /* Include padding in width calculation */
 }
@@ -110,13 +148,13 @@ input:focus {
 }
 
 .data-container {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--bg-secondary);
   border-radius: 1rem;
   padding: 1.5rem;
   width: 100%;
   max-width: 500px;
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   box-shadow: 
     0 4px 24px -1px rgba(0, 0, 0, 0.3),
     0 0 1px 0 rgba(255, 255, 255, 0.1) inset;
@@ -127,7 +165,7 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   padding: 0.35rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
   width: 100%;
 }
 
@@ -136,7 +174,7 @@ input:focus {
 }
 
 .label {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   font-size: 0.75rem;
   text-align: left;
   flex: 1;
@@ -150,6 +188,7 @@ input:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .health-factor {
@@ -163,18 +202,18 @@ input:focus {
 }
 
 .health-factor.safe {
-  background: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
+  background: var(--health-safe-bg);
+  color: var(--health-safe-color);
 }
 
 .health-factor.warning {
-  background: rgba(255, 152, 0, 0.2);
-  color: #ffa726;
+  background: var(--health-warning-bg);
+  color: var(--health-warning-color);
 }
 
 .health-factor.danger {
-  background: rgba(244, 67, 54, 0.2);
-  color: #f44336;
+  background: var(--health-danger-bg);
+  color: var(--health-danger-color);
 }
 
 .addresses-container {
@@ -207,7 +246,7 @@ input:focus {
 .address-value {
   font-size: 14px;
   font-weight: 500;
-  color: white;
+  color: var(--text-primary);
   margin-right: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -221,9 +260,9 @@ input:focus {
 .network-select-badge {
   padding: 2px 12px 2px 4px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-primary);
   font-size: 10px;
   appearance: none;
   background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -237,20 +276,24 @@ input:focus {
   text-overflow: ellipsis;
 }
 
+[data-theme="light"] .network-select-badge {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
 .network-select-badge:focus {
   outline: none;
   border-color: #6b0080;
 }
 
 .network-select-badge option {
-  background-color: #1e1e1e;
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 .remove-button {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   font-size: 1.2rem;
   cursor: pointer;
   padding: 0.2rem 0.5rem;
@@ -258,8 +301,8 @@ input:focus {
 }
 
 .remove-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.9);
+  background: var(--button-hover-bg);
+  color: var(--text-primary);
 }
 
 .address-actions {
@@ -283,7 +326,7 @@ input:focus {
 .options-button {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   text-decoration: underline;
   cursor: pointer;
   padding: 4px;
@@ -292,7 +335,7 @@ input:focus {
 }
 
 .options-button:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--text-primary);
 }
 
 /* Create a container for the action icons */
@@ -310,7 +353,7 @@ input:focus {
   cursor: pointer;
   opacity: 0.8;
   transition: opacity 0.2s;
-  filter: invert(1);
+  filter: var(--icon-filter);
 }
 
 .action-icon:hover {
@@ -331,15 +374,6 @@ input:focus {
 .icon-button img {
   width: 18px;
   height: 18px;
-  filter: invert(1);
-}
-
-.eye-icon {
-  filter: invert(1);
-}
-
-.options-icon {
-  filter: invert(1);
 }
 
 .global-error {
@@ -376,17 +410,17 @@ input:focus {
 }
 
 .error-container {
-  background-color: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
 }
 
 .retry-button {
-  background-color: rgba(76, 175, 80, 0.2);
+  background-color: var(--health-safe-bg);
   border: 1px solid rgba(76, 175, 80, 0.3);
-  color: #4CAF50;
+  color: var(--health-safe-color);
   padding: 5px 10px;
   border-radius: 4px;
   cursor: pointer;
@@ -410,8 +444,8 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   padding: 8px 12px;
-  background-color: #2c3e50;
-  color: white;
+  background-color: var(--button-bg);
+  color: var(--text-primary);
   border-radius: 4px;
   cursor: pointer;
   font-weight: 500;
@@ -419,7 +453,7 @@ input:focus {
 }
 
 .network-selector-button:hover {
-  background-color: #34495e;
+  background-color: var(--button-hover-bg);
 }
 
 .dropdown-arrow {
@@ -432,7 +466,7 @@ input:focus {
   top: 100%;
   left: 0;
   right: 0;
-  background-color: #fff;
+  background-color: var(--bg-secondary);
   border-radius: 4px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 10;
@@ -445,15 +479,15 @@ input:focus {
   padding: 10px 12px;
   cursor: pointer;
   transition: background-color 0.2s;
-  color: #333;
+  color: var(--text-primary);
 }
 
 .network-option:hover {
-  background-color: #f5f5f5;
+  background-color: var(--button-hover-bg);
 }
 
 .network-option.selected {
-  background-color: #e3f2fd;
+  background-color: var(--button-bg);
   font-weight: 500;
 }
 
@@ -467,9 +501,9 @@ input:focus {
   height: 100%;
   padding: 8px 20px 8px 10px;
   border-radius: 4px;
-  border: 1px solid rgba(107, 0, 128, 0.3);
-  background-color: rgba(107, 0, 128, 0.2);
-  color: white;
+  border: 1px solid var(--button-border);
+  background-color: var(--button-bg);
+  color: var(--text-primary);
   font-size: 12px;
   font-weight: 500;
   appearance: none;
@@ -483,18 +517,81 @@ input:focus {
   box-sizing: border-box;
 }
 
+[data-theme="light"] .network-select-small {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
 .network-select-small:focus {
   outline: none;
   border-color: #6b0080;
 }
 
 .network-select-small:hover {
-  background-color: rgba(107, 0, 128, 0.3);
+  background-color: var(--button-hover-bg);
 }
 
 .network-select-small option {
-  background-color: #1e1e1e;
-  color: white;
-  text-align: center;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 5px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--button-hover-bg);
+}
+
+/* Loading spinner */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: var(--text-secondary);
+}
+
+.loading::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  margin-left: 10px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Truncated address style */
+.truncated-address {
+  font-family: monospace;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 

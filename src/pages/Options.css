@@ -1,15 +1,49 @@
+/* Theme variables */
+:root {
+  /* Dark theme (default) */
+  --bg-primary: linear-gradient(135deg, #121212 0%, #1e1e1e 50%, #121212 100%);
+  --bg-secondary: rgba(0, 0, 0, 0.4);
+  --text-primary: white;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --button-bg: rgba(107, 0, 128, 0.8);
+  --button-hover-bg: rgba(107, 0, 128, 1);
+  --button-border: rgba(107, 0, 128, 0.3);
+  --section-bg: rgba(0, 0, 0, 0.2);
+  --success-bg: rgba(76, 175, 80, 0.2);
+  --success-color: #4CAF50;
+  --danger-bg: rgba(244, 67, 54, 0.8);
+  --danger-hover-bg: rgba(244, 67, 54, 1);
+  --dropdown-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --bg-primary: linear-gradient(135deg, #f5f5f5 0%, #ffffff 50%, #f5f5f5 100%);
+  --bg-secondary: rgba(240, 240, 240, 0.8);
+  --text-primary: #333333;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.05);
+  --button-bg: rgba(107, 0, 128, 0.7);
+  --button-hover-bg: rgba(107, 0, 128, 0.9);
+  --button-border: rgba(107, 0, 128, 0.2);
+  --section-bg: rgba(240, 240, 240, 0.8);
+  --success-bg: rgba(76, 175, 80, 0.1);
+  --success-color: #2E7D32;
+  --danger-bg: rgba(244, 67, 54, 0.7);
+  --danger-hover-bg: rgba(244, 67, 54, 0.9);
+  --dropdown-arrow: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+}
+
 body, html {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    135deg,
-    #121212 0%,
-    #1e1e1e 50%,
-    #121212 100%
-  );
-  color: white;
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
@@ -18,42 +52,66 @@ body, html {
 }
 
 .options-container {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  color: white;
+  padding: 2rem;
+  color: var(--text-primary);
 }
 
 h1 {
-  color: white;
+  color: var(--text-primary);
   margin-bottom: 30px;
   font-size: 24px;
   font-weight: 500;
+  text-align: center;
+}
+
+h2 {
+  color: var(--text-primary);
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 18px;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.settings-section, .theme-section {
+  margin-bottom: 2rem;
+  background: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
 }
 
 .setting-group {
   margin-bottom: 25px;
   padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.setting-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 label {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;
-  color: white;
+  color: var(--text-primary);
   font-size: 14px;
 }
 
 input, select {
   width: 100%;
   padding: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
   margin-top: 5px;
-  background-color: rgba(255, 255, 255, 0.05);
-  color: white;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
 }
 
 input:focus, select:focus {
@@ -63,7 +121,7 @@ input:focus, select:focus {
 }
 
 button {
-  background-color: #6b0080;
+  background-color: var(--button-bg);
   color: white;
   border: none;
   padding: 12px 20px;
@@ -74,76 +132,62 @@ button {
 }
 
 button:hover {
-  background-color: #8a00a3;
+  background-color: var(--button-hover-bg);
 }
 
 .status-message {
   margin-top: 20px;
   padding: 10px;
   border-radius: 4px;
-  background-color: rgba(76, 175, 80, 0.2);
-  color: #4CAF50;
+  background-color: var(--success-bg);
+  color: var(--success-color);
   text-align: center;
 }
 
-.setting-description {
+.setting-description, .help-text {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
   margin-top: 5px;
 }
 
 .button-group {
-  margin-top: 10px;
-}
-
-.reset-button {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  padding: 8px 15px;
-  font-size: 14px;
-}
-
-.reset-button:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Actions container for save and reset all buttons */
-.actions-container {
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+  gap: 15px;
 }
 
 .save-button {
-  background-color: #6b0080;
   flex: 1;
-  margin-right: 10px;
+  background-color: var(--button-bg);
 }
 
-.reset-all-button {
-  background-color: rgba(244, 67, 54, 0.8);
+.save-button:hover {
+  background-color: var(--button-hover-bg);
+}
+
+.reset-button {
+  flex: 1;
+  background-color: var(--danger-bg);
   color: white;
-  flex: 1;
-  margin-left: 10px;
 }
 
-.reset-all-button:hover {
-  background-color: rgba(244, 67, 54, 1);
+.reset-button:hover {
+  background-color: var(--danger-hover-bg);
 }
 
 /* Network selector styles */
 .network-select {
-  background-color: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 10px;
   width: 100%;
   font-size: 14px;
-  color: white;
+  color: var(--text-primary);
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-image: var(--dropdown-arrow);
   background-repeat: no-repeat;
   background-position: right 10px top 50%;
   background-size: 12px auto;
@@ -155,7 +199,89 @@ button:hover {
 }
 
 .network-select option {
-  background-color: #1e1e1e;
-  color: white;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   padding: 10px;
+}
+
+/* Theme toggle styling */
+.theme-toggle-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.theme-toggle-container label {
+  margin-right: 1rem;
+  font-weight: 500;
+  min-width: 120px;
+  margin-bottom: 0;
+}
+
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.theme-label {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.theme-toggle-button {
+  width: 60px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: var(--button-bg);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  overflow: hidden;
+}
+
+.theme-toggle-button::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: white;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.3s;
+  z-index: 1;
+}
+
+.theme-toggle-button.light::after {
+  transform: translateX(30px);
+}
+
+.theme-toggle-button .toggle-icon {
+  color: white;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-button .toggle-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: white;
+  stroke-width: 2px;
+}
+
+.theme-toggle-button .sun-icon {
+  margin-right: 5px;
+}
+
+.theme-toggle-button .moon-icon {
+  margin-left: 5px;
 } 

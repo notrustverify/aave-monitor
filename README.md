@@ -1,5 +1,5 @@
 # Aave Health Factor Extension
-A browser extension to monitor Aave health factors for multiple addresses. Compatible with both Chrome and Firefox.
+Monitor Aave health factor
 
 Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
 
@@ -8,14 +8,13 @@ Features:
 * Starred Address: Highlight a specific address to monitor its health factor directly from your browser's toolbar.
 * Badge Notifications: Get visual alerts on your browser's badge for quick insights into your account's health status.
 * Easy Management: Add or remove Ethereum addresses with a simple interface, and save your preferences directly in your browser.
-* Customizable RPC Provider: Set your preferred Ethereum RPC provider for fetching data.
-* Privacy Mode: Option to hide the extension icon and badge when not in use.
-* Separator: Option to set the separator for the extension.
+Customizable RPC Provider: Set your preferred Ethereum RPC provider for fetching data.
+* Monitor your Aave positions across multiple networks: supporting Ethereum, Gnosis, Arbitrum, etc
 
 How It Works:
 1. Add Addresses: Enter Ethereum addresses to monitor their Aave account data.
 2. Star an Address: Click the star icon to set an address as your primary focus, and receive badge updates for its health factor.
-3. Monitor Health Factor: The badge color changes based on the health factor, alerting you to potential risks:
+Monitor Health Factor: The badge color changes based on the health factor, alerting you to potential risks:
 * Green: Healthy (> 2)
 * Orange: Warning (1 - 2)
 * Red: Danger (< 1)
@@ -28,6 +27,7 @@ Why Use Aave Health Factor?
 
 Get Started:
 Install the Aave Account Monitor extension today and take control of your Aave account management with ease and confidence.
+
 
 ## Requirements
 
