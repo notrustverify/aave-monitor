@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import browserAPI from './utils/browserAPI';
+import networks from './config/networks';
 
 const POOL_ABI = [
   "function getUserAccountData(address user) external view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)"
@@ -7,12 +8,35 @@ const POOL_ABI = [
 
 async function updateHealthFactor() {
   try {
-    const { starredAddress, rpcProvider } = await browserAPI.storage.local.get(['starredAddress', 'rpcProvider']);
+    // Get starred address and its associated network
+    const { savedAddresses, starredAddress } = await browserAPI.storage.local.get(['savedAddresses', 'starredAddress']);
     if (!starredAddress) return;
 
-    const provider = new ethers.providers.JsonRpcProvider(rpcProvider || 'https://eth.public-rpc.com');
+    // Find the network for the starred address
+    let networkKey = 'ethereum'; // Default to Ethereum
+    if (savedAddresses && Array.isArray(savedAddresses)) {
+      // Check if using new format (objects with address and network)
+      if (savedAddresses.length > 0 && typeof savedAddresses[0] === 'object') {
+        const addressData = savedAddresses.find(item => item.address === starredAddress);
+        if (addressData && addressData.network) {
+          networkKey = addressData.network;
+        }
+      }
+    }
+
+    // Get network configuration
+    const networkConfig = networks[networkKey];
+    if (!networkConfig) {
+      console.error(`Network configuration not found for ${networkKey}`);
+      browserAPI.action.setBadgeText({ text: 'ERR' });
+      browserAPI.action.setBadgeBackgroundColor({ color: '#f44336' });
+      return;
+    }
+
+    // Use network-specific RPC provider and contract address
+    const provider = new ethers.providers.JsonRpcProvider(networkConfig.defaultRpcUrl);
     const poolContract = new ethers.Contract(
-      '0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2',
+      networkConfig.contractAddress,
       POOL_ABI,
       provider
     );
@@ -28,7 +52,7 @@ async function updateHealthFactor() {
       return;
     }
 
-    console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2), rpcProvider);
+    console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2), networkConfig.defaultRpcUrl, networkKey);
     // Update badge
     let color = '#4CAF50';
     if (parseFloat(healthFactor) < 1) {
@@ -40,7 +64,8 @@ async function updateHealthFactor() {
     browserAPI.action.setBadgeBackgroundColor({ color });
   } catch (error) {
     console.error('Error updating health factor:', error);
-    browserAPI.action.setBadgeText({ text: '' });
+    browserAPI.action.setBadgeText({ text: 'ERR' });
+    browserAPI.action.setBadgeBackgroundColor({ color: '#f44336' });
   }
 }
 
@@ -77,13 +102,13 @@ setupHealthCheck();
 // Add storage change listener
 browserAPI.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'local') {
-    if (changes.starredAddress) {
+    if (changes.starredAddress || changes.savedAddresses) {
       // If starred address was cleared, clear the badge
-      if (!changes.starredAddress.newValue) {
+      if (changes.starredAddress && !changes.starredAddress.newValue) {
         browserAPI.action.setBadgeText({ text: '' });
         return;
       }
-      // Update health factor for the new starred address
+      // Update health factor for the new starred address or if networks changed
       updateHealthFactor();
     }
     

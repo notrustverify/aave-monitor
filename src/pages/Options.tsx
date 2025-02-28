@@ -134,7 +134,7 @@ function Options() {
     <div className="options-container">
       <h1>Settings</h1>
       
-      <div className="setting-group">
+     {/* <div className="setting-group">
         <label>
           Network:
           <select 
@@ -152,7 +152,7 @@ function Options() {
         <p className="setting-description">
           Select the network to monitor Aave positions on.
         </p>
-      </div>
+      </div>*/}
 
       <div className="setting-group">
         <label>
@@ -167,7 +167,7 @@ function Options() {
         </label>
       </div>
 
-      <div className="setting-group">
+     {/*<div className="setting-group">
         <label>
           RPC Provider URL:
           <input
@@ -207,7 +207,7 @@ function Options() {
             Reset to Network Defaults
           </button>
         </div>
-      </div>
+      </div>*/}
 
       <div className="setting-group">
         <label>

@@ -5,33 +5,52 @@ import { formatUnits } from '@ethersproject/units';
 import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import browserAPI from './utils/browserAPI';
+import networks, { NetworkConfig, getAllNetworks } from './config/networks';
 
 // Aave Pool ABI - only the function we need
 const POOL_ABI = [
   "function getUserAccountData(address user) external view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)"
 ];
 
+// Interface for address data including network
+interface AddressData {
+  address: string;
+  network: string;
+}
+
 function App() {
-  const [addresses, setAddresses] = useState<string[]>([]);
+  const [addresses, setAddresses] = useState<AddressData[]>([]);
   const [userData, setUserData] = useState<{[key: string]: any}>({});
   const [isLoading, setIsLoading] = useState<{[key: string]: boolean}>({});
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [globalError, setGlobalError] = useState<string>('');
   const [starredAddress, setStarredAddress] = useState<string>('');
   const [newAddress, setNewAddress] = useState<string>('');
+  const [selectedNetwork, setSelectedNetwork] = useState<string>('ethereum');
   const [rpcProvider, setRpcProvider] = useState('https://eth.public-rpc.com');
   const [privacyMode, setPrivacyMode] = useState(false);
   const [locale, setLocale] = useState(navigator.language);
   const [contractAddress, setContractAddress] = useState('0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2');
   const [showContractInput, setShowContractInput] = useState(false);
+  const [showNetworkSelector, setShowNetworkSelector] = useState(false);
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
-    let previousContractAddress = contractAddress;
-    
-    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress']).then(result => {
+    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress', 'selectedNetwork']).then(result => {
       if (result.savedAddresses) {
-        setAddresses(result.savedAddresses);
+        // Convert old format to new format if needed
+        if (Array.isArray(result.savedAddresses) && result.savedAddresses.length > 0 && typeof result.savedAddresses[0] === 'string') {
+          const defaultNetwork = result.selectedNetwork || 'ethereum';
+          const convertedAddresses = result.savedAddresses.map((addr: string) => ({
+            address: addr,
+            network: defaultNetwork
+          }));
+          setAddresses(convertedAddresses);
+          // Save the converted format back to storage
+          browserAPI.storage.local.set({ savedAddresses: convertedAddresses });
+        } else {
+          setAddresses(result.savedAddresses);
+        }
       }
       if (result.starredAddress) {
         setStarredAddress(result.starredAddress);
@@ -42,31 +61,26 @@ function App() {
       if (result.locale) {
         setLocale(result.locale);
       }
+      if (result.selectedNetwork) {
+        setSelectedNetwork(result.selectedNetwork);
+      }
       if (result.contractAddress) {
-        // Check if contract address has changed
-        const contractChanged = previousContractAddress !== result.contractAddress;
         setContractAddress(result.contractAddress);
-        
-        // If addresses exist, fetch data for them
-        if (result.savedAddresses && result.savedAddresses.length > 0) {
-          // If contract changed, refresh all data
-          if (contractChanged) {
-            console.log('Contract address changed, refreshing all data');
-            result.savedAddresses.forEach((addr: string) => {
-              getUserData(addr);
-            });
-          } else {
-            // Otherwise, just load data normally
-            result.savedAddresses.forEach((addr: string) => {
-              getUserData(addr);
-            });
-          }
-        }
-      } else {
-        // If no contract address in storage, fetch data with default
-        if (result.savedAddresses) {
+      }
+      
+      // If addresses exist, fetch data for them
+      if (result.savedAddresses && result.savedAddresses.length > 0) {
+        // Handle both old and new address format
+        if (typeof result.savedAddresses[0] === 'string') {
+          // Old format
+          const defaultNetwork = result.selectedNetwork || 'ethereum';
           result.savedAddresses.forEach((addr: string) => {
-            getUserData(addr);
+            getUserData(addr, defaultNetwork);
+          });
+        } else {
+          // New format with network
+          result.savedAddresses.forEach((addrData: AddressData) => {
+            getUserData(addrData.address, addrData.network);
           });
         }
       }
@@ -84,15 +98,8 @@ function App() {
   // Handle visibility change (popup opened)
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
-      console.log('Popup opened, checking contract address');
-      // Check if contract address has changed while popup was closed
-      browserAPI.storage.local.get('contractAddress', (result) => {
-        if (result.contractAddress && result.contractAddress !== contractAddress) {
-          console.log('Contract address changed while popup was closed');
-          setContractAddress(result.contractAddress);
-          refreshData();
-        }
-      });
+      console.log('Popup opened, refreshing data');
+      refreshData();
     }
   };
 
@@ -116,8 +123,9 @@ function App() {
       }
       if (changes.contractAddress) {
         setContractAddress(changes.contractAddress.newValue);
-        // Refresh data when contract address changes
-        refreshData();
+      }
+      if (changes.selectedNetwork) {
+        setSelectedNetwork(changes.selectedNetwork.newValue);
       }
     };
 
@@ -153,16 +161,22 @@ function App() {
   };
 
   const addAddress = async () => {
-    if (!newAddress || addresses.includes(newAddress)) return;
+    if (!newAddress || addresses.some(a => a.address === newAddress)) return;
     
-    const updatedAddresses = [...addresses, newAddress];
+    const newAddressData = {
+      address: newAddress,
+      network: selectedNetwork
+    };
+    
+    const updatedAddresses = [...addresses, newAddressData];
     setAddresses(updatedAddresses);
     await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
-    getUserData(newAddress);
+    getUserData(newAddress, selectedNetwork);
+    setNewAddress('');
   };
 
   const removeAddress = async (addressToRemove: string) => {
-    const updatedAddresses = addresses.filter(addr => addr !== addressToRemove);
+    const updatedAddresses = addresses.filter(a => a.address !== addressToRemove);
     setAddresses(updatedAddresses);
     await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
     
@@ -179,7 +193,19 @@ function App() {
     }
   };
 
-  const getUserData = async (userAddress: string) => {
+  const updateAddressNetwork = async (address: string, newNetwork: string) => {
+    const updatedAddresses = addresses.map(a => 
+      a.address === address ? { ...a, network: newNetwork } : a
+    );
+    
+    setAddresses(updatedAddresses);
+    await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
+    
+    // Refresh data for this address with the new network
+    getUserData(address, newNetwork);
+  };
+
+  const getUserData = async (userAddress: string, networkKey: string = 'ethereum') => {
     if (!userAddress) return;
     
     setIsLoading(prev => ({ ...prev, [userAddress]: true }));
@@ -188,10 +214,16 @@ function App() {
     setGlobalError('');
     
     try {
-      const provider = new ethers.providers.JsonRpcProvider(rpcProvider);
+      // Get network configuration
+      const networkConfig = networks[networkKey];
+      if (!networkConfig) {
+        throw new Error(`Network configuration not found for ${networkKey}`);
+      }
+      
+      const provider = new ethers.providers.JsonRpcProvider(networkConfig.defaultRpcUrl);
       
       const poolContract = new ethers.Contract(
-        contractAddress,
+        networkConfig.contractAddress,
         POOL_ABI,
         provider
       );
@@ -203,7 +235,8 @@ function App() {
         availableBorrows: formatUnits(data.availableBorrowsBase, 8),
         liquidationThreshold: formatUnits(data.currentLiquidationThreshold, 2),
         ltv: formatUnits(data.ltv, 2),
-        healthFactor: formatUnits(data.healthFactor, 18)
+        healthFactor: formatUnits(data.healthFactor, 18),
+        network: networkKey
       };
       
       setUserData(prev => ({ ...prev, [userAddress]: formatted }));
@@ -222,15 +255,12 @@ function App() {
       if (error instanceof Error) {
         if (error.message.includes('call revert exception')) {
           errorMessage = 'Contract call failed. Invalid contract address or network issue.';
-          // Also set global error if this is the first address with an error
-          if (!globalError) {
-            setGlobalError(`Contract error: Please check if the contract address (${contractAddress.substring(0, 6)}...${contractAddress.substring(contractAddress.length - 4)}) is valid for the current network.`);
-          }
         } else if (error.message.includes('network')) {
           errorMessage = 'Network error. Please check your connection.';
-          if (!globalError) {
-            setGlobalError('Network error: Unable to connect to the RPC provider. Please check your connection or RPC URL.');
-          }
+        } else if (error.message.includes('Network configuration not found')) {
+          errorMessage = `Network configuration not found for ${networkKey}`;
+        } else {
+          errorMessage = error.message;
         }
       }
       
@@ -272,8 +302,8 @@ function App() {
   const refreshData = () => {
     // Clear global error when refreshing
     setGlobalError('');
-    addresses.forEach((address) => {
-      getUserData(address);
+    addresses.forEach((addressData) => {
+      getUserData(addressData.address, addressData.network);
     });
   };
 
@@ -286,6 +316,17 @@ function App() {
 
   const formatAmount = (amount: string) => {
     return privacyMode ? '****' : formatNumber(amount);
+  };
+
+  // Get network for an address
+  const getAddressNetwork = (address: string): string => {
+    const addressData = addresses.find(a => a.address === address);
+    return addressData ? addressData.network : 'ethereum';
+  };
+
+  // Get network symbol
+  const getNetworkSymbol = (networkKey: string): string => {
+    return networks[networkKey]?.nativeCurrency.symbol || 'ETH';
   };
 
   return (
@@ -303,6 +344,7 @@ function App() {
           </div>
         </div>
       )}
+      
       <div className="input-container">
         <div className="input-with-button">
           <input
@@ -316,6 +358,24 @@ function App() {
               }
             }}
           />
+          <div className="network-selector-small">
+            <select 
+              value={selectedNetwork}
+              onChange={(e) => setSelectedNetwork(e.target.value)}
+              className="network-select-small"
+              title={networks[selectedNetwork]?.name || 'Ethereum'}
+            >
+              {getAllNetworks().map(network => (
+                <option 
+                  key={network.chainId} 
+                  value={network.name.toLowerCase()}
+                  title={network.name}
+                >
+                  {network.nativeCurrency.symbol}
+                </option>
+              ))}
+            </select>
+          </div>
           <button 
             className="add-button"
             onClick={addAddress}
@@ -323,131 +383,161 @@ function App() {
             Add
           </button>
         </div>
-        <button 
-          className="refresh-button icon-button"
-          onClick={refreshData}
-          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
-
-        >
-          <img src="../public/assets/refresh.svg" alt="Refresh" />
-        </button>
-        <img 
-          src="../public/assets/eye.svg" 
-          alt="Toggle Privacy Mode" 
-          className="eye-icon"
-          onClick={togglePrivacyMode}
-          style={{ cursor: 'pointer', width: '20px', height: '20px' }}
-        />
-        <div className="options-container">
+        <div className="action-icons">
+          <img 
+            src="../public/assets/refresh.svg" 
+            alt="Refresh" 
+            className="action-icon"
+            onClick={refreshData}
+            title="Refresh data"
+          />
+          <img 
+            src="../public/assets/eye.svg" 
+            alt="Toggle Privacy Mode" 
+            className="action-icon"
+            onClick={togglePrivacyMode}
+            title="Toggle privacy mode"
+          />
           <img 
             src="../public/assets/settings.svg" 
             alt="Options" 
-            className="options-icon invert-color"
+            className="action-icon"
             onClick={() => browserAPI.runtime.openOptionsPage()}
-            style={{ cursor: 'pointer', width: '20px', height: '20px' }}
+            title="Settings"
           />
         </div>
-        {showContractInput && (
-          <div className="contract-input" style={{ marginTop: '10px' }}>
-            <input
-              type="text"
-              placeholder="Contract Address"
-              value={contractAddress}
-              onChange={(e) => {
-                setContractAddress(e.target.value);
-                browserAPI.storage.local.set({ contractAddress: e.target.value });
-              }}
-              style={{ width: '100%', padding: '5px' }}
-            />
-          </div>
-        )}
       </div>
 
       <div className="addresses-container">
-        {addresses.map(address => (
-          <div key={address} className="address-data">
-            {isLoading[address] ? (
-              <div className="loading">Loading...</div>
-            ) : errors[address] ? (
-              <div className="error-container">
-                <div className="address-header">
-                  <span className="address-value">{address}</span>
-                  <div className="address-actions">
-                    <button 
-                      className={`star-button ${starredAddress === address ? 'starred' : ''}`}
-                      onClick={() => toggleStar(address)}
-                    >
-                      {starredAddress === address ? '★' : '☆'}
-                    </button>
-                    <button 
-                      className="remove-button"
-                      onClick={() => removeAddress(address)}
-                    >
-                      ×
-                    </button>
+        {addresses.map(addressData => {
+          const address = addressData.address;
+          const network = addressData.network;
+          
+          return (
+            <div key={address} className="address-data">
+              {isLoading[address] ? (
+                <div className="loading">Loading...</div>
+              ) : errors[address] ? (
+                <div className="error-container">
+                  <div className="address-header">
+                    <div className="address-info">
+                      <span className="address-value">{address}</span>
+                      <div className="network-badge">
+                        <select
+                          value={network}
+                          onChange={(e) => updateAddressNetwork(address, e.target.value)}
+                          className="network-select-badge"
+                          title={networks[network]?.name || 'Ethereum'}
+                        >
+                          {getAllNetworks().map(net => (
+                            <option 
+                              key={net.chainId} 
+                              value={net.name.toLowerCase()}
+                              title={net.name}
+                            >
+                              {net.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="address-actions">
+                      <button 
+                        className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                        onClick={() => toggleStar(address)}
+                      >
+                        {starredAddress === address ? '★' : '☆'}
+                      </button>
+                      <button 
+                        className="remove-button"
+                        onClick={() => removeAddress(address)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                  <div className="error-message">{errors[address]}</div>
+                  <button 
+                    className="retry-button"
+                    onClick={() => getUserData(address, network)}
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : userData[address] && (
+                <div className="container">
+                  <div className="address-header">
+                    <div className="address-info">
+                      <span className="address-value">{address}</span>
+                      <div className="network-badge">
+                        <select
+                          value={userData[address].network || network}
+                          onChange={(e) => updateAddressNetwork(address, e.target.value)}
+                          className="network-select-badge"
+                          title={networks[userData[address].network || network]?.name || 'Ethereum'}
+                        >
+                          {getAllNetworks().map(net => (
+                            <option 
+                              key={net.chainId} 
+                              value={net.name.toLowerCase()}
+                              title={net.name}
+                            >
+                              {net.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="address-actions">
+                      <button 
+                        className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                        onClick={() => toggleStar(address)}
+                      >
+                        {starredAddress === address ? '★' : '☆'}
+                      </button>
+                      <button 
+                        className="remove-button"
+                        onClick={() => removeAddress(address)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </div>
+                  <div className="data-row">
+                    <span className="label">Total Collateral</span>
+                    <span className="value">$ {formatAmount(userData[address].totalCollateral)}</span>
+                  </div>
+                  <div className="data-row">
+                    <span className="label">Total Debt</span>
+                    <span className="value">$ {formatAmount(userData[address].totalDebt)}</span>
+                  </div>
+                  <div className="data-row">
+                    <span className="label">Available to Borrow</span>
+                    <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
+                  </div>
+                  <div className="data-row">
+                    <span className="label">Liquidation Threshold</span>
+                    <span className="value">{userData[address].liquidationThreshold}%</span>
+                  </div>
+                  <div className="data-row">
+                    <span className="label">LTV</span>
+                    <span className="value">{userData[address].ltv}%</span>
+                  </div>
+                  <div className={`health-factor ${
+                    parseFloat(userData[address].healthFactor) > 2 ? 'safe' : 
+                    parseFloat(userData[address].healthFactor) > 1 ? 'warning' : 'danger'
+                  }`}>
+                    Health Factor: {
+                      parseFloat(userData[address].totalDebt) === 0 
+                        ? "No debt"
+                        : formatNumber(userData[address].healthFactor)
+                    }
                   </div>
                 </div>
-                <div className="error-message">{errors[address]}</div>
-                <button 
-                  className="retry-button"
-                  onClick={() => getUserData(address)}
-                >
-                  Retry
-                </button>
-              </div>
-            ) : userData[address] && (
-              <div className="container">
-                <div className="address-header">
-                  <span className="address-value">{address}</span>
-                  <div className="address-actions">
-                    <button 
-                      className={`star-button ${starredAddress === address ? 'starred' : ''}`}
-                      onClick={() => toggleStar(address)}
-                    >
-                      {starredAddress === address ? '★' : '☆'}
-                    </button>
-                    <button 
-                      className="remove-button"
-                      onClick={() => removeAddress(address)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-                <div className="data-row">
-                  <span className="label">Total Collateral</span>
-                  <span className="value">$ {formatAmount(userData[address].totalCollateral)}</span>
-                </div>
-                <div className="data-row">
-                  <span className="label">Total Debt</span>
-                  <span className="value">$ {formatAmount(userData[address].totalDebt)}</span>
-                </div>
-                <div className="data-row">
-                  <span className="label">Available to Borrow</span>
-                  <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
-                </div>
-                <div className="data-row">
-                  <span className="label">Liquidation Threshold</span>
-                  <span className="value">{userData[address].liquidationThreshold}%</span>
-                </div>
-                <div className="data-row">
-                  <span className="label">LTV</span>
-                  <span className="value">{userData[address].ltv}%</span>
-                </div>
-                <div className={`health-factor ${
-                  parseFloat(userData[address].healthFactor) > 2 ? 'safe' : 
-                  parseFloat(userData[address].healthFactor) > 1 ? 'warning' : 'danger'
-                }`}>
-                  Health Factor: {
-                    parseFloat(userData[address].totalDebt) === 0 
-                      ? "No debt"
-                      : formatNumber(userData[address].healthFactor)
-                  }
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

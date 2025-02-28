@@ -36,41 +36,55 @@ body, html {
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.5rem;
-  box-sizing: border-box; /* Include padding in width calculation */
-  margin-bottom: 0.5rem; /* Add space at bottom */
+  padding: 0.4rem;
+  box-sizing: border-box;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
 }
 
 .input-container {
   display: flex;
   align-items: center;
-  justify-content: flex-start; /* Align items to the left */
-  gap: 8px; /* Add space between elements */
+  margin-bottom: 15px;
   width: 100%;
-  margin-bottom: 0.5rem;
-  box-sizing: border-box;
 }
 
 .input-with-button {
   display: flex;
-  gap: 8px;
-  width: 100%;
+  flex: 1;
+  align-items: center;
+  height: 32px; /* Set fixed height for consistent sizing */
 }
 
 .input-with-button input {
   flex: 1;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.input-with-button input:focus {
+  outline: none;
+  border-color: #6b0080;
 }
 
 .add-button {
   background: rgba(107, 0, 128, 0.2);
   border: 1px solid rgba(107, 0, 128, 0.3);
   color: white;
-  padding: 0.4rem 1rem;
-  border-radius: 0.4rem;
+  padding: 8px 10px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 12px;
+  font-weight: 500;
   transition: all 0.2s ease;
-  min-width: fit-content; /* Ensure button doesn't shrink */
+  min-width: 60px;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .add-button:hover {
@@ -180,16 +194,57 @@ input:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.address-info {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  overflow: hidden;
 }
 
 .address-value {
-  font-family: monospace;
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  margin-right: 8px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.network-badge {
+  display: inline-flex;
+  margin-left: 8px;
+}
+
+.network-select-badge {
+  padding: 2px 12px 2px 4px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 10px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px top 50%;
+  background-size: 6px auto;
+  cursor: pointer;
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.network-select-badge:focus {
+  outline: none;
+  border-color: #6b0080;
+}
+
+.network-select-badge option {
+  background-color: #1e1e1e;
+  color: white;
 }
 
 .remove-button {
@@ -240,6 +295,29 @@ input:focus {
   color: rgba(255, 255, 255, 0.9);
 }
 
+/* Create a container for the action icons */
+.action-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 10px;
+}
+
+/* Style for all action icons */
+.action-icon {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  filter: invert(1);
+}
+
+.action-icon:hover {
+  opacity: 1;
+}
+
+/* Remove old individual icon styles */
 .icon-button {
   background: transparent;
   border: none;
@@ -251,8 +329,8 @@ input:focus {
 }
 
 .icon-button img {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   filter: invert(1);
 }
 
@@ -377,5 +455,46 @@ input:focus {
 .network-option.selected {
   background-color: #e3f2fd;
   font-weight: 500;
+}
+
+/* Network selector styles for address input */
+.network-selector-small {
+  min-width: 60px;
+  margin: 0 5px;
+}
+
+.network-select-small {
+  height: 100%;
+  padding: 8px 20px 8px 10px;
+  border-radius: 4px;
+  border: 1px solid rgba(107, 0, 128, 0.3);
+  background-color: rgba(107, 0, 128, 0.2);
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23ffffff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 5px top 50%;
+  background-size: 8px auto;
+  cursor: pointer;
+  text-align: center;
+  width: 60px;
+  box-sizing: border-box;
+}
+
+.network-select-small:focus {
+  outline: none;
+  border-color: #6b0080;
+}
+
+.network-select-small:hover {
+  background-color: rgba(107, 0, 128, 0.3);
+}
+
+.network-select-small option {
+  background-color: #1e1e1e;
+  color: white;
+  text-align: center;
 }
 
