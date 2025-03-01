@@ -9,7 +9,18 @@ const POOL_ABI = [
 async function updateHealthFactor() {
   try {
     // Get starred address and its associated network
-    const { savedAddresses, starredAddress } = await browserAPI.storage.local.get(['savedAddresses', 'starredAddress']);
+    const { 
+      savedAddresses, 
+      starredAddress, 
+      warningThreshold = 2, 
+      dangerThreshold = 1 
+    } = await browserAPI.storage.local.get([
+      'savedAddresses', 
+      'starredAddress',
+      'warningThreshold',
+      'dangerThreshold'
+    ]);
+    
     if (!starredAddress) return;
 
     // Find the network for the starred address
@@ -55,9 +66,9 @@ async function updateHealthFactor() {
     console.log("updating badge", new Date(Date.now()).toISOString(), parseFloat(healthFactor).toFixed(2), networkConfig.defaultRpcUrl, networkKey);
     // Update badge
     let color = '#4CAF50';
-    if (parseFloat(healthFactor) < 1) {
+    if (parseFloat(healthFactor) <= dangerThreshold) {
       color = '#f44336';
-    } else if (parseFloat(healthFactor) < 2) {
+    } else if (parseFloat(healthFactor) <= warningThreshold) {
       color = '#FFA726';
     }
     browserAPI.action.setBadgeText({ text: parseFloat(healthFactor).toFixed(2) });
@@ -102,13 +113,13 @@ setupHealthCheck();
 // Add storage change listener
 browserAPI.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'local') {
-    if (changes.starredAddress || changes.savedAddresses) {
+    if (changes.starredAddress || changes.savedAddresses || changes.warningThreshold || changes.dangerThreshold) {
       // If starred address was cleared, clear the badge
       if (changes.starredAddress && !changes.starredAddress.newValue) {
         browserAPI.action.setBadgeText({ text: '' });
         return;
       }
-      // Update health factor for the new starred address or if networks changed
+      // Update health factor for the new starred address or if networks or thresholds changed
       updateHealthFactor();
     }
     

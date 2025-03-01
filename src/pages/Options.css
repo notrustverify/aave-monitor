@@ -49,50 +49,70 @@ body, html {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .options-container {
-  max-width: 800px;
+  width: 100%;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem;
   color: var(--text-primary);
+  box-sizing: border-box;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 100%;
+}
+
+@media (max-width: 640px) {
+  .options-container {
+    padding: 1rem;
+  }
 }
 
 h1 {
   color: var(--text-primary);
-  margin-bottom: 30px;
-  font-size: 24px;
+  margin-bottom: 20px;
+  font-size: 22px;
   font-weight: 500;
   text-align: center;
 }
 
 h2 {
   color: var(--text-primary);
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
-  font-size: 18px;
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  font-size: 16px;
   font-weight: 500;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
 .settings-section, .theme-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   background: var(--bg-secondary);
-  padding: 1.5rem;
+  padding: 1.25rem;
   border-radius: 8px;
   border: 1px solid var(--border-color);
 }
 
 .setting-group {
-  margin-bottom: 25px;
-  padding-bottom: 20px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
   border-bottom: 1px solid var(--border-color);
 }
 
 .setting-group:last-child {
   border-bottom: none;
   padding-bottom: 0;
+  margin-bottom: 0;
 }
 
 label {
@@ -284,4 +304,37 @@ button:hover {
 
 .theme-toggle-button .moon-icon {
   margin-left: 5px;
+}
+
+.threshold-input-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.threshold-input-container input {
+  width: 80px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+}
+
+.threshold-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+.threshold-preview.warning {
+  background-color: #FFA726;
+}
+
+.threshold-preview.danger {
+  background-color: #f44336;
+}
+
+.threshold-preview.safe {
+  background-color: #4CAF50;
 } 

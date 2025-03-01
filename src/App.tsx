@@ -33,10 +33,22 @@ function App() {
   const [showContractInput, setShowContractInput] = useState(false);
   const [showNetworkSelector, setShowNetworkSelector] = useState(false);
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [warningThreshold, setWarningThreshold] = useState(2);
+  const [dangerThreshold, setDangerThreshold] = useState(1);
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
-    browserAPI.storage.local.get(['savedAddresses', 'starredAddress', 'rpcProvider', 'locale', 'contractAddress', 'selectedNetwork', 'theme']).then(result => {
+    browserAPI.storage.local.get([
+      'savedAddresses', 
+      'starredAddress', 
+      'rpcProvider', 
+      'locale', 
+      'contractAddress', 
+      'selectedNetwork', 
+      'theme',
+      'warningThreshold',
+      'dangerThreshold'
+    ]).then(result => {
       if (result.savedAddresses) {
         // Convert old format to new format if needed
         if (Array.isArray(result.savedAddresses) && result.savedAddresses.length > 0 && typeof result.savedAddresses[0] === 'string') {
@@ -69,6 +81,12 @@ function App() {
       }
       if (result.theme) {
         setTheme(result.theme);
+      }
+      if (result.warningThreshold !== undefined) {
+        setWarningThreshold(result.warningThreshold);
+      }
+      if (result.dangerThreshold !== undefined) {
+        setDangerThreshold(result.dangerThreshold);
       }
       
       // If addresses exist, fetch data for them
@@ -137,6 +155,12 @@ function App() {
       }
       if (changes.theme) {
         setTheme(changes.theme.newValue);
+      }
+      if (changes.warningThreshold) {
+        setWarningThreshold(changes.warningThreshold.newValue);
+      }
+      if (changes.dangerThreshold) {
+        setDangerThreshold(changes.dangerThreshold.newValue);
       }
     };
 
@@ -298,10 +322,10 @@ function App() {
     const hf = parseFloat(healthFactor).toFixed(2);
     
     // Set badge color based on health factor
-    let color = '#4CAF50'; // Green for healthy (> 2)
-    if (parseFloat(hf) < 1) {
+    let color = '#4CAF50'; // Green for healthy (> warningThreshold)
+    if (parseFloat(hf) < dangerThreshold) {
       color = '#f44336'; // Red for danger
-    } else if (parseFloat(hf) < 2) {
+    } else if (parseFloat(hf) < warningThreshold) {
       color = '#FFA726'; // Orange for warning
     }
 
@@ -551,8 +575,8 @@ function App() {
                     <span className="value">{userData[address].ltv}%</span>
                   </div>
                   <div className={`health-factor ${
-                    parseFloat(userData[address].healthFactor) > 2 ? 'safe' : 
-                    parseFloat(userData[address].healthFactor) > 1 ? 'warning' : 'danger'
+                    parseFloat(userData[address].healthFactor) >= warningThreshold ? 'safe' : 
+                    parseFloat(userData[address].healthFactor) >= dangerThreshold ? 'warning' : 'danger'
                   }`}>
                     Health Factor: {
                       parseFloat(userData[address].totalDebt) === 0 

@@ -13,10 +13,22 @@ function Options() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [status, setStatus] = useState('');
   const [customRpc, setCustomRpc] = useState(false);
+  const [warningThreshold, setWarningThreshold] = useState(2);
+  const [dangerThreshold, setDangerThreshold] = useState(1);
 
   useEffect(() => {
     // Load saved settings
-    browserAPI.storage.local.get(['updateFrequency', 'rpcProvider', 'locale', 'contractAddress', 'selectedNetwork', 'customRpc', 'theme'], (result) => {
+    browserAPI.storage.local.get([
+      'updateFrequency', 
+      'rpcProvider', 
+      'locale', 
+      'contractAddress', 
+      'selectedNetwork', 
+      'customRpc', 
+      'theme',
+      'warningThreshold',
+      'dangerThreshold'
+    ], (result) => {
       if (result.updateFrequency) {
         setUpdateFrequency(result.updateFrequency);
       }
@@ -43,12 +55,21 @@ function Options() {
       if (result.theme) {
         setTheme(result.theme);
       }
+      if (result.warningThreshold !== undefined) {
+        setWarningThreshold(result.warningThreshold);
+      }
+      if (result.dangerThreshold !== undefined) {
+        setDangerThreshold(result.dangerThreshold);
+      }
     });
   }, []);
 
   // Apply theme to document
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    // Set body and html to full height
+    document.body.style.height = '100%';
+    document.documentElement.style.height = '100%';
   }, [theme]);
 
   const handleNetworkChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -95,6 +116,8 @@ function Options() {
     setLocale(navigator.language);
     setCustomRpc(false);
     setTheme('dark');
+    setWarningThreshold(2);
+    setDangerThreshold(1);
     
     // Save the reset settings to storage
     browserAPI.storage.local.set({
@@ -104,7 +127,9 @@ function Options() {
       contractAddress: networks.ethereum.contractAddress,
       locale: navigator.language,
       customRpc: false,
-      theme: 'dark'
+      theme: 'dark',
+      warningThreshold: 2,
+      dangerThreshold: 1
     });
     
     // Update the alarm interval
@@ -126,7 +151,9 @@ function Options() {
         contractAddress,
         selectedNetwork,
         customRpc,
-        theme
+        theme,
+        warningThreshold,
+        dangerThreshold
       });
       
       // Update the alarm interval
@@ -234,6 +261,44 @@ function Options() {
           <p className="help-text">The contract address is automatically set based on the selected network.</p>
         </div>
       </div> */}
+      
+      <div className="settings-section">
+        <h2>Health Factor Thresholds</h2>
+        
+        <div className="setting-group">
+          <label htmlFor="warning-threshold">Warning Threshold:</label>
+          <div className="threshold-input-container">
+            <input 
+              type="number" 
+              id="warning-threshold"
+              value={warningThreshold} 
+              onChange={(e) => setWarningThreshold(parseFloat(e.target.value))}
+              min="0.1"
+              max="10"
+              step="0.1"
+            />
+            <div className="threshold-preview warning"></div>
+          </div>
+          <p className="help-text">Health factor below this value will show as orange (default: 2.0)</p>
+        </div>
+        
+        <div className="setting-group">
+          <label htmlFor="danger-threshold">Danger Threshold:</label>
+          <div className="threshold-input-container">
+            <input 
+              type="number" 
+              id="danger-threshold"
+              value={dangerThreshold} 
+              onChange={(e) => setDangerThreshold(parseFloat(e.target.value))}
+              min="0.1"
+              max="10"
+              step="0.1"
+            />
+            <div className="threshold-preview danger"></div>
+          </div>
+          <p className="help-text">Health factor below this value will show as red (default: 1.0)</p>
+        </div>
+      </div>
       
       <div className="settings-section">
         <h2>Display Settings</h2>
