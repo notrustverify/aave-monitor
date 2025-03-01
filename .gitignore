@@ -26,7 +26,6 @@ yarn-error.log*
 *.pem
 *.zip
 *.crx
-dist/
 cache/
 *.DS_Store
 web-ext-artifacts/
