@@ -15,6 +15,7 @@ function Options() {
   const [customRpc, setCustomRpc] = useState(false);
   const [warningThreshold, setWarningThreshold] = useState(2);
   const [dangerThreshold, setDangerThreshold] = useState(1);
+  const [badgeDisplay, setBadgeDisplay] = useState<string>('healthFactor');
 
   useEffect(() => {
     // Load saved settings
@@ -27,7 +28,8 @@ function Options() {
       'customRpc', 
       'theme',
       'warningThreshold',
-      'dangerThreshold'
+      'dangerThreshold',
+      'badgeDisplay'
     ], (result) => {
       if (result.updateFrequency) {
         setUpdateFrequency(result.updateFrequency);
@@ -60,6 +62,9 @@ function Options() {
       }
       if (result.dangerThreshold !== undefined) {
         setDangerThreshold(result.dangerThreshold);
+      }
+      if (result.badgeDisplay) {
+        setBadgeDisplay(result.badgeDisplay);
       }
     });
   }, []);
@@ -118,6 +123,7 @@ function Options() {
     setTheme('dark');
     setWarningThreshold(2);
     setDangerThreshold(1);
+    setBadgeDisplay('healthFactor');
     
     // Save the reset settings to storage
     browserAPI.storage.local.set({
@@ -129,7 +135,8 @@ function Options() {
       customRpc: false,
       theme: 'dark',
       warningThreshold: 2,
-      dangerThreshold: 1
+      dangerThreshold: 1,
+      badgeDisplay: 'healthFactor'
     });
     
     // Update the alarm interval
@@ -142,8 +149,27 @@ function Options() {
     setTimeout(() => setStatus(''), 3000);
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    browserAPI.storage.local.set({ theme: newTheme });
+  };
+
+  const handleBadgeDisplayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newBadgeDisplay = e.target.value;
+    setBadgeDisplay(newBadgeDisplay);
+    
+    // Save the badge display setting immediately to ensure it persists
+    console.log('Changing badge display to:', newBadgeDisplay);
+    browserAPI.storage.local.set({ badgeDisplay: newBadgeDisplay });
+    
+    setStatus('Badge display updated');
+    setTimeout(() => setStatus(''), 3000);
+  };
+
   const saveSettings = async () => {
     try {
+      console.log('Saving settings with badge display:', badgeDisplay);
       await browserAPI.storage.local.set({
         updateFrequency,
         rpcProvider,
@@ -153,7 +179,8 @@ function Options() {
         customRpc,
         theme,
         warningThreshold,
-        dangerThreshold
+        dangerThreshold,
+        badgeDisplay
       });
       
       // Update the alarm interval
@@ -168,12 +195,6 @@ function Options() {
       setStatus('Error saving settings');
       console.error('Error saving settings:', error);
     }
-  };
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    browserAPI.storage.local.set({ theme: newTheme });
   };
 
   return (
@@ -302,6 +323,27 @@ function Options() {
       
       <div className="settings-section">
         <h2>Display Settings</h2>
+        
+        <div className="setting-group">
+          <label htmlFor="badge-display">Badge Display:</label>
+          <div className="badge-display-container">
+            <select 
+              id="badge-display"
+              value={badgeDisplay}
+              onChange={handleBadgeDisplayChange}
+              className="badge-display-select"
+            >
+              <option value="healthFactor">Health Factor</option>
+              <option value="totalCollateralBase">Total Collateral</option>
+              <option value="totalDebtBase">Total Debt</option>
+              <option value="availableBorrowsBase">Available Borrows</option>
+              <option value="currentLiquidationThreshold">Liquidation Threshold</option>
+              <option value="ltv">Loan to Value</option>
+            </select>
+            
+          </div>
+          <p className="help-text">Choose what information to display in the extension badge</p>
+        </div>
         
         <div className="setting-group">
           <label htmlFor="locale-select">Number Format Locale:</label>

@@ -337,4 +337,51 @@ button:hover {
 
 .threshold-preview.safe {
   background-color: #4CAF50;
+}
+
+/* Badge display container */
+.badge-display-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.badge-display-select {
+  flex: 1;
+}
+
+.badge-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-text {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-width: 16px;
+  text-align: center;
+}
+
+[data-theme="light"] .badge-icon {
+  background-color: #e0e0e0;
+  border: 1px solid #ccc;
 } 

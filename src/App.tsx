@@ -5,11 +5,10 @@ import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import browserAPI from './utils/browserAPI';
 import networks, { NetworkConfig, getAllNetworks } from './config/networks';
+import { POOL_ABI } from './config/abi';
+import { formatLargeNumber } from './utils/utils';
 
-// Aave Pool ABI - only the function we need
-const POOL_ABI = [
-  "function getUserAccountData(address user) external view returns (uint256 totalCollateralBase, uint256 totalDebtBase, uint256 availableBorrowsBase, uint256 currentLiquidationThreshold, uint256 ltv, uint256 healthFactor)"
-];
+
 
 // Interface for address data including network
 interface AddressData {
@@ -189,7 +188,7 @@ function App() {
     
     // Update badge with starred address data if exists
     if (newStarred && userData[newStarred]) {
-      updateBadge(userData[newStarred].healthFactor);
+      updateBadge(userData[newStarred].healthFactor, userData[newStarred]);
     } else {
       browserAPI.action.setBadgeText({ text: '' });
     }
@@ -278,7 +277,7 @@ function App() {
       
       // Only update badge if this is the starred address
       if (userAddress === starredAddress) {
-        updateBadge(formatted.healthFactor);
+        updateBadge(formatted.healthFactor, formatted);
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -310,28 +309,91 @@ function App() {
     }
   };
 
-  const updateBadge = (healthFactor: string) => {
-    // Check if there's any debt in the starred address
-    if (starredAddress && userData[starredAddress] && parseFloat(userData[starredAddress].totalDebt) === 0) {
-      browserAPI.action.setBadgeText({ text: 'ND' }); // ND for "No Debt" since badge space is limited
-      browserAPI.action.setBadgeBackgroundColor({ color: '#4CAF50' }); // Green for no debt
-      return;
-    }
+  const updateBadge = (healthFactor: string, userData: any) => {
+    // Get user data and badge display preference from storage
+    browserAPI.storage.local.get([
+      'warningThreshold', 
+      'dangerThreshold', 
+      'badgeDisplay',
+    ], (result) => {
+      const warningThreshold = result.warningThreshold || 2;
+      const dangerThreshold = result.dangerThreshold || 1;
+      const badgeDisplay = result.badgeDisplay || 'healthFactor';
+      
+      // Default to health factor
+      const hf = parseFloat(healthFactor);
+      let badgeText = hf.toFixed(2);
+      
+      let color = '#649dfa'; // Blue color for non-health factor metrics
+      
+      // Determine badge text based on selected display option
+      switch (badgeDisplay) {
+        case 'totalCollateralBase':
+          if (userData.totalCollateral) {
+            badgeText = formatLargeNumber(userData.totalCollateral);
+          }
+          break;
+        case 'totalDebtBase':
+          if (parseFloat(userData.totalDebt) <= 0) {
+            badgeText = 'ND'
+            color = '#4CAF50'
+          } else {
+            badgeText = formatLargeNumber(userData.totalDebt);
+          }
+          break;
+        case 'availableBorrowsBase':
+          if (userData.availableBorrows) {
+            badgeText = formatLargeNumber(userData.availableBorrows);
+          }
+          break;
+        case 'currentLiquidationThreshold':
+          if (userData.currentLiquidationThreshold) {
+            badgeText = (parseFloat(userData.currentLiquidationThreshold) * 100).toFixed(0) + '%';
+          }
+          break;
+        case 'ltv':
+          if (userData.ltv) {
+            badgeText = (parseFloat(userData.ltv) * 100).toFixed(0) + '%';
+          }
+          break;
+        case 'healthFactor':
+        default:
+          console.log("totalDebt", userData.totalDebt)
+          // Check for no debt
+          if (parseFloat(userData.totalDebt) <= 0 ) {
+             badgeText ='ND'
+             color = '#4CAF50'
+            break;
+          }
 
-    // Convert health factor to a simpler number for display
-    const hf = parseFloat(healthFactor).toFixed(2);
-    
-    // Set badge color based on health factor
-    let color = '#4CAF50'; // Green for healthy (> warningThreshold)
-    if (parseFloat(hf) < dangerThreshold) {
-      color = '#f44336'; // Red for danger
-    } else if (parseFloat(hf) < warningThreshold) {
-      color = '#FFA726'; // Orange for warning
-    }
-
-    // Update extension badge
-    browserAPI.action.setBadgeText({ text: hf });
-    browserAPI.action.setBadgeBackgroundColor({ color: color });
+          badgeText = hf.toFixed(2);
+          // Set color based on health factor thresholds
+          if (hf <= dangerThreshold) {
+            color = '#f44336'; // Red for danger
+          } else if (hf <= warningThreshold) {
+            color = '#FFA726'; // Orange for warning
+          }
+          break;
+      }
+      
+      // Ensure badge text is not too long
+      if (badgeText.endsWith('K') || badgeText.endsWith('M') || badgeText.endsWith('B')) {
+        if (badgeText.length > 5) {
+          badgeText = badgeText.substring(0, 4) + badgeText.slice(-1);
+        }
+      } else if (badgeText.endsWith('%')) {
+        if (badgeText.length > 4) {
+          badgeText = badgeText.substring(0, 3) + '%';
+        }
+      } else {
+        if (badgeText.length > 5) {
+          badgeText = badgeText.substring(0, 5);
+        }
+      }
+      
+      browserAPI.action.setBadgeText({ text: badgeText });
+      browserAPI.action.setBadgeBackgroundColor({ color });
+    });
   };
 
   const refreshData = () => {
@@ -456,7 +518,14 @@ function App() {
       </div>
 
       <div className="addresses-container">
-        {addresses.map(addressData => {
+        {addresses
+          .sort((a, b) => {
+            // Put starred address at the top
+            if (a.address === starredAddress) return -1;
+            if (b.address === starredAddress) return 1;
+            return 0;
+          })
+          .map(addressData => {
           const address = addressData.address;
           const network = addressData.network;
           
