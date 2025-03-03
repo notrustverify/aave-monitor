@@ -63,17 +63,7 @@ async function updateHealthFactor() {
     );
 
     const data = await poolContract.getUserAccountData(starredAddress);
-    const healthFactor = ethers.formatUnits(data.healthFactor, 18);
     const totalDebt = ethers.formatUnits(data.totalDebtBase, 8);
-    const totalCollateral = ethers.formatUnits(data.totalCollateralBase, 8);
-    const availableBorrows = ethers.formatUnits(data.availableBorrowsBase, 8);
-    const liquidationThreshold = ethers.formatUnits(data.currentLiquidationThreshold, 4);
-    const ltv = ethers.formatUnits(data.ltv, 4);
-
-    console.log("updating badge", new Date(Date.now()).toISOString(), 
-      "health factor:", parseFloat(healthFactor).toFixed(2), 
-      "network:", networkKey,
-      "badge display:", displayOption);
     
     // Determine badge text based on selected display option
     let badgeText = '';
@@ -81,6 +71,7 @@ async function updateHealthFactor() {
     
     switch (displayOption) {
       case 'totalCollateralBase':
+        const totalCollateral = ethers.formatUnits(data.totalCollateralBase, 8);
         badgeText = formatLargeNumber(totalCollateral);
         break;
       case 'totalDebtBase':
@@ -92,14 +83,17 @@ async function updateHealthFactor() {
         }
         break;
       case 'availableBorrowsBase':
+        const availableBorrows = ethers.formatUnits(data.availableBorrowsBase, 8);
         badgeText = formatLargeNumber(availableBorrows);
         break;
       case 'currentLiquidationThreshold':
         // Format as percentage
+        const liquidationThreshold = ethers.formatUnits(data.currentLiquidationThreshold, 4);
         badgeText = (parseFloat(liquidationThreshold) * 100).toFixed(0) + '%';
         break;
       case 'ltv':
         // Format as percentage
+        const ltv = ethers.formatUnits(data.ltv, 4);
         badgeText = (parseFloat(ltv) * 100).toFixed(0) + '%';
         break;
       case 'healthFactor':
@@ -111,9 +105,11 @@ async function updateHealthFactor() {
           color = '#4CAF50'
           break;
         }
-        
+        const healthFactor = ethers.formatUnits(data.healthFactor, 18);
+
         badgeText = parseFloat(healthFactor).toFixed(2);
         // Set color based on health factor thresholds
+        color = '#4CAF50'
         if (parseFloat(healthFactor) <= dangerThreshold) {
           color = '#f44336';
         } else if (parseFloat(healthFactor) <= warningThreshold) {

@@ -368,6 +368,7 @@ function App() {
 
           badgeText = hf.toFixed(2);
           // Set color based on health factor thresholds
+          color = '#4CAF50'; // Blue color for non-health factor metrics
           if (hf <= dangerThreshold) {
             color = '#f44336'; // Red for danger
           } else if (hf <= warningThreshold) {
