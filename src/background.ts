@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import browserAPI from './utils/browserAPI';
 import networks from './config/networks';
 import { POOL_ABI } from "./config/abi";
-import { formatLargeNumber } from "./utils/utils";
+import { formatLargeNumber, updateBadge } from "./utils/utils";
 
 async function updateHealthFactor() {
   try {
@@ -63,83 +63,8 @@ async function updateHealthFactor() {
     );
 
     const data = await poolContract.getUserAccountData(starredAddress);
-    const totalDebt = ethers.formatUnits(data.totalDebtBase, 8);
-    
-    // Determine badge text based on selected display option
-    let badgeText = '';
-    let color = '#649dfa'; // Blue color for non-health factor metrics
-    
-    switch (displayOption) {
-      case 'totalCollateralBase':
-        const totalCollateral = ethers.formatUnits(data.totalCollateralBase, 8);
-        badgeText = formatLargeNumber(totalCollateral);
-        break;
-      case 'totalDebtBase':
-        if(parseFloat(totalDebt) <= 0) {
-          badgeText = 'ND'
-          color = '#4CAF50'
-        } else {
-          badgeText = formatLargeNumber(totalDebt);
-        }
-        break;
-      case 'availableBorrowsBase':
-        const availableBorrows = ethers.formatUnits(data.availableBorrowsBase, 8);
-        badgeText = formatLargeNumber(availableBorrows);
-        break;
-      case 'currentLiquidationThreshold':
-        // Format as percentage
-        const liquidationThreshold = ethers.formatUnits(data.currentLiquidationThreshold, 4);
-        badgeText = (parseFloat(liquidationThreshold) * 100).toFixed(0) + '%';
-        break;
-      case 'ltv':
-        // Format as percentage
-        const ltv = ethers.formatUnits(data.ltv, 4);
-        badgeText = (parseFloat(ltv) * 100).toFixed(0) + '%';
-        break;
-      case 'healthFactor':
-      default:
-        // Check for no debt
-        console.log("totalDebt", totalDebt)
-        if (parseFloat(totalDebt) <= 0 ) {
-          badgeText ='ND'
-          color = '#4CAF50'
-          break;
-        }
-        const healthFactor = ethers.formatUnits(data.healthFactor, 18);
-
-        badgeText = parseFloat(healthFactor).toFixed(2);
-        // Set color based on health factor thresholds
-        color = '#4CAF50'
-        if (parseFloat(healthFactor) <= dangerThreshold) {
-          color = '#f44336';
-        } else if (parseFloat(healthFactor) <= warningThreshold) {
-          color = '#FFA726';
-        }
-        break;
-    }
-    
-    // Ensure badge text is not too long for the badge
-    // For values with K/M suffix, we want to keep the suffix
-    if (badgeText.endsWith('K') || badgeText.endsWith('M') || badgeText.endsWith('B')) {
-      // Allow more characters for values with suffix
-      if (badgeText.length > 5) {
-        badgeText = badgeText.substring(0, 4) + badgeText.slice(-1);
-      }
-    } else if (badgeText.endsWith('%')) {
-      // For percentages, allow up to 4 chars including the %
-      if (badgeText.length > 4) {
-        badgeText = badgeText.substring(0, 3) + '%';
-      }
-    } else {
-      // For other values, allow up to 5 chars
-      if (badgeText.length > 5) {
-        badgeText = badgeText.substring(0, 5);
-      }
-    }
-    
-    // Update badge
-    browserAPI.action.setBadgeText({ text: badgeText });
-    browserAPI.action.setBadgeBackgroundColor({ color });
+    updateBadge(data);
+   
   } catch (error) {
     console.error('Error updating health factor:', error);
     browserAPI.action.setBadgeText({ text: 'ERR' });
