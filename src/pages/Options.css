@@ -63,12 +63,12 @@ body, html {
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 0.5rem;
   color: var(--text-primary);
   box-sizing: border-box;
   flex: 1;
   overflow-y: auto;
-  min-height: 100%;
+  min-height: calc(100% - 20px);
 }
 
 @media (max-width: 640px) {
@@ -384,4 +384,24 @@ button:hover {
 [data-theme="light"] .badge-icon {
   background-color: #e0e0e0;
   border: 1px solid #ccc;
+}
+
+.footer {
+  margin-top: 10px;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  width: 100%;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: var(--text-primary);
 } 

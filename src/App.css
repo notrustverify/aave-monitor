@@ -593,5 +593,25 @@ input:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+.footer {
+  margin-top: 2px;
+  padding: 1px 0;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  width: 100%;
+}
+
+.footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer a:hover {
+  color: var(--text-primary);
 }
 

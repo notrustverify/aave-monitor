@@ -8,7 +8,11 @@ import {
   AaveV3Base,
   AaveV3Metis,
   AaveV3BNB,
-  AaveV3Scroll
+  AaveV3Scroll,
+  AaveV3Linea,
+  AaveV3Sonic,
+  AaveV3ZkSync,
+  AaveV3EthereumEtherFi
 } from '@bgd-labs/aave-address-book';
 
 export interface NetworkConfig {
@@ -24,25 +28,10 @@ export interface NetworkConfig {
   blockExplorerUrl: string;
 }
 
-// Define chain IDs for all networks
-const ChainId = {
-  mainnet: 1,
-  polygon: 137,
-  avalanche: 43114,
-  optimism: 10,
-  arbitrum_one: 42161,
-  gnosis: 100,
-  base: 8453,
-  metis_andromeda: 1088,
-  bnb: 56,
-  scroll: 534352,
-  polygon_zkevm: 1101
-};
-
 const networks: Record<string, NetworkConfig> = {
   ethereum: {
     name: 'Ethereum',
-    chainId: ChainId.mainnet,
+    chainId: AaveV3Ethereum.CHAIN_ID,
     contractAddress: AaveV3Ethereum.POOL, // Aave V3 Pool on Ethereum from address book
     defaultRpcUrl: 'https://eth.public-rpc.com',
     nativeCurrency: {
@@ -54,7 +43,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   polygon: {
     name: 'Polygon',
-    chainId: ChainId.polygon,
+    chainId: AaveV3Polygon.CHAIN_ID,
     contractAddress: AaveV3Polygon.POOL, // Aave V3 Pool on Polygon from address book
     defaultRpcUrl: 'https://polygon-rpc.com',
     nativeCurrency: {
@@ -66,7 +55,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   avalanche: {
     name: 'Avalanche',
-    chainId: ChainId.avalanche,
+    chainId: AaveV3Avalanche.CHAIN_ID,
     contractAddress: AaveV3Avalanche.POOL, // Aave V3 Pool on Avalanche from address book
     defaultRpcUrl: 'https://api.avax.network/ext/bc/C/rpc',
     nativeCurrency: {
@@ -78,7 +67,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   optimism: {
     name: 'Optimism',
-    chainId: ChainId.optimism,
+    chainId: AaveV3Optimism.CHAIN_ID,
     contractAddress: AaveV3Optimism.POOL, // Aave V3 Pool on Optimism from address book
     defaultRpcUrl: 'https://mainnet.optimism.io',
     nativeCurrency: {
@@ -90,7 +79,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   arbitrum: {
     name: 'Arbitrum',
-    chainId: ChainId.arbitrum_one,
+    chainId: AaveV3Arbitrum.CHAIN_ID,
     contractAddress: AaveV3Arbitrum.POOL, // Aave V3 Pool on Arbitrum from address book
     defaultRpcUrl: 'https://arb1.arbitrum.io/rpc',
     nativeCurrency: {
@@ -102,7 +91,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   gnosis: {
     name: 'Gnosis',
-    chainId: ChainId.gnosis,
+    chainId: AaveV3Gnosis.CHAIN_ID,
     contractAddress: AaveV3Gnosis.POOL, // Aave V3 Pool on Gnosis from address book
     defaultRpcUrl: 'https://rpc.gnosischain.com',
     nativeCurrency: {
@@ -114,7 +103,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   base: {
     name: 'Base',
-    chainId: ChainId.base,
+    chainId: AaveV3Base.CHAIN_ID,
     contractAddress: AaveV3Base.POOL, // Aave V3 Pool on Base from address book
     defaultRpcUrl: 'https://mainnet.base.org',
     nativeCurrency: {
@@ -126,7 +115,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   metis: {
     name: 'Metis',
-    chainId: ChainId.metis_andromeda,
+    chainId: AaveV3Metis.CHAIN_ID,
     contractAddress: AaveV3Metis.POOL, // Aave V3 Pool on Metis from address book
     defaultRpcUrl: 'https://andromeda.metis.io/?owner=1088',
     nativeCurrency: {
@@ -136,9 +125,9 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: 'https://andromeda-explorer.metis.io'
   },
-  bnb: {
+  "bnb chain": {
     name: 'BNB Chain',
-    chainId: ChainId.bnb,
+    chainId: AaveV3BNB.CHAIN_ID,
     contractAddress: AaveV3BNB.POOL, // Aave V3 Pool on BNB Chain from address book
     defaultRpcUrl: 'https://bsc-dataseed.binance.org',
     nativeCurrency: {
@@ -150,7 +139,7 @@ const networks: Record<string, NetworkConfig> = {
   },
   scroll: {
     name: 'Scroll',
-    chainId: ChainId.scroll,
+    chainId: AaveV3Scroll.CHAIN_ID,
     contractAddress: AaveV3Scroll.POOL, // Aave V3 Pool on Scroll from address book
     defaultRpcUrl: 'https://rpc.scroll.io',
     nativeCurrency: {
@@ -159,6 +148,54 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18
     },
     blockExplorerUrl: 'https://scrollscan.com'
+  },
+  linea: {
+    name: 'Linea',
+    chainId: AaveV3Linea.CHAIN_ID,
+    contractAddress: AaveV3Linea.POOL, // Aave V3 Pool on Linea from address book
+    defaultRpcUrl: 'https://rpc.linea.build',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://lineascan.build'
+  },
+  sonic: {
+    name: 'Sonic',
+    chainId: AaveV3Sonic.CHAIN_ID,
+    contractAddress: AaveV3Sonic.POOL, // Aave V3 Pool on Sonic from address book
+    defaultRpcUrl: 'https://mainnet.sonic.fantom.network',
+    nativeCurrency: {
+      name: 'Fantom',
+      symbol: 'FTM',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://explorer.sonic.fantom.network'
+  },
+  zksync: {
+    name: 'zkSync Era',
+    chainId: AaveV3ZkSync.CHAIN_ID,
+    contractAddress: AaveV3ZkSync.POOL, // Aave V3 Pool on zkSync from address book
+    defaultRpcUrl: 'https://mainnet.era.zksync.io',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://explorer.zksync.io'
+  },
+  etherfi: {
+    name: 'EtherFi',
+    chainId: AaveV3EthereumEtherFi.CHAIN_ID,
+    contractAddress: AaveV3EthereumEtherFi.POOL, // Aave V3 Pool for EtherFi from address book
+    defaultRpcUrl: 'https://eth.public-rpc.com',
+    nativeCurrency: {
+      name: 'Ether',
+      symbol: 'ETH',
+      decimals: 18
+    },
+    blockExplorerUrl: 'https://etherscan.io'
   }
 };
 
@@ -168,7 +205,7 @@ try {
   if (AaveV3PolygonZkEvm?.POOL) {
     networks.zkevm = {
       name: 'Polygon zkEVM',
-      chainId: ChainId.polygon_zkevm,
+      chainId: AaveV3PolygonZkEvm.CHAIN_ID,
       contractAddress: AaveV3PolygonZkEvm.POOL,
       defaultRpcUrl: 'https://zkevm-rpc.com',
       nativeCurrency: {

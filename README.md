@@ -1,6 +1,4 @@
 # Aave Health Factor Extension
-Monitor Aave health factor
-
 Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
 
 Features:
@@ -8,12 +6,12 @@ Features:
 * Starred Address: Highlight a specific address to monitor its health factor directly from your browser's toolbar.
 * Badge Notifications: Get visual alerts on your browser's badge for quick insights into your account's health status.
 * Easy Management: Add or remove Ethereum addresses with a simple interface, and save your preferences directly in your browser.
-Customizable RPC Provider: Set your preferred Ethereum RPC provider for fetching data.
 * Monitor your Aave positions across multiple networks: supporting Ethereum, Gnosis, Arbitrum, etc
 
 How It Works:
 1. Add Addresses: Enter Ethereum addresses to monitor their Aave account data.
 2. Star an Address: Click the star icon to set an address as your primary focus, and receive badge updates for its health factor.
+
 Monitor Health Factor: The badge color changes based on the health factor, alerting you to potential risks:
 * Green: Healthy (> 2)
 * Orange: Warning (1 - 2)
@@ -128,3 +126,28 @@ For Firefox distribution:
 2. The build process creates a Firefox-compatible extension
 3. Test the extension in Firefox before submission
 4. Submit to Firefox Add-ons (AMO) using the built files
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgements
+
+- [Aave Protocol](https://aave.com/) for providing the DeFi lending platform
+- [Alephium](https://alephium.org/) for supporting the development
+- [Ethers.js](https://docs.ethers.io/) for Ethereum interactions
+- [React](https://reactjs.org/) for the UI framework
+
+---
+
+Made with ❤️ by No Trust Verify

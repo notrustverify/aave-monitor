@@ -350,6 +350,7 @@ function App() {
     setTheme(newTheme);
     browserAPI.storage.local.set({ theme: newTheme });
   };
+  console.log(selectedNetwork);
 
   return (
     <div className="App">
@@ -393,7 +394,7 @@ function App() {
                   value={network.name.toLowerCase()}
                   title={network.name}
                 >
-                  {network.nativeCurrency.symbol}
+                  {network.name} ({network.nativeCurrency.symbol})
                 </option>
               ))}
             </select>

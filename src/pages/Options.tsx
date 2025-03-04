@@ -367,6 +367,10 @@ function Options() {
       </div>
       
       {status && <div className="status-message">{status}</div>}
+      
+      <div className="footer">
+        Made with <span style={{ color: '#e25555' }}>love</span> by <a href="https://notrustverify.ch" target="_blank" rel="noopener noreferrer">No Trust Verify</a>
+      </div>
     </div>
   );
 }
