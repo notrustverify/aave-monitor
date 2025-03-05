@@ -250,6 +250,7 @@ function App() {
     try {
       // Get network configuration
       const networkConfig = networks[networkKey];
+      console.log(networkKey);
       if (!networkConfig) {
         throw new Error(`Network configuration not found for ${networkKey}`);
       }

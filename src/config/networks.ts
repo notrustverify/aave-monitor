@@ -165,7 +165,7 @@ const networks: Record<string, NetworkConfig> = {
     name: 'Sonic',
     chainId: AaveV3Sonic.CHAIN_ID,
     contractAddress: AaveV3Sonic.POOL, // Aave V3 Pool on Sonic from address book
-    defaultRpcUrl: 'https://mainnet.sonic.fantom.network',
+    defaultRpcUrl: 'https://sonic-rpc.publicnode.com',
     nativeCurrency: {
       name: 'Fantom',
       symbol: 'FTM',
