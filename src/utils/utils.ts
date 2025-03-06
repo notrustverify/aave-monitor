@@ -66,12 +66,12 @@ import browserAPI from "./browserAPI";
               break;
             case 'currentLiquidationThreshold':
               if (userData.liquidationThreshold) {
-                badgeText = (parseFloat(userData.liquidationThreshold) * 100).toFixed(0) + '%';
+                badgeText = (parseFloat(userData.liquidationThreshold)).toFixed(0) + '%';
               }
               break;
             case 'ltv':
               if (userData.ltv) {
-                badgeText = (parseFloat(userData.ltv) * 100).toFixed(0) + '%';
+                badgeText = (parseFloat(userData.ltv)).toFixed(0) + '%';
               }
               break;
             case 'healthFactor':
@@ -83,7 +83,7 @@ import browserAPI from "./browserAPI";
                  color = '#4CAF50'
                 break;
               }
-    
+              
               badgeText = hf.toFixed(2);
               // Set color based on health factor thresholds
               color = '#4CAF50'; // Blue color for non-health factor metrics
@@ -101,7 +101,7 @@ import browserAPI from "./browserAPI";
               badgeText = badgeText.substring(0, 4) + badgeText.slice(-1);
             }
           } else if (badgeText.endsWith('%')) {
-            if (badgeText.length > 4) {
+            if (badgeText.length > 5) {
               badgeText = badgeText.substring(0, 3) + '%';
             }
           } else {
@@ -110,6 +110,8 @@ import browserAPI from "./browserAPI";
             }
           }
           
+          console.log("hf", badgeText, userData)
+
           browserAPI.action.setBadgeText({ text: badgeText });
           browserAPI.action.setBadgeBackgroundColor({ color });
         });
