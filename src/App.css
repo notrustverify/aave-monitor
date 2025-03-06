@@ -599,7 +599,7 @@ input:focus {
 .footer {
   margin-top: 2px;
   padding: 1px 0;
-  text-align: center;
+  text-align: left;
   font-size: 10px;
   color: var(--text-secondary);
   width: 100%;
