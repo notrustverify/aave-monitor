@@ -574,6 +574,10 @@ function App() {
           );
         })}
       </div>
+      
+      <div className="footer">
+        Built by <a href="https://notrustverify.ch" target="_blank" rel="noopener noreferrer">No Trust Verify</a>
+      </div>
     </div>
   );
 }
