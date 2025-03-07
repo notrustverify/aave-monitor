@@ -32,6 +32,7 @@ import browserAPI from "./browserAPI";
             totalCollateral: ethers.formatUnits(data.totalCollateralBase, 8),
             totalDebt: ethers.formatUnits(data.totalDebtBase, 8),
             availableBorrows: ethers.formatUnits(data.availableBorrowsBase, 8),
+            netWorth: ethers.formatUnits(data.totalCollateralBase - data.totalDebtBase, 8),
             liquidationThreshold: ethers.formatUnits(data.currentLiquidationThreshold, 2),
             ltv: ethers.formatUnits(data.ltv, 2),
             healthFactor: ethers.formatUnits(data.healthFactor, 18)
@@ -62,6 +63,11 @@ import browserAPI from "./browserAPI";
             case 'availableBorrowsBase':
               if (userData.availableBorrows) {
                 badgeText = formatLargeNumber(userData.availableBorrows);
+              }
+              break;
+              case 'netWorth':
+              if (userData.netWorth) {
+                badgeText = formatLargeNumber(userData.netWorth);
               }
               break;
             case 'currentLiquidationThreshold':

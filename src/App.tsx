@@ -269,6 +269,7 @@ function App() {
         totalDebt: ethers.formatUnits(data.totalDebtBase, 8),
         availableBorrows: ethers.formatUnits(data.availableBorrowsBase, 8),
         liquidationThreshold: ethers.formatUnits(data.currentLiquidationThreshold, 2),
+        netWorth: ethers.formatUnits(data.totalCollateralBase - data.totalDebtBase, 8),
         ltv: ethers.formatUnits(data.ltv, 2),
         healthFactor: ethers.formatUnits(data.healthFactor, 18),
         network: networkKey
@@ -551,6 +552,10 @@ function App() {
                     <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
                   </div>
                   <div className="data-row">
+                    <span className="label">Net Worth</span>
+                    <span className="value">$ {formatAmount(userData[address].netWorth)}</span>
+                  </div>
+                  <div className="data-row">
                     <span className="label">Liquidation Threshold</span>
                     <span className="value">{userData[address].liquidationThreshold}%</span>
                   </div>
@@ -576,7 +581,10 @@ function App() {
       </div>
       
       <div className="footer">
-        Built by <a href="https://notrustverify.ch" target="_blank" rel="noopener noreferrer">No Trust Verify</a>
+        <hr className="footer-divider" />
+        <div className="footer-content">
+          Made with <svg className="heart-icon" viewBox="0 0 24 24" width="14" height="14"><path fill="#ff5252" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"/></svg> by <a href="https://notrustverify.ch" target="_blank" rel="noopener noreferrer">No Trust Verify</a>
+        </div>
       </div>
     </div>
   );
