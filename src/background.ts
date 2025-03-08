@@ -67,8 +67,8 @@ async function updateHealthFactor() {
    
   } catch (error) {
     console.error('Error updating health factor:', error);
-    browserAPI.action.setBadgeText({ text: 'ERR' });
-    browserAPI.action.setBadgeBackgroundColor({ color: '#f44336' });
+    //browserAPI.action.setBadgeText({ text: 'ERR' });
+    //browserAPI.action.setBadgeBackgroundColor({ color: '#f44336' });
   }
 }
 
