@@ -247,9 +247,9 @@ input:focus {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
-  margin-right: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .network-badge {
@@ -594,6 +594,34 @@ input:focus {
   text-overflow: ellipsis;
   white-space: nowrap;
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.copy-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  color: var(--text-secondary);
+  min-width: 18px;
+  min-height: 18px;
+}
+
+.copy-button:hover {
+  opacity: 1;
+  color: var(--text-primary);
+}
+
+.copy-icon {
+  display: inline-block;
+  vertical-align: middle;
 }
 
 .footer {
