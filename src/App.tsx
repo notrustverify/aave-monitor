@@ -34,6 +34,7 @@ function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const [warningThreshold, setWarningThreshold] = useState(2);
   const [dangerThreshold, setDangerThreshold] = useState(1);
+  const [toast, setToast] = useState<{message: string, visible: boolean}>({message: '', visible: false});
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
@@ -349,11 +350,19 @@ function App() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text)
       .then(() => {
-        // Could add a toast notification here if desired
-        console.log('Address copied to clipboard');
+        // Show toast notification
+        setToast({message: 'Address copied to clipboard', visible: true});
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+          setToast({message: '', visible: false});
+        }, 3000);
       })
       .catch(err => {
         console.error('Failed to copy address: ', err);
+        setToast({message: 'Failed to copy address', visible: true});
+        setTimeout(() => {
+          setToast({message: '', visible: false});
+        }, 3000);
       });
   };
 
@@ -377,6 +386,13 @@ function App() {
               ×
             </button>
           </div>
+        </div>
+      )}
+      
+      {/* Toast notification */}
+      {toast.visible && (
+        <div className="toast-notification">
+          {toast.message}
         </div>
       )}
       
