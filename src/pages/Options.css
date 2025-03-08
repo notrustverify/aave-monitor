@@ -68,6 +68,7 @@ body, html {
   box-sizing: border-box;
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: calc(100% - 20px);
 }
 
@@ -394,6 +395,8 @@ button:hover {
   color: var(--text-secondary);
   width: 100%;
   letter-spacing: normal;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .footer-divider {
@@ -402,6 +405,7 @@ button:hover {
   background: var(--border-color);
   margin: 0 0 8px 0;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .footer-content {
@@ -410,6 +414,8 @@ button:hover {
   justify-content: center;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
 }
 
 .heart-icon {
