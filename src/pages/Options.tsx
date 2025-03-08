@@ -199,7 +199,7 @@ function Options() {
 
   return (
     <div className="options-container">
-      <h1>Aave Health Factor Settings</h1>
+      <h1>Aave Monitor Settings</h1>
       
       <div className="theme-section">
         <h2>Appearance</h2>
