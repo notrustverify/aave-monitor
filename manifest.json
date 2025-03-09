@@ -8,7 +8,8 @@
     },
     "permissions": [
         "storage",
-        "alarms"
+        "alarms",
+        "sidePanel"
     ],
     "background": {
         "service_worker": "js/background.js",
@@ -22,6 +23,9 @@
     "options_ui": {
         "page": "public/options.html",
         "open_in_tab": true
+    },
+    "side_panel": {
+        "default_path": "js/sidepanel.html"
     },
     "browser_specific_settings": {
         "gecko": {

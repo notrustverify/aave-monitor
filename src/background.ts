@@ -4,6 +4,29 @@ import networks from './config/networks';
 import { POOL_ABI } from "./config/abi";
 import { formatLargeNumber, updateBadge } from "./utils/utils";
 
+// Setup side panel when extension is installed
+browserAPI.runtime.onInstalled.addListener(() => {
+  if (browserAPI.sidePanel) {
+    browserAPI.sidePanel.setOptions({
+      path: 'js/sidepanel.html',
+      enabled: true
+    });
+  }
+});
+
+// Handle extension icon click
+browserAPI.action.onClicked.addListener(async (tab) => {
+  // If sidePanel API is available (Chrome)
+  if (browserAPI.sidePanel) {
+    try {
+      // Toggle the side panel
+      browserAPI.sidePanel.open({ windowId: tab.windowId });
+    } catch (error) {
+      console.error('Error opening side panel:', error);
+    }
+  }
+});
+
 async function updateHealthFactor() {
   try {
     // Get starred address and its associated network
@@ -112,9 +135,45 @@ async function setupHealthCheck() {
   }
 }
 
+// Add a new alarm for side panel updates (more frequent)
+async function setupSidePanelAlarm(isOpen: boolean) {
+  try {
+    console.log(`Side panel ${isOpen ? 'opened' : 'closed'}, ${isOpen ? 'creating' : 'clearing'} alarm`);
+    
+    // Clear existing side panel alarm if any
+    await browserAPI.alarms.clear('sidePanelUpdate');
+    
+    if (isOpen) {
+      // Create a more frequent alarm when side panel is open (every 30 seconds)
+      browserAPI.alarms.create('sidePanelUpdate', {
+        periodInMinutes: 0.5 // 30 seconds
+      });
+      
+      // Immediately update data
+      updateHealthFactor();
+    }
+  } catch (error) {
+    console.error('Error setting up side panel alarm:', error);
+  }
+}
+
+// Listen for messages from the side panel
+browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'sidePanelOpened') {
+    setupSidePanelAlarm(true);
+    sendResponse({ success: true });
+  } else if (message.action === 'sidePanelClosed') {
+    setupSidePanelAlarm(false);
+    sendResponse({ success: true });
+  }
+  return true; // Required for async response
+});
+
 // Listen for alarm events
 browserAPI.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'healthCheck') {
+    updateHealthFactor();
+  } else if (alarm.name === 'sidePanelUpdate') {
     updateHealthFactor();
   }
 });

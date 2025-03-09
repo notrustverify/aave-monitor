@@ -6,7 +6,8 @@ module.exports = {
   entry: {
     index: "./src/index.tsx",
     background: "./src/background.ts",
-    options: "./src/options.tsx"
+    options: "./src/options.tsx",
+    sidepanel: "./src/sidepanel.tsx"
   },
   mode: "production",
   module: {
@@ -37,7 +38,22 @@ module.exports = {
         { from: "public", to: "../public" }
       ],
     }),
-    ...getHtmlPlugins(["index", "options"]),
+    new HTMLPlugin({
+      title: "Aave Monitor",
+      filename: "index.html",
+      chunks: ["index"],
+    }),
+    new HTMLPlugin({
+      title: "Aave Monitor Options",
+      filename: "options.html",
+      chunks: ["options"],
+    }),
+    new HTMLPlugin({
+      title: "Aave Monitor Side Panel",
+      filename: "sidepanel.html",
+      template: "./public/sidepanel.html",
+      chunks: ["sidepanel"],
+    }),
   ],
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
@@ -47,14 +63,3 @@ module.exports = {
     filename: "[name].js",
   },
 };
-
-function getHtmlPlugins(chunks) {
-  return chunks.map(
-    (chunk) =>
-      new HTMLPlugin({
-        title: "React extension",
-        filename: `${chunk}.html`,
-        chunks: [chunk],
-      })
-  );
-}

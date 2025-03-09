@@ -35,6 +35,45 @@ function App() {
   const [warningThreshold, setWarningThreshold] = useState(2);
   const [dangerThreshold, setDangerThreshold] = useState(1);
   const [toast, setToast] = useState<{message: string, visible: boolean}>({message: '', visible: false});
+  const [isSidePanel, setIsSidePanel] = useState(false);
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+
+  // Function to open the sidepanel
+  const openSidePanel = () => {
+    if (browserAPI.sidePanel) {
+      try {
+        // We need to get the current tab first
+        if (browserAPI.tabs && browserAPI.tabs.query) {
+          browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs: chrome.tabs.Tab[]) => {
+            if (tabs && tabs.length > 0) {
+              const currentTab = tabs[0];
+              // Now we can open the side panel with the correct parameters
+              if (currentTab.windowId) {
+                browserAPI.sidePanel.open({ windowId: currentTab.windowId });
+                // Close the popup after opening the side panel
+                setTimeout(() => window.close(), 100);
+              } else {
+                console.error('Tab has no windowId');
+                setGlobalError('Failed to open side panel: Tab has no windowId');
+              }
+            } else {
+              console.error('No active tab found');
+              setGlobalError('Failed to open side panel: No active tab found');
+            }
+          });
+        } else {
+          // Fallback if tabs API is not available
+          console.error('Tabs API not available');
+          setGlobalError('Failed to open side panel: Tabs API not available');
+        }
+      } catch (error: unknown) {
+        console.error('Error opening side panel:', error);
+        setGlobalError('Failed to open side panel');
+      }
+    } else {
+      setGlobalError('Side panel is not supported in this browser');
+    }
+  };
 
   // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
   useEffect(() => {
@@ -171,6 +210,19 @@ function App() {
       browserAPI.storage.onChanged.removeListener(handleStorageChange);
     };
   }, []);
+
+  // Detect if running in side panel
+  useEffect(() => {
+   const isSidePanelContainer = document.querySelector('.sidepanel-container') !== null;
+   setIsSidePanel(isSidePanelContainer);
+  }, []);
+
+  // Update last refresh time when data is refreshed
+  useEffect(() => {
+    if (Object.keys(isLoading).length > 0 && !Object.values(isLoading).some(loading => loading)) {
+      setLastRefreshTime(new Date());
+    }
+  }, [isLoading]);
 
   const formatNumber = (value: string | number) => {
     return new Intl.NumberFormat(locale, {
@@ -320,13 +372,6 @@ function App() {
     });
   };
 
-  const togglePrivacyMode = () => {
-    const newPrivacyMode = !privacyMode;
-    setPrivacyMode(newPrivacyMode);
-    // Save privacy mode state to storage
-    browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
-  };
-
   const formatAmount = (amount: string) => {
     return privacyMode ? '****' : formatNumber(amount);
   };
@@ -371,6 +416,23 @@ function App() {
     setTheme(newTheme);
     browserAPI.storage.local.set({ theme: newTheme });
   };
+
+  // Format the last refresh time
+  const formatLastRefreshTime = () => {
+    if (!lastRefreshTime) return 'Never';
+    
+    const now = new Date();
+    const diffSeconds = Math.floor((now.getTime() - lastRefreshTime.getTime()) / 1000);
+    
+    if (diffSeconds < 60) {
+      return `${diffSeconds} seconds ago`;
+    } else if (diffSeconds < 3600) {
+      return `${Math.floor(diffSeconds / 60)} minutes ago`;
+    } else {
+      return lastRefreshTime.toLocaleTimeString();
+    }
+  };
+
   console.log(selectedNetwork);
 
   return (
@@ -379,12 +441,7 @@ function App() {
         <div className="global-error">
           <div className="error-message">
             {globalError}
-            <button 
-              className="close-error"
-              onClick={() => setGlobalError('')}
-            >
-              ×
-            </button>
+            <button className="close-error" onClick={() => setGlobalError('')}>×</button>
           </div>
         </div>
       )}
@@ -396,232 +453,211 @@ function App() {
         </div>
       )}
       
-      <div className="input-container">
-        <div className="input-with-button">
-          <input
-            type="text"
-            placeholder="Enter address"
-            value={newAddress}
-            onChange={(e) => setNewAddress(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                addAddress();
-              }
-            }}
-          />
-          <div className="network-selector-small">
+      <div className="container">
+        <div className="input-container">
+          <div className="input-with-button">
+            <input
+              type="text"
+              placeholder="Enter Ethereum address"
+              value={newAddress}
+              onChange={(e) => setNewAddress(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && addAddress()}
+            />
             <select 
+              className="network-select-small"
               value={selectedNetwork}
               onChange={(e) => setSelectedNetwork(e.target.value)}
-              className="network-select-small"
-              title={networks[selectedNetwork]?.name || 'Ethereum'}
             >
-              {getAllNetworks().map(network => (
-                <option 
-                  key={network.chainId} 
-                  value={network.name.toLowerCase()}
-                  title={network.name}
-                >
-                  {network.name} ({network.nativeCurrency.symbol})
+              {Object.keys(networks).map(key => (
+                <option key={key} value={key}>
+                  {networks[key].name}
                 </option>
               ))}
             </select>
+            <button className="add-button" onClick={addAddress}>Add</button>
           </div>
-          <button 
-            className="add-button"
-            onClick={addAddress}
-          >
-            Add
-          </button>
+          <div className="action-icons">
+            <img 
+              src="../public/assets/refresh.svg" 
+              alt="Refresh" 
+              className="action-icon"
+              onClick={refreshData}
+              title="Refresh data"
+            />
+            <img 
+              src="../public/assets/eye.svg" 
+              alt="Toggle Privacy Mode" 
+              className="action-icon"
+              onClick={() => setPrivacyMode(!privacyMode)}
+              title={privacyMode ? "Show values" : "Hide values"}
+            />
+            <img 
+              src="../public/assets/sidepanel.svg" 
+              alt="Open Side Panel" 
+              className="action-icon"
+              onClick={openSidePanel}
+              title="Open Side Panel"
+            />
+            <img 
+              src="../public/assets/settings.svg" 
+              alt="Settings" 
+              className="action-icon"
+              onClick={() => window.open(browserAPI.runtime.getURL('public/options.html'))}
+              title="Settings"
+            />
+          </div>
         </div>
-        <div className="action-icons">
-          <img 
-            src="../public/assets/refresh.svg" 
-            alt="Refresh" 
-            className="action-icon"
-            onClick={refreshData}
-            title="Refresh data"
-          />
-          <img 
-            src="../public/assets/eye.svg" 
-            alt="Toggle Privacy Mode" 
-            className="action-icon"
-            onClick={togglePrivacyMode}
-            title="Toggle privacy mode"
-          />
-          <img 
-            src="../public/assets/settings.svg" 
-            alt="Options" 
-            className="action-icon"
-            onClick={() => browserAPI.runtime.openOptionsPage()}
-            title="Settings"
-          />
-        </div>
-      </div>
-
-      <div className="addresses-container">
-        {addresses
-          .sort((a, b) => {
-            // Put starred address at the top
-            if (a.address === starredAddress) return -1;
-            if (b.address === starredAddress) return 1;
-            return 0;
-          })
-          .map(addressData => {
-          const address = addressData.address;
-          const network = addressData.network;
-          
-          return (
-            <div key={address} className="address-data">
-              {isLoading[address] ? (
-                <div className="loading">Loading...</div>
-              ) : errors[address] ? (
-                <div className="error-container">
-                  <div className="address-header">
-                    <div className="address-info">
-                      <span className="address-value truncated-address" title={address}>
-                        {truncateAddress(address)}
-                        <button 
-                          className="copy-button" 
-                          onClick={() => copyToClipboard(address)}
-                          title="Copy address to clipboard"
-                        >
-                          <svg className="copy-icon" viewBox="0 0 24 24" width="14" height="14">
-                            <path fill="currentColor" d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" />
-                          </svg>
-                        </button>
-                      </span>
-                      <div className="network-badge">
-                        <select
-                          value={network}
-                          onChange={(e) => updateAddressNetwork(address, e.target.value)}
-                          className="network-select-badge"
-                          title={networks[network]?.name || 'Ethereum'}
-                        >
-                          {getAllNetworks().map(net => (
-                            <option 
-                              key={net.chainId} 
-                              value={net.name.toLowerCase()}
-                              title={net.name}
-                            >
-                              {net.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="address-actions">
-                      <button 
-                        className={`star-button ${starredAddress === address ? 'starred' : ''}`}
-                        onClick={() => toggleStar(address)}
-                      >
-                        {starredAddress === address ? '★' : '☆'}
-                      </button>
-                      <button 
-                        className="remove-button"
-                        onClick={() => removeAddress(address)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                  <div className="error-message">{errors[address]}</div>
-                  <button 
-                    className="retry-button"
-                    onClick={() => getUserData(address, network)}
-                  >
-                    Retry
-                  </button>
-                </div>
-              ) : userData[address] && (
-                <div className="container">
-                  <div className="address-header">
-                    <div className="address-info">
-                      <span className="address-value truncated-address" title={address}>
-                        {truncateAddress(address)}
-                        <button 
-                          className="copy-button" 
-                          onClick={() => copyToClipboard(address)}
-                          title="Copy address to clipboard"
-                        >
-                          <svg className="copy-icon" viewBox="0 0 24 24" width="14" height="14">
-                            <path fill="currentColor" d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" />
-                          </svg>
-                        </button>
-                      </span>
-                      <div className="network-badge">
-                        <select
-                          value={userData[address].network || network}
-                          onChange={(e) => updateAddressNetwork(address, e.target.value)}
-                          className="network-select-badge"
-                          title={networks[userData[address].network || network]?.name || 'Ethereum'}
-                        >
-                          {getAllNetworks().map(net => (
-                            <option 
-                              key={net.chainId} 
-                              value={net.name.toLowerCase()}
-                              title={net.name}
-                            >
-                              {net.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                    <div className="address-actions">
-                      <button 
-                        className={`star-button ${starredAddress === address ? 'starred' : ''}`}
-                        onClick={() => toggleStar(address)}
-                      >
-                        {starredAddress === address ? '★' : '☆'}
-                      </button>
-                      <button 
-                        className="remove-button"
-                        onClick={() => removeAddress(address)}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Total Collateral</span>
-                    <span className="value">$ {formatAmount(userData[address].totalCollateral)}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Total Debt</span>
-                    <span className="value">$ {formatAmount(userData[address].totalDebt)}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Available to Borrow</span>
-                    <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Net Worth</span>
-                    <span className="value">$ {formatAmount(userData[address].netWorth)}</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">Liquidation Threshold</span>
-                    <span className="value">{userData[address].liquidationThreshold}%</span>
-                  </div>
-                  <div className="data-row">
-                    <span className="label">LTV</span>
-                    <span className="value">{userData[address].ltv}%</span>
-                  </div>
-                  <div className={`health-factor ${
-                    parseFloat(userData[address].healthFactor) >= warningThreshold ? 'safe' : 
-                    parseFloat(userData[address].healthFactor) >= dangerThreshold ? 'warning' : 'danger'
-                  }`}>
-                    Health Factor: {
-                      parseFloat(userData[address].totalDebt) === 0 
-                        ? "No debt"
-                        : formatNumber(userData[address].healthFactor)
-                    }
-                  </div>
-                </div>
-              )}
+        
+        <div className="addresses-container">
+          {addresses.length === 0 ? (
+            <div className="error-container">
+              No addresses added yet. Add an address to monitor.
             </div>
-          );
-        })}
+          ) : (
+            addresses.map(({ address, network }) => {
+              return (
+                <div key={address} className="address-data">
+                  {isLoading[address] ? (
+                    <div className="loading">Loading...</div>
+                  ) : errors[address] ? (
+                    <div className="error-container">
+                      <div className="address-header">
+                        <div className="address-header-left">
+                          <span className="truncated-address" title={address}>
+                            {truncateAddress(address)}
+                          </span>
+                          <div className="copy-icon-container" onClick={() => copyToClipboard(address)} title="Copy address to clipboard">
+                            <svg className="copy-icon" viewBox="0 0 24 24" width="14" height="14">
+                              <path fill="currentColor" d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="address-header-right">
+                          <select
+                            value={network}
+                            onChange={(e) => updateAddressNetwork(address, e.target.value)}
+                            className="network-select-badge"
+                            title={networks[network]?.name || 'Ethereum'}
+                          >
+                            {getAllNetworks().map(net => (
+                              <option 
+                                key={net.chainId} 
+                                value={net.name.toLowerCase()}
+                                title={net.name}
+                              >
+                                {net.name}
+                              </option>
+                            ))}
+                          </select>
+                          <button 
+                            className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                            onClick={() => toggleStar(address)}
+                          >
+                            {starredAddress === address ? '★' : '☆'}
+                          </button>
+                          <button 
+                            className="remove-button"
+                            onClick={() => removeAddress(address)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                      <div className="error-message">{errors[address]}</div>
+                      <button 
+                        className="retry-button"
+                        onClick={() => getUserData(address, network)}
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  ) : userData[address] && (
+                    <div className="container">
+                      <div className="address-header">
+                        <div className="address-header-left">
+                          <span className="truncated-address" title={address}>
+                            {truncateAddress(address)}
+                          </span>
+                          <div className="copy-icon-container" onClick={() => copyToClipboard(address)} title="Copy address to clipboard">
+                            <svg className="copy-icon" viewBox="0 0 24 24" width="14" height="14">
+                              <path fill="currentColor" d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z" />
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="address-header-right">
+                          <select
+                            value={userData[address].network || network}
+                            onChange={(e) => updateAddressNetwork(address, e.target.value)}
+                            className="network-select-badge"
+                            title={networks[userData[address].network || network]?.name || 'Ethereum'}
+                          >
+                            {getAllNetworks().map(net => (
+                              <option 
+                                key={net.chainId} 
+                                value={net.name.toLowerCase()}
+                                title={net.name}
+                              >
+                                {net.name}
+                              </option>
+                            ))}
+                          </select>
+                          <button 
+                            className={`star-button ${starredAddress === address ? 'starred' : ''}`}
+                            onClick={() => toggleStar(address)}
+                          >
+                            {starredAddress === address ? '★' : '☆'}
+                          </button>
+                          <button 
+                            className="remove-button"
+                            onClick={() => removeAddress(address)}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Total Collateral</span>
+                        <span className="value">$ {formatAmount(userData[address].totalCollateral)}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Total Debt</span>
+                        <span className="value">$ {formatAmount(userData[address].totalDebt)}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Available to Borrow</span>
+                        <span className="value">$ {formatAmount(userData[address].availableBorrows)}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Net Worth</span>
+                        <span className="value">$ {formatAmount(userData[address].netWorth)}</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">Liquidation Threshold</span>
+                        <span className="value">{userData[address].liquidationThreshold}%</span>
+                      </div>
+                      <div className="data-row">
+                        <span className="label">LTV</span>
+                        <span className="value">{userData[address].ltv}%</span>
+                      </div>
+                      <div className={`health-factor ${
+                        parseFloat(userData[address].healthFactor) >= warningThreshold ? 'safe' : 
+                        parseFloat(userData[address].healthFactor) >= dangerThreshold ? 'warning' : 'danger'
+                      }`}>
+                        Health Factor: {
+                          parseFloat(userData[address].totalDebt) === 0 
+                            ? "No debt"
+                            : formatNumber(userData[address].healthFactor)
+                        }
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+        
+       
       </div>
       
       <div className="footer">
