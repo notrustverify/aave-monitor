@@ -7,6 +7,13 @@ import browserAPI from './utils/browserAPI';
 
 // Side Panel specific component
 const SidePanel: React.FC = () => {
+  // Function to close the side panel
+  const closeSidePanel = () => {
+    // The Chrome API doesn't have a direct sidePanel.close() method
+    // Using window.close() is the recommended way to close the side panel
+    window.close();
+  };
+
   // Set document title and notify background script when side panel is opened/closed
   useEffect(() => {    
     // Add a class to the body for side panel specific styling
@@ -34,7 +41,16 @@ const SidePanel: React.FC = () => {
 
   return (
     <div className="sidepanel-container">
-      <h3 className="sidepanel-title">Aave Monitor</h3>
+      <div className="sidepanel-header">
+        <h3 className="sidepanel-title">Aave Monitor</h3>
+        <button 
+          className="close-button" 
+          onClick={closeSidePanel}
+          title="Close side panel"
+        >
+          <img src="../public/assets/close.svg" alt="Close" />
+        </button>
+      </div>
       <App />
     </div>
   );
