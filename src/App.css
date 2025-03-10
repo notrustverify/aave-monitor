@@ -229,7 +229,6 @@ input:focus {
   width: 100%;
   flex: 1;
   overflow-y: auto;
-  display: flex;
   flex-direction: column;
   gap: 1rem;
 }
@@ -310,9 +309,7 @@ input:focus {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   transition: transform 0.2s ease;
-  display: flex;
   flex-direction: column;
-  background-color: #fff;
   overflow: visible;
   margin-bottom: 10px;
 }
@@ -321,10 +318,7 @@ input:focus {
   background-color: #2a2a2a;
 }
 
-.address-data:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-}
+
 
 /* Network badge styling */
 .network-select-badge {
@@ -932,7 +926,6 @@ select.network-select-badge {
   transition: transform 0.2s ease;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
   overflow: visible;
   margin-bottom: 10px;
 }
