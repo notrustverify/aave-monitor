@@ -31,7 +31,7 @@
     "webpack-cli": "^6.0.1"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js && zip -r aavemonitor.zip dist/ -x '*.DS_Store'",
+    "build": "webpack --config webpack.config.js && zip -r chrome-extension.zip dist/ -x '*.DS_Store'",
     "watch": "webpack -w --config webpack.config.js",
     "build:firefox": "NODE_ENV=firefox webpack --config webpack.config.js && cp manifest_firefox.json firefox_dist/manifest.json && web-ext build --source-dir firefox_dist --overwrite-dest",
     "compile": "zip -r sourcecode.zip src public -x '*.pem' -x '*node_modules*' -x '*.git*' -x '*web-ext-artifacts*' -x '*.DS_Store'",
