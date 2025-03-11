@@ -90,12 +90,19 @@ body, html {
   border-radius: 4px;
 }
 
+[data-theme="dark"] .input-container {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .input-with-button {
   display: flex;
   width: 100%;
   align-items: center;
   gap: 8px;
   height: 36px;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .input-with-button input {
@@ -388,6 +395,10 @@ select.network-select-badge {
 
 .star-button.starred {
   color: #ffd700;
+}
+
+.star-button:hover {
+  color: #ffc107;
 }
 
 .options-button {
@@ -773,7 +784,8 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-body {
-  background-color: #1e1e1e;
+  background: var(--bg-primary);
+  color: var(--text-primary);
 }
 
 .sidepanel-container {
@@ -785,19 +797,39 @@ select.network-select-badge {
   align-items: center;
   padding: 0;
   box-sizing: border-box;
-  background-color: #f5f5f5;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .sidepanel-container {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.sidepanel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1px;
+  box-sizing: border-box;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  backdrop-filter: blur(12px);
 }
 
 .sidepanel-title {
-  font-size: 18px;
-  font-weight: 600;
-  margin: 10px 0;
+  margin: 5px 0;
   color: #333;
   text-align: center;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 [data-theme="dark"] .sidepanel-title {
-  color: #f0f0f0;
+  color: var(--text-primary);
 }
 
 .sidepanel-container .App {
@@ -809,6 +841,11 @@ select.network-select-badge {
   box-sizing: border-box;
   min-height: 100vh;
   overflow-y: visible;
+  background: transparent;
+}
+
+[data-theme="dark"] .sidepanel-container .App {
+  background: transparent;
 }
 
 .sidepanel-container .container {
@@ -822,6 +859,12 @@ select.network-select-badge {
   overflow-y: visible;
 }
 
+[data-theme="dark"] .sidepanel-container .container {
+  background: var(--bg-secondary);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+}
+
 .sidepanel-container .input-container {
   width: 100%;
   margin-bottom: 15px;
@@ -833,12 +876,19 @@ select.network-select-badge {
   border-radius: 4px;
 }
 
+[data-theme="dark"] .sidepanel-container .input-container {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+}
+
 .sidepanel-container .input-with-button {
   display: flex;
   width: 100%;
   align-items: center;
   gap: 8px;
   height: 36px;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .sidepanel-container .input-with-button input {
@@ -869,7 +919,7 @@ select.network-select-badge {
 [data-theme="dark"] .sidepanel-container input {
   background-color: #333;
   border-color: #444;
-  color: #f0f0f0;
+  color: var(--text-primary);
 }
 
 .sidepanel-container input:focus {
@@ -931,7 +981,8 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-container .address-data {
-  background-color: #2a2a2a;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
 }
 
 .sidepanel-container .address-data:hover {
@@ -958,7 +1009,8 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-container .data-row {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .sidepanel-container .data-row:last-child {
@@ -975,6 +1027,7 @@ select.network-select-badge {
   flex: 1;
   min-width: 0;
   text-align: left;
+  color: var(--text-secondary);
 }
 
 .sidepanel-container .value {
@@ -986,6 +1039,7 @@ select.network-select-badge {
   text-overflow: ellipsis;
   flex-shrink: 0;
   min-width: 80px;
+  color: var(--text-primary);
 }
 
 .sidepanel-container .health-factor {
@@ -1070,8 +1124,8 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-container .address-header {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: var(--input-bg);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sidepanel-container .star-button {
@@ -1146,8 +1200,9 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-container .network-select-badge {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--button-bg);
+  border-color: var(--button-border);
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .sidepanel-container select.network-select-badge {
@@ -1168,10 +1223,9 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .sidepanel-container .network-select-small {
-  background-color: #333;
-  border-color: #444;
-  color: #f0f0f0;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="%23f0f0f0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-color: var(--button-bg);
+  border-color: var(--button-border);
+  color: var(--text-primary);
 }
 
 .sidepanel-container .action-icons {
@@ -1304,6 +1358,14 @@ select.network-select-badge {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
+  background-color: #f5f5f5;
+}
+
+[data-theme="dark"] .sidepanel-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  backdrop-filter: blur(12px);
 }
 
 .close-button {
@@ -1318,6 +1380,8 @@ select.network-select-badge {
   width: 30px;
   height: 30px;
   transition: background-color 0.2s;
+  margin-left: auto;
+  order: 2;
 }
 
 .close-button:hover {
@@ -1325,7 +1389,7 @@ select.network-select-badge {
 }
 
 [data-theme="dark"] .close-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--button-hover-bg);
 }
 
 .close-button img {
@@ -1340,5 +1404,11 @@ select.network-select-badge {
 
 [data-theme="dark"] .close-button img {
   filter: invert(1);
+}
+
+[data-theme="dark"] .input-with-button input {
+  background-color: #333;
+  border-color: #444;
+  color: #f0f0f0;
 }
 

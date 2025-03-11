@@ -42,7 +42,7 @@ const SidePanel: React.FC = () => {
   return (
     <div className="sidepanel-container">
       <div className="sidepanel-header">
-        <h3 className="sidepanel-title">Aave Monitor</h3>
+       
         <button 
           className="close-button" 
           onClick={closeSidePanel}
