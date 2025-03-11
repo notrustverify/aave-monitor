@@ -1,4 +1,7 @@
 # Aave Health Factor Extension
+
+[![Build extensions](https://github.com/notrustverify/aave-monitor/actions/workflows/build-chrome.yml/badge.svg)](https://github.com/notrustverify/aave-monitor/actions/workflows/build-chrome.yml)
+
 Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
 
 Features:
