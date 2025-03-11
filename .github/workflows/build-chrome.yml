@@ -1,4 +1,4 @@
-name: Build chrome extension
+name: Build extensions
 
 on:
   push:
