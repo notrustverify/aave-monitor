@@ -4,6 +4,7 @@
   "private": true,
   "license": "GPL-3.0-only",
   "dependencies": {
+    "@bgd-labs/aave-address-book": "^4.16.0",
     "@ethersproject/bytes": "^5.8.0",
     "@ethersproject/providers": "^5.8.0",
     "@testing-library/dom": "^10.4.0",

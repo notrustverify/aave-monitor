@@ -1108,6 +1108,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bgd-labs/aave-address-book@^4.16.0":
+  version "4.16.0"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-address-book/-/aave-address-book-4.16.0.tgz#acaa52523b6f6a9ca6fdc356ee08a07c5df10ee1"
+  integrity sha512-ucSZCKlabZM78XMcgH7/8BOIbSfu+negMCGcco4CUzCuNyIdR+P5y9yIYr/m7E89xLN9uvrCGp6KiNy8BLP1rA==
+
 "@cspotcode/source-map-support@^0.8.0":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-support/-/source-map-support-0.8.1.tgz#00629c35a688e05a88b1cda684fb9d5e73f000a1"

@@ -31,3 +31,4 @@ cache/
 web-ext-artifacts/
 firefox_dist/.amo-upload-uuid
 chrome-extension.zip
+dist/
