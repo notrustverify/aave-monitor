@@ -6,22 +6,33 @@ import { formatLargeNumber, updateBadge } from "./utils/utils";
 
 // Track side panel state
 let isSidePanelOpen = false;
+let preferSidePanel = true; // Default preference
 
 // Function to update the popup setting based on side panel state
 function updatePopupSetting() {
-  if (isSidePanelOpen) {
-    // If side panel is open, disable the popup
+  if (isSidePanelOpen || preferSidePanel) {
+    // If side panel is open or user prefers side panel, disable the popup
     browserAPI.action.setPopup({ popup: '' });
   } else {
-    // If side panel is closed, enable the popup
+    // If side panel is closed and user prefers popup, enable the popup
     browserAPI.action.setPopup({ popup: 'js/index.html' });
   }
 }
 
+// Load user preferences when extension starts
+function loadUserPreferences() {
+  browserAPI.storage.local.get(['preferSidePanel'], (result) => {
+    if (result.preferSidePanel !== undefined) {
+      preferSidePanel = result.preferSidePanel;
+      updatePopupSetting();
+    }
+  });
+}
+
 // Setup side panel when extension is installed
 browserAPI.runtime.onInstalled.addListener(() => {
-  // Set initial popup state
-  updatePopupSetting();
+  // Load user preferences
+  loadUserPreferences();
   
   if (browserAPI.sidePanel) {
     browserAPI.sidePanel.setOptions({
@@ -31,10 +42,15 @@ browserAPI.runtime.onInstalled.addListener(() => {
   }
 });
 
+// Ensure preferences are loaded when browser starts
+browserAPI.runtime.onStartup.addListener(() => {
+  loadUserPreferences();
+});
+
 // Handle extension icon click
 browserAPI.action.onClicked.addListener(async (tab) => {
-  // If sidePanel API is available (Chrome)
-  if (browserAPI.sidePanel) {
+  // If sidePanel API is available and user prefers side panel
+  if (browserAPI.sidePanel && preferSidePanel) {
     try {
       // Only open the side panel if it's not already open
       if (!isSidePanelOpen) {
@@ -287,5 +303,13 @@ browserAPI.storage.onChanged.addListener((changes, namespace) => {
       });
       updateHealthFactor();
     }
+  }
+});
+
+// Listen for changes to preferences
+browserAPI.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.preferSidePanel !== undefined) {
+    preferSidePanel = changes.preferSidePanel.newValue;
+    updatePopupSetting();
   }
 }); 

@@ -16,6 +16,7 @@ function Options() {
   const [warningThreshold, setWarningThreshold] = useState(2);
   const [dangerThreshold, setDangerThreshold] = useState(1);
   const [badgeDisplay, setBadgeDisplay] = useState<string>('healthFactor');
+  const [preferSidePanel, setPreferSidePanel] = useState<boolean>(true);
 
   useEffect(() => {
     // Load saved settings
@@ -29,7 +30,8 @@ function Options() {
       'theme',
       'warningThreshold',
       'dangerThreshold',
-      'badgeDisplay'
+      'badgeDisplay',
+      'preferSidePanel'
     ], (result) => {
       if (result.updateFrequency) {
         setUpdateFrequency(result.updateFrequency);
@@ -65,6 +67,9 @@ function Options() {
       }
       if (result.badgeDisplay) {
         setBadgeDisplay(result.badgeDisplay);
+      }
+      if (result.preferSidePanel !== undefined) {
+        setPreferSidePanel(result.preferSidePanel);
       }
     });
   }, []);
@@ -180,7 +185,8 @@ function Options() {
         theme,
         warningThreshold,
         dangerThreshold,
-        badgeDisplay
+        badgeDisplay,
+        preferSidePanel
       });
       
       // Update the alarm interval
@@ -359,6 +365,22 @@ function Options() {
             <option value="fr-FR">Space</option>
             <option value="en-CH">'</option>
           </select>
+        </div>
+        
+        <div className="setting-group">
+          <label htmlFor="prefer-side-panel">Extension Icon Click Behavior:</label>
+          <div className="side-panel-preference-container">
+            <select 
+              id="prefer-side-panel"
+              value={preferSidePanel ? 'sidepanel' : 'popup'}
+              onChange={(e) => setPreferSidePanel(e.target.value === 'sidepanel')}
+              className="side-panel-preference-select"
+            >
+              <option value="sidepanel">Open Side Panel</option>
+              <option value="popup">Open Popup</option>
+            </select>
+          </div>
+          <p className="help-text">Choose what happens when you click the extension icon</p>
         </div>
       </div>
       
