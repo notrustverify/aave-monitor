@@ -4,8 +4,25 @@ import networks from './config/networks';
 import { POOL_ABI } from "./config/abi";
 import { formatLargeNumber, updateBadge } from "./utils/utils";
 
+// Track side panel state
+let isSidePanelOpen = false;
+
+// Function to update the popup setting based on side panel state
+function updatePopupSetting() {
+  if (isSidePanelOpen) {
+    // If side panel is open, disable the popup
+    browserAPI.action.setPopup({ popup: '' });
+  } else {
+    // If side panel is closed, enable the popup
+    browserAPI.action.setPopup({ popup: 'js/index.html' });
+  }
+}
+
 // Setup side panel when extension is installed
 browserAPI.runtime.onInstalled.addListener(() => {
+  // Set initial popup state
+  updatePopupSetting();
+  
   if (browserAPI.sidePanel) {
     browserAPI.sidePanel.setOptions({
       path: 'js/sidepanel.html',
@@ -19,10 +36,12 @@ browserAPI.action.onClicked.addListener(async (tab) => {
   // If sidePanel API is available (Chrome)
   if (browserAPI.sidePanel) {
     try {
-      // Toggle the side panel
-      browserAPI.sidePanel.open({ windowId: tab.windowId });
+      // Only open the side panel if it's not already open
+      if (!isSidePanelOpen) {
+        browserAPI.sidePanel.open({ windowId: tab.windowId });
+      }
     } catch (error) {
-      console.error('Error opening side panel:', error);
+      console.error('Error handling side panel:', error);
     }
   }
 });
@@ -160,9 +179,13 @@ async function setupSidePanelAlarm(isOpen: boolean) {
 // Listen for messages from the side panel
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'sidePanelOpened') {
+    isSidePanelOpen = true;
+    updatePopupSetting();
     setupSidePanelAlarm(true);
     sendResponse({ success: true });
   } else if (message.action === 'sidePanelClosed') {
+    isSidePanelOpen = false;
+    updatePopupSetting();
     setupSidePanelAlarm(false);
     sendResponse({ success: true });
   }
@@ -189,6 +212,9 @@ browserAPI.runtime.onStartup.addListener(() => {
       setupHealthCheck();
     });
   });
+  
+  console.log('Extension started, updating popup setting...');
+  updatePopupSetting();
 });
 
 // Ensure badge is updated when extension is installed/updated

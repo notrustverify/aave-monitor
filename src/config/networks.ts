@@ -33,7 +33,7 @@ const networks: Record<string, NetworkConfig> = {
     name: 'Ethereum',
     chainId: AaveV3Ethereum.CHAIN_ID,
     contractAddress: AaveV3Ethereum.POOL, // Aave V3 Pool on Ethereum from address book
-    defaultRpcUrl: 'https://eth.public-rpc.com',
+    defaultRpcUrl: 'https://eth.llamarpc.com',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',

@@ -491,13 +491,15 @@ function App() {
               onClick={() => setPrivacyMode(!privacyMode)}
               title={privacyMode ? "Show values" : "Hide values"}
             />
-            <img 
-              src="../public/assets/sidepanel.svg" 
-              alt="Open Side Panel" 
-              className="action-icon"
-              onClick={openSidePanel}
-              title="Open Side Panel"
-            />
+            {!isSidePanel && (
+              <img 
+                src="../public/assets/sidepanel.svg" 
+                alt="Open Side Panel" 
+                className="action-icon"
+                onClick={openSidePanel}
+                title="Open Side Panel"
+              />
+            )}
             <img 
               src="../public/assets/settings.svg" 
               alt="Settings" 

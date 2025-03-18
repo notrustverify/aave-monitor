@@ -9,9 +9,17 @@ import browserAPI from './utils/browserAPI';
 const SidePanel: React.FC = () => {
   // Function to close the side panel
   const closeSidePanel = () => {
-    // The Chrome API doesn't have a direct sidePanel.close() method
-    // Using window.close() is the recommended way to close the side panel
-    window.close();
+    // Send message before closing
+    browserAPI.runtime.sendMessage({ action: 'sidePanelClosed' })
+      .then(() => {
+        // The Chrome API doesn't have a direct sidePanel.close() method
+        // Using window.close() is the recommended way to close the side panel
+        window.close();
+      })
+      .catch(error => {
+        console.error('Error sending side panel closed notification:', error);
+        window.close();
+      });
   };
 
   // Set document title and notify background script when side panel is opened/closed
@@ -28,21 +36,26 @@ const SidePanel: React.FC = () => {
         console.error('Error sending side panel opened notification:', error);
       });
     
-    return () => {
-      document.body.classList.remove('sidepanel-body');
-      
-      // Notify background script that side panel is closed
+    // Add an event listener for the beforeunload event
+    const handleBeforeUnload = () => {
       browserAPI.runtime.sendMessage({ action: 'sidePanelClosed' })
         .catch(error => {
           console.error('Error sending side panel closed notification:', error);
         });
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      document.body.classList.remove('sidepanel-body');
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
 
   return (
     <div className="sidepanel-container">
       <div className="sidepanel-header">
-       
+        <h2 className="sidepanel-title">Aave Monitor</h2>
         <button 
           className="close-button" 
           onClick={closeSidePanel}
@@ -56,11 +69,13 @@ const SidePanel: React.FC = () => {
   );
 };
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <SidePanel />
-  </React.StrictMode>
-); 
+// Create root container and render the Side Panel component
+const root = document.getElementById('root');
+if (root) {
+  const reactRoot = ReactDOM.createRoot(root);
+  reactRoot.render(
+    <React.StrictMode>
+      <SidePanel />
+    </React.StrictMode>
+  );
+} 

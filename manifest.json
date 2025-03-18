@@ -4,7 +4,7 @@
     "version": "2.6.2",
     "description": "Monitor Aave health factor and other metrics",
     "action": {
-        "default_popup": "js/index.html"
+        "default_popup": ""
     },
     "permissions": [
         "storage",
