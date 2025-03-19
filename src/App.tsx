@@ -511,7 +511,12 @@ function App() {
               No addresses added yet. Add an address to monitor.
             </div>
           ) : (
-            addresses.map(({ address, network }) => {
+            // Sort addresses to keep starred address on top
+            [...addresses].sort((a, b) => {
+              if (a.address === starredAddress) return -1;
+              if (b.address === starredAddress) return 1;
+              return 0;
+            }).map(({ address, network }) => {
               return (
                 <div key={address} className="address-data">
                   {isLoading[address] ? (
