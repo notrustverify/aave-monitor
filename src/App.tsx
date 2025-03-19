@@ -458,7 +458,7 @@ function App() {
           <div className="input-with-button">
             <input
               type="text"
-              placeholder="Enter Ethereum address"
+              placeholder="Enter address"
               value={newAddress}
               onChange={(e) => setNewAddress(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && addAddress()}
@@ -488,18 +488,13 @@ function App() {
               src="../public/assets/eye.svg" 
               alt="Toggle Privacy Mode" 
               className="action-icon"
-              onClick={() => setPrivacyMode(!privacyMode)}
+              onClick={() => {
+                const newPrivacyMode = !privacyMode;
+                setPrivacyMode(newPrivacyMode);
+                browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
+              }}
               title={privacyMode ? "Show values" : "Hide values"}
             />
-            {!isSidePanel && (
-              <img 
-                src="../public/assets/sidepanel.svg" 
-                alt="Open Side Panel" 
-                className="action-icon"
-                onClick={openSidePanel}
-                title="Open Side Panel"
-              />
-            )}
             <img 
               src="../public/assets/settings.svg" 
               alt="Settings" 

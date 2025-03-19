@@ -52,14 +52,33 @@ browserAPI.action.onClicked.addListener(async (tab) => {
   // If sidePanel API is available and user prefers side panel
   if (browserAPI.sidePanel && preferSidePanel) {
     try {
-      // Only open the side panel if it's not already open
-      if (!isSidePanelOpen) {
+      if (isSidePanelOpen) {
+        // Close the side panel by disabling it
+        browserAPI.sidePanel.setOptions({
+          enabled: false
+        });
+        
+        // Then immediately re-enable for next time
+        setTimeout(() => {
+          browserAPI.sidePanel.setOptions({
+            path: 'js/sidepanel.html',
+            enabled: true
+          });
+        }, 100);
+        
+        // Update our internal state
+        isSidePanelOpen = false;
+        updatePopupSetting();
+      } else {
+        // Open the side panel
         browserAPI.sidePanel.open({ windowId: tab.windowId });
       }
     } catch (error) {
       console.error('Error handling side panel:', error);
     }
   }
+  // No else block needed - if user prefers popup, the action.onClicked won't fire
+  // because the popup is set via updatePopupSetting()
 });
 
 async function updateHealthFactor() {
@@ -309,7 +328,37 @@ browserAPI.storage.onChanged.addListener((changes, namespace) => {
 // Listen for changes to preferences
 browserAPI.storage.onChanged.addListener((changes, area) => {
   if (area === 'local' && changes.preferSidePanel !== undefined) {
+    const previousValue = preferSidePanel;
     preferSidePanel = changes.preferSidePanel.newValue;
+    
+    // Close side panel if user changed from preferring side panel to preferring popup
+    if (previousValue === true && preferSidePanel === false && isSidePanelOpen && browserAPI.sidePanel) {
+      // Close the side panel by disabling it
+      browserAPI.sidePanel.setOptions({
+        enabled: false
+      });
+      
+      // Then immediately re-enable for next time
+      setTimeout(() => {
+        browserAPI.sidePanel.setOptions({
+          path: 'js/sidepanel.html',
+          enabled: true
+        });
+      }, 100);
+      
+      // Update our internal state
+      isSidePanelOpen = false;
+    }
+    
+    // Always update popup setting after preference change
     updatePopupSetting();
+    
+    // Force browser to recognize popup change by simulating a small delay
+    if (!preferSidePanel) {
+      setTimeout(() => {
+        console.log('Ensuring popup is properly set to js/index.html');
+        browserAPI.action.setPopup({ popup: 'js/index.html' });
+      }, 100);
+    }
   }
 }); 
