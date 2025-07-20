@@ -5,30 +5,33 @@
 Stay on top of your Aave account with the Aave Account Monitor Chrome Extension. This tool provides real-time insights into your Aave account data, helping you manage your crypto assets more effectively.
 
 Features:
-* Real-Time Data: Automatically fetches and displays your Aave account data, including total collateral, total debt, available borrows, liquidation threshold, LTV, and health factor.
-* Starred Address: Highlight a specific address to monitor its health factor directly from your browser's toolbar.
-* Badge Notifications: Get visual alerts on your browser's badge for quick insights into your account's health status.
-* Easy Management: Add or remove Ethereum addresses with a simple interface, and save your preferences directly in your browser.
-* Monitor your Aave positions across multiple networks: supporting Ethereum, Gnosis, Arbitrum, etc
+
+- Real-Time Data: Automatically fetches and displays your Aave account data, including total collateral, total debt, available borrows, liquidation threshold, LTV, and health factor.
+- Starred Address: Highlight a specific address to monitor its health factor directly from your browser's toolbar.
+- Badge Notifications: Get visual alerts on your browser's badge for quick insights into your account's health status.
+- Easy Management: Add or remove Ethereum addresses with a simple interface, and save your preferences directly in your browser.
+- Monitor your Aave positions across multiple networks: supporting Ethereum, Gnosis, Arbitrum, etc
 
 How It Works:
+
 1. Add Addresses: Enter Ethereum addresses to monitor their Aave account data.
 2. Star an Address: Click the star icon to set an address as your primary focus, and receive badge updates for its health factor.
 
 Monitor Health Factor: The badge color changes based on the health factor, alerting you to potential risks:
-* Green: Healthy (> 2)
-* Orange: Warning (1 - 2)
-* Red: Danger (< 1)
-* No Debt Indicator: If an address has no debt, the badge will display "ND" for "No Debt."
+
+- Green: Healthy (> 2)
+- Orange: Warning (1 - 2)
+- Red: Danger (< 1)
+- No Debt Indicator: If an address has no debt, the badge will display "ND" for "No Debt."
 
 Why Use Aave Health Factor?
-* Convenience: Access your Aave account data without leaving your browser.
-* Security: Keep track of your account's health to avoid liquidation risks.
-* Efficiency: Quickly identify and respond to changes in your account status.
+
+- Convenience: Access your Aave account data without leaving your browser.
+- Security: Keep track of your account's health to avoid liquidation risks.
+- Efficiency: Quickly identify and respond to changes in your account status.
 
 Get Started:
 Install the Aave Account Monitor extension today and take control of your Aave account management with ease and confidence.
-
 
 ## Requirements
 
@@ -39,13 +42,14 @@ Install the Aave Account Monitor extension today and take control of your Aave a
 ## Build Instructions
 
 1. Clone the repository
+
    ```bash
    git clone [your-repository-url]
    cd aave-health-factor
    ```
 
-
 2. Install dependencies
+
    ```bash
    npm install
    ```
@@ -64,11 +68,13 @@ This will create a `build` directory with the extension files.
 ## Development Setup
 
 ### Chrome Development
+
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable "Developer mode" in the top right
 3. Click "Load unpacked" and select the `build` directory
 
 ### Firefox Development
+
 1. Open Firefox and navigate to `about:debugging`
 2. Click "This Firefox" on the left sidebar
 3. Click "Load Temporary Add-on"
@@ -92,13 +98,14 @@ aave-health-factor/
 └── package.json
 ```
 
-
 ## Build Environment Details
 
 ### Operating System
+
 - The extension can be built on any operating system that supports Node.js (Windows, macOS, Linux)
 
 ### Build Environment
+
 - Node.js environment
 - npm package manager
 - Create React App build system
@@ -106,7 +113,9 @@ aave-health-factor/
 - Webpack (included in Create React App)
 
 ### Dependencies
+
 All dependencies are managed through npm and listed in package.json. Key dependencies include:
+
 - React 18.x
 - TypeScript 4.x
 - ethers.js 5.x
@@ -115,6 +124,7 @@ All dependencies are managed through npm and listed in package.json. Key depende
 ## Production Build Process
 
 The production build process:
+
 1. Compiles TypeScript files
 2. Bundles modules with Webpack
 3. Minifies JavaScript and CSS
@@ -125,6 +135,7 @@ The production build process:
 ## Firefox Add-on Specific Notes
 
 For Firefox distribution:
+
 1. Ensure you have a valid extension ID in manifest.json
 2. The build process creates a Firefox-compatible extension
 3. Test the extension in Firefox before submission
