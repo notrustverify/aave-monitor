@@ -12,7 +12,8 @@ import {
   AaveV3Linea,
   AaveV3Sonic,
   AaveV3ZkSync,
-  AaveV3EthereumEtherFi
+  AaveV3EthereumEtherFi,
+  AaveV3Celo
 } from '@bgd-labs/aave-address-book';
 
 export interface NetworkConfig {
@@ -196,7 +197,19 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18
     },
     blockExplorerUrl: 'https://etherscan.io'
-  }
+  },
+    celo: {
+    name: "Celo",
+    chainId: AaveV3Celo.CHAIN_ID,
+    contractAddress: AaveV3Celo.POOL, // Aave V3 Pool on Celo from address book
+    defaultRpcUrl: "https://celo-rpc.publicnode.com",
+    nativeCurrency: {
+      name: "Celo",
+      symbol: "CELO",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://celoscan.io/",
+  },
 };
 
 // Add Polygon zkEVM if available in the package
