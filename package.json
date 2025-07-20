@@ -59,6 +59,7 @@
   "devDependencies": {
     "@types/chrome": "^0.0.306",
     "@types/webextension-polyfill": "^0.12.2",
+    "prettier": "3.6.2",
     "web-ext": "^8.4.0"
   }
 }
