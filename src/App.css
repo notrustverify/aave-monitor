@@ -12,7 +12,7 @@
   --button-hover-bg: rgba(107, 0, 128, 0.3);
   --button-hover-border: rgba(107, 0, 128, 0.4);
   --health-safe-bg: rgba(76, 175, 80, 0.2);
-  --health-safe-color: #4CAF50;
+  --health-safe-color: #4caf50;
   --health-warning-bg: rgba(255, 152, 0, 0.2);
   --health-warning-color: #ffa726;
   --health-danger-bg: rgba(244, 67, 54, 0.2);
@@ -33,24 +33,25 @@
   --button-hover-bg: rgba(107, 0, 128, 0.2);
   --button-hover-border: rgba(107, 0, 128, 0.3);
   --health-safe-bg: rgba(76, 175, 80, 0.1);
-  --health-safe-color: #2E7D32;
+  --health-safe-color: #2e7d32;
   --health-warning-bg: rgba(255, 152, 0, 0.1);
-  --health-warning-color: #E65100;
+  --health-warning-color: #e65100;
   --health-danger-bg: rgba(244, 67, 54, 0.1);
-  --health-danger-color: #C62828;
+  --health-danger-color: #c62828;
   --icon-filter: invert(0);
 }
 
 /* Reset default margins and padding */
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   background: transparent;
-  font-family:  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
+    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -65,7 +66,7 @@ body, html {
   background: var(--bg-primary);
   padding: 0.5rem;
   box-sizing: border-box;
-  margin: 0;  /* Ensure no margin on App */
+  margin: 0; /* Ensure no margin on App */
 }
 
 .container {
@@ -171,7 +172,7 @@ input:focus {
   max-width: 500px;
   backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
-  box-shadow: 
+  box-shadow:
     0 4px 24px -1px rgba(0, 0, 0, 0.3),
     0 0 1px 0 rgba(255, 255, 255, 0.1) inset;
 }
@@ -324,8 +325,6 @@ input:focus {
 [data-theme="dark"] .address-data {
   background-color: #2a2a2a;
 }
-
-
 
 /* Network badge styling */
 .network-select-badge {
@@ -767,10 +766,22 @@ select.network-select-badge {
 }
 
 @keyframes fadeInOut {
-  0% { opacity: 0; transform: translate(-50%, 20px); }
-  10% { opacity: 1; transform: translate(-50%, 0); }
-  90% { opacity: 1; transform: translate(-50%, 0); }
-  100% { opacity: 0; transform: translate(-50%, -20px); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
 }
 
 /* Side Panel Styles */
@@ -780,7 +791,9 @@ select.network-select-badge {
   overflow: hidden;
   height: 100vh;
   background-color: #f5f5f5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 [data-theme="dark"] .sidepanel-body {
@@ -1281,11 +1294,11 @@ select.network-select-badge {
   .sidepanel-container .addresses-container {
     max-width: 100%;
   }
-  
+
   .sidepanel-container .input-container {
     max-width: 500px;
   }
-  
+
   .sidepanel-container .footer-content {
     max-width: 500px;
   }
@@ -1295,11 +1308,11 @@ select.network-select-badge {
   .sidepanel-container .addresses-container {
     max-width: 100%;
   }
-  
+
   .sidepanel-container .input-container {
     max-width: 600px;
   }
-  
+
   .sidepanel-container .footer-content {
     max-width: 600px;
   }
@@ -1309,11 +1322,11 @@ select.network-select-badge {
   .sidepanel-container .addresses-container {
     max-width: 800px;
   }
-  
+
   .sidepanel-container .input-container {
     max-width: 800px;
   }
-  
+
   .sidepanel-container .footer-content {
     max-width: 800px;
   }
@@ -1417,4 +1430,3 @@ select.network-select-badge {
   border-color: #444;
   color: #f0f0f0;
 }
-

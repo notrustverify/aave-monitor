@@ -7,15 +7,11 @@ declare namespace chrome {
       path?: string;
       enabled?: boolean;
     }): void;
-    
-    export function open(options?: {
-      windowId?: number;
-      tabId?: number;
-    }): void;
-    
-    export function getOptions(callback: (options: {
-      path: string;
-      enabled: boolean;
-    }) => void): void;
+
+    export function open(options?: { windowId?: number; tabId?: number }): void;
+
+    export function getOptions(
+      callback: (options: { path: string; enabled: boolean }) => void
+    ): void;
   }
 }
