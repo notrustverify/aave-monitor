@@ -1,5 +1,7 @@
 # Scriptable widget
 
+Download iOS app : [link](https://apps.apple.com/fr/app/scriptable/id1405459188)
+
 TODO : Add screenshot per feature (and detail differences)
 
 <img width="287" height="253" alt="image" src="https://github.com/user-attachments/assets/b78ab0f4-c9ab-4078-b13f-1fed64685c8f" />
