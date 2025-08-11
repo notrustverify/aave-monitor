@@ -120,6 +120,14 @@ const NETWORKS = {
       "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/xdai/info/logo.png",
     chainId: 100,
   },
+  gnosisRmm: {
+    name: "Gnosis RMM",
+    contractAddress: "0xed56f76e9cbc6a64b821e9c016eafbd3db5436d1", // RMM V3 Pool
+    rpcUrl: "https://rpc.gnosischain.com",
+    logoUrl:
+      "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/xdai/info/logo.png",
+    chainId: 100,
+  },
   bsc: {
     name: "Binance Chain",
     contractAddress: "0x6807dc923806fE8Fd134338EABCA509979a7e0cB", // AAVE V3 Pool

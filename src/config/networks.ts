@@ -102,6 +102,18 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://gnosisscan.io",
   },
+  gnosisRmm: {
+    name: "Gnosis RMM",
+    chainId: AaveV3Gnosis.CHAIN_ID,
+    contractAddress: "0xed56f76e9cbc6a64b821e9c016eafbd3db5436d1",
+    defaultRpcUrl: "https://rpc.gnosischain.com",
+    nativeCurrency: {
+      name: "xDai",
+      symbol: "xDAI",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://gnosisscan.io",
+  },
   base: {
     name: "Base",
     chainId: AaveV3Base.CHAIN_ID,
