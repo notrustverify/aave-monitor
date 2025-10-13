@@ -64,7 +64,7 @@ const SidePanel: React.FC = () => {
           onClick={closeSidePanel}
           title="Close side panel"
         >
-          <img src="../public/assets/close.svg" alt="Close" />
+          <img src="../assets/close.svg" alt="Close" />
         </button>
       </div>
       <App />

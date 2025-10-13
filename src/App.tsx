@@ -522,14 +522,14 @@ function App() {
           </div>
           <div className="action-icons">
             <img
-              src="../public/assets/refresh.svg"
+              src="../assets/refresh.svg"
               alt="Refresh"
               className="action-icon"
               onClick={refreshData}
               title="Refresh data"
             />
             <img
-              src="../public/assets/eye.svg"
+              src="../assets/eye.svg"
               alt="Toggle Privacy Mode"
               className="action-icon"
               onClick={() => {
@@ -540,7 +540,7 @@ function App() {
               title={privacyMode ? "Show values" : "Hide values"}
             />
             <img
-              src="../public/assets/settings.svg"
+              src="../assets/settings.svg"
               alt="Settings"
               className="action-icon"
               onClick={() =>

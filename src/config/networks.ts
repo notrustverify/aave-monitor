@@ -14,6 +14,7 @@ import {
   AaveV3ZkSync,
   AaveV3EthereumEtherFi,
   AaveV3Celo,
+  AaveV3Plasma,
 } from "@bgd-labs/aave-address-book";
 
 export interface NetworkConfig {
@@ -221,6 +222,18 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18,
     },
     blockExplorerUrl: "https://celoscan.io/",
+  },
+  plasma: {
+    name: "Plasma",
+    chainId: AaveV3Plasma.CHAIN_ID,
+    contractAddress: AaveV3Plasma.POOL, // Aave V3 Pool on Plasma from address book
+    defaultRpcUrl: "https://rpc.plasma.to",
+    nativeCurrency: {
+      name: "Plasma",
+      symbol: "XPL",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://plasmascan.to/",
   },
 };
 

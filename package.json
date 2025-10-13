@@ -3,63 +3,37 @@
   "version": "0.1.0",
   "private": true,
   "license": "GPL-3.0-only",
+  "type": "module",
   "dependencies": {
-    "@bgd-labs/aave-address-book": "^4.16.0",
+    "@bgd-labs/aave-address-book": "^4.32.0",
     "@ethersproject/bytes": "^5.8.0",
     "@ethersproject/providers": "^5.8.0",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
     "bignumber.js": "^9.1.2",
-    "copy-webpack-plugin": "^12.0.2",
-    "css-loader": "^7.1.2",
     "ethers": "^6.13.5",
-    "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.6.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-scripts": "5.0.1",
     "reflect-metadata": "^0.2.2",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4",
-    "webpack-cli": "^6.0.1"
+    "typescript": "^5.9.3",
+    "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js && zip -r chrome-extension.zip dist/ -x '*.DS_Store'",
-    "watch": "webpack -w --config webpack.config.js",
-    "build:firefox": "NODE_ENV=firefox webpack --config webpack.config.js && cp manifest_firefox.json firefox_dist/manifest.json && web-ext build --source-dir firefox_dist --overwrite-dest && zip -r firefox-extension.zip dist/ -x '*.DS_Store'",
+    "dev": "vite",
+    "build": "vite build && zip -r chrome-extension.zip dist/ -x '*.DS_Store'",
+    "preview": "vite preview",
+    "build:firefox": "NODE_ENV=firefox vite build && cp manifest_firefox.json firefox_dist/manifest.json && web-ext build --source-dir firefox_dist --overwrite-dest && zip -r firefox-extension.zip dist/ -x '*.DS_Store'",
     "compile": "zip -r sourcecode.zip src public -x '*.pem' -x '*node_modules*' -x '*.git*' -x '*web-ext-artifacts*' -x '*.DS_Store'",
     "publish:firefox": "npx web-ext sign  --api-key=$API_KEY --api-secret=$API_SECRET  -s firefox_dist --channel $CHANNEL"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "@types/chrome": "^0.0.306",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
     "@types/webextension-polyfill": "^0.12.2",
+    "@vitejs/plugin-react": "^4.3.3",
     "prettier": "3.6.2",
+    "vite": "^6.0.3",
+    "vite-plugin-web-extension": "^4.1.1",
     "web-ext": "^8.4.0"
   }
 }

@@ -15,7 +15,7 @@ function updatePopupSetting() {
     browserAPI.action.setPopup({ popup: "" });
   } else {
     // If side panel is closed and user prefers popup, enable the popup
-    browserAPI.action.setPopup({ popup: "js/index.html" });
+    browserAPI.action.setPopup({ popup: "public/index.html" });
   }
 }
 
@@ -36,7 +36,7 @@ browserAPI.runtime.onInstalled.addListener(() => {
 
   if (browserAPI.sidePanel) {
     browserAPI.sidePanel.setOptions({
-      path: "js/sidepanel.html",
+      path: "public/sidepanel.html",
       enabled: true,
     });
   }
@@ -61,7 +61,7 @@ browserAPI.action.onClicked.addListener(async (tab) => {
         // Then immediately re-enable for next time
         setTimeout(() => {
           browserAPI.sidePanel.setOptions({
-            path: "js/sidepanel.html",
+            path: "public/sidepanel.html",
             enabled: true,
           });
         }, 100);
@@ -365,7 +365,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
       // Then immediately re-enable for next time
       setTimeout(() => {
         browserAPI.sidePanel.setOptions({
-          path: "js/sidepanel.html",
+          path: "public/sidepanel.html",
           enabled: true,
         });
       }, 100);
@@ -381,7 +381,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
     if (!preferSidePanel) {
       setTimeout(() => {
         console.log("Ensuring popup is properly set to js/index.html");
-        browserAPI.action.setPopup({ popup: "js/index.html" });
+        browserAPI.action.setPopup({ popup: "public/index.html" });
       }, 100);
     }
   }
