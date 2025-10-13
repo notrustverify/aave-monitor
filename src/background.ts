@@ -112,16 +112,40 @@ async function updateHealthFactor() {
 
     if (!starredAddress) return;
 
-    // Find the network for the starred address
+    // Parse starred address to get address and network
+    let actualAddress = starredAddress;
     let networkKey = "ethereum"; // Default to Ethereum
-    if (savedAddresses && Array.isArray(savedAddresses)) {
-      // Check if using new format (objects with address and network)
-      if (savedAddresses.length > 0 && typeof savedAddresses[0] === "object") {
-        const addressData = savedAddresses.find(
-          (item) => item.address === starredAddress
-        );
-        if (addressData && addressData.network) {
-          networkKey = addressData.network;
+    
+    // Check if starred address is in new format (address-network)
+    if (starredAddress.includes('-')) {
+      const parts = starredAddress.split('-');
+      if (parts.length >= 2) {
+        // Reconstruct address (it might contain dashes, so we need to be careful)
+        // The network is always the last part
+        const networkPart = parts[parts.length - 1];
+        actualAddress = parts.slice(0, -1).join('-');
+        
+        // Find the network key from the saved addresses
+        if (savedAddresses && Array.isArray(savedAddresses)) {
+          const addressData = savedAddresses.find(
+            (item) => item.address === actualAddress && item.network === networkPart
+          );
+          if (addressData && addressData.network) {
+            networkKey = addressData.network;
+          }
+        }
+      }
+    } else {
+      // Old format - find the network for the starred address
+      if (savedAddresses && Array.isArray(savedAddresses)) {
+        // Check if using new format (objects with address and network)
+        if (savedAddresses.length > 0 && typeof savedAddresses[0] === "object") {
+          const addressData = savedAddresses.find(
+            (item) => item.address === starredAddress
+          );
+          if (addressData && addressData.network) {
+            networkKey = addressData.network;
+          }
         }
       }
     }
@@ -143,7 +167,7 @@ async function updateHealthFactor() {
       provider
     );
 
-    const data = await poolContract.getUserAccountData(starredAddress);
+    const data = await poolContract.getUserAccountData(actualAddress);
     updateBadge(data);
   } catch (error) {
     console.error("Error updating health factor:", error);
