@@ -276,7 +276,13 @@ function App() {
   };
 
   const addAddress = async () => {
-    if (!newAddress || addresses.some((a) => a.address === newAddress && a.network === selectedNetwork)) return;
+    if (
+      !newAddress ||
+      addresses.some(
+        (a) => a.address === newAddress && a.network === selectedNetwork
+      )
+    )
+      return;
 
     const newAddressData = {
       address: newAddress,
@@ -290,11 +296,16 @@ function App() {
     setNewAddress("");
   };
 
-  const removeAddress = async (addressToRemove: string, networkToRemove?: string) => {
+  const removeAddress = async (
+    addressToRemove: string,
+    networkToRemove?: string
+  ) => {
     const updatedAddresses = addresses.filter((a) => {
       if (networkToRemove) {
         // Remove specific address+network combination
-        return !(a.address === addressToRemove && a.network === networkToRemove);
+        return !(
+          a.address === addressToRemove && a.network === networkToRemove
+        );
       } else {
         // Remove all instances of this address (backward compatibility)
         return a.address !== addressToRemove;
@@ -309,7 +320,7 @@ function App() {
       delete updatedUserData[`${addressToRemove}-${networkToRemove}`];
     } else {
       // Remove all instances of this address (backward compatibility)
-      Object.keys(updatedUserData).forEach(key => {
+      Object.keys(updatedUserData).forEach((key) => {
         if (key.startsWith(`${addressToRemove}-`)) {
           delete updatedUserData[key];
         }
@@ -318,17 +329,29 @@ function App() {
     setUserData(updatedUserData);
 
     // Clear starred address if removed
-    const addressKey = networkToRemove ? `${addressToRemove}-${networkToRemove}` : addressToRemove;
-    if (starredAddress === addressKey || (networkToRemove === undefined && starredAddress.startsWith(`${addressToRemove}-`))) {
+    const addressKey = networkToRemove
+      ? `${addressToRemove}-${networkToRemove}`
+      : addressToRemove;
+    if (
+      starredAddress === addressKey ||
+      (networkToRemove === undefined &&
+        starredAddress.startsWith(`${addressToRemove}-`))
+    ) {
       setStarredAddress("");
       await browserAPI.storage.local.set({ starredAddress: "" });
       browserAPI.action.setBadgeText({ text: "" });
     }
   };
 
-  const updateAddressNetwork = async (address: string, currentNetwork: string, newNetwork: string) => {
+  const updateAddressNetwork = async (
+    address: string,
+    currentNetwork: string,
+    newNetwork: string
+  ) => {
     const updatedAddresses = addresses.map((a) =>
-      a.address === address && a.network === currentNetwork ? { ...a, network: newNetwork } : a
+      a.address === address && a.network === currentNetwork
+        ? { ...a, network: newNetwork }
+        : a
     );
 
     setAddresses(updatedAddresses);
@@ -621,7 +644,11 @@ function App() {
                             <select
                               value={network}
                               onChange={(e) =>
-                                updateAddressNetwork(address, network, e.target.value)
+                                updateAddressNetwork(
+                                  address,
+                                  network,
+                                  e.target.value
+                                )
                               }
                               className="network-select-badge"
                               title={networks[network]?.name || "Ethereum"}
@@ -640,7 +667,9 @@ function App() {
                               className={`star-button ${starredAddress === `${address}-${network}` ? "starred" : ""}`}
                               onClick={() => toggleStar(address, network)}
                             >
-                              {starredAddress === `${address}-${network}` ? "★" : "☆"}
+                              {starredAddress === `${address}-${network}`
+                                ? "★"
+                                : "☆"}
                             </button>
                             <button
                               className="remove-button"
@@ -650,7 +679,9 @@ function App() {
                             </button>
                           </div>
                         </div>
-                        <div className="error-message">{errors[`${address}-${network}`]}</div>
+                        <div className="error-message">
+                          {errors[`${address}-${network}`]}
+                        </div>
                         <button
                           className="retry-button"
                           onClick={() => getUserData(address, network)}
@@ -689,14 +720,24 @@ function App() {
                             </div>
                             <div className="address-header-right">
                               <select
-                                value={userData[`${address}-${network}`].network || network}
+                                value={
+                                  userData[`${address}-${network}`].network ||
+                                  network
+                                }
                                 onChange={(e) =>
-                                  updateAddressNetwork(address, userData[`${address}-${network}`].network || network, e.target.value)
+                                  updateAddressNetwork(
+                                    address,
+                                    userData[`${address}-${network}`].network ||
+                                      network,
+                                    e.target.value
+                                  )
                                 }
                                 className="network-select-badge"
                                 title={
-                                  networks[userData[`${address}-${network}`].network || network]
-                                    ?.name || "Ethereum"
+                                  networks[
+                                    userData[`${address}-${network}`].network ||
+                                      network
+                                  ]?.name || "Ethereum"
                                 }
                               >
                                 {getAllNetworks().map((net) => (
@@ -713,7 +754,9 @@ function App() {
                                 className={`star-button ${starredAddress === `${address}-${network}` ? "starred" : ""}`}
                                 onClick={() => toggleStar(address, network)}
                               >
-                                {starredAddress === `${address}-${network}` ? "★" : "☆"}
+                                {starredAddress === `${address}-${network}`
+                                  ? "★"
+                                  : "☆"}
                               </button>
                               <button
                                 className="remove-button"
@@ -727,32 +770,48 @@ function App() {
                             <span className="label">Total Collateral</span>
                             <span className="value">
                               ${" "}
-                              {formatAmount(userData[`${address}-${network}`].totalCollateral)}
+                              {formatAmount(
+                                userData[`${address}-${network}`]
+                                  .totalCollateral
+                              )}
                             </span>
                           </div>
                           <div className="data-row">
                             <span className="label">Total Debt</span>
                             <span className="value">
-                              $ {formatAmount(userData[`${address}-${network}`].totalDebt)}
+                              ${" "}
+                              {formatAmount(
+                                userData[`${address}-${network}`].totalDebt
+                              )}
                             </span>
                           </div>
                           <div className="data-row">
                             <span className="label">Available to Borrow</span>
                             <span className="value">
                               ${" "}
-                              {formatAmount(userData[`${address}-${network}`].availableBorrows)}
+                              {formatAmount(
+                                userData[`${address}-${network}`]
+                                  .availableBorrows
+                              )}
                             </span>
                           </div>
                           <div className="data-row">
                             <span className="label">Net Worth</span>
                             <span className="value">
-                              $ {formatAmount(userData[`${address}-${network}`].netWorth)}
+                              ${" "}
+                              {formatAmount(
+                                userData[`${address}-${network}`].netWorth
+                              )}
                             </span>
                           </div>
                           <div className="data-row">
                             <span className="label">Liquidation Threshold</span>
                             <span className="value">
-                              {userData[`${address}-${network}`].liquidationThreshold}%
+                              {
+                                userData[`${address}-${network}`]
+                                  .liquidationThreshold
+                              }
+                              %
                             </span>
                           </div>
                           <div className="data-row">
@@ -763,19 +822,26 @@ function App() {
                           </div>
                           <div
                             className={`health-factor ${
-                              parseFloat(userData[`${address}-${network}`].healthFactor) >=
-                              warningThreshold
+                              parseFloat(
+                                userData[`${address}-${network}`].healthFactor
+                              ) >= warningThreshold
                                 ? "safe"
-                                : parseFloat(userData[`${address}-${network}`].healthFactor) >=
-                                    dangerThreshold
+                                : parseFloat(
+                                      userData[`${address}-${network}`]
+                                        .healthFactor
+                                    ) >= dangerThreshold
                                   ? "warning"
                                   : "danger"
                             }`}
                           >
                             Health Factor:{" "}
-                            {parseFloat(userData[`${address}-${network}`].totalDebt) === 0
+                            {parseFloat(
+                              userData[`${address}-${network}`].totalDebt
+                            ) === 0
                               ? "No debt"
-                              : formatNumber(userData[`${address}-${network}`].healthFactor)}
+                              : formatNumber(
+                                  userData[`${address}-${network}`].healthFactor
+                                )}
                           </div>
                         </div>
                       )
