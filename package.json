@@ -18,7 +18,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build && zip -r chrome-extension.zip dist/ -x '*.DS_Store'",
+    "build": "vite build && zip -r chrome-extension.zip dist/* -x '*.DS_Store'",
     "preview": "vite preview",
     "build:firefox": "NODE_ENV=firefox vite build && cp manifest_firefox.json firefox_dist/manifest.json && web-ext build --source-dir firefox_dist --overwrite-dest && zip -r firefox-extension.zip dist/ -x '*.DS_Store'",
     "compile": "zip -r sourcecode.zip src public -x '*.pem' -x '*node_modules*' -x '*.git*' -x '*web-ext-artifacts*' -x '*.DS_Store'",
