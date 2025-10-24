@@ -1,8 +1,148 @@
 /// <reference types="chrome"/>
 import React, { useState, useEffect } from "react";
-import "./Options.css";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Container,
+  Typography,
+  Box,
+  Stack,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Switch,
+  FormControlLabel,
+  Alert,
+  Card,
+  CardContent,
+} from "@mui/material";
+import {
+  LightMode,
+  DarkMode,
+  Refresh,
+} from "@mui/icons-material";
 import browserAPI from "../utils/browserAPI";
-import networks, { NetworkConfig, getAllNetworks } from "../config/networks";
+import networks from "../config/networks";
+
+// Create theme matching the main app
+const createAppTheme = (mode: "light" | "dark") =>
+  createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: mode === "dark" ? "#eaebf0" : "#383d50",
+      },
+      secondary: {
+        main: mode === "dark" ? "#00d4aa" : "#00d4aa",
+      },
+      background: {
+        default: mode === "dark" ? "#1a2030" : "#f1f1f3",
+        paper: mode === "dark" ? "#292e42" : "#ffffff",
+      },
+      text: {
+        primary: mode === "dark" ? "#eaebf0" : "#383d50",
+        secondary: mode === "dark" ? "#8b8b8b" : "#6b7280",
+      },
+      success: {
+        main: mode === "dark" ? "#67ad5c" : "#67ad5c",
+        light: mode === "dark" ? "rgba(103, 173, 92, 0.1)" : "rgba(103, 173, 92, 0.1)",
+        dark: mode === "dark" ? "#67ad5c" : "#67ad5c",
+      },
+      warning: {
+        main: mode === "dark" ? "#eca340" : "#eca340",
+        light: mode === "dark" ? "rgba(236, 163, 64, 0.1)" : "rgba(236, 163, 64, 0.1)",
+        dark: mode === "dark" ? "#eca340" : "#eca340",
+      },
+      error: {
+        main: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
+        light: mode === "dark" ? "rgba(255, 107, 107, 0.1)" : "rgba(255, 107, 107, 0.1)",
+        dark: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
+      },
+      info: {
+        main: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
+        light: mode === "dark" ? "rgba(79, 195, 247, 0.1)" : "rgba(79, 195, 247, 0.1)",
+        dark: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
+      },
+    },
+    typography: {
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: 14,
+      h4: {
+        fontSize: '1.5rem',
+        fontWeight: 600,
+      },
+      h6: {
+        fontSize: '1.125rem',
+        fontWeight: 600,
+      },
+      body1: {
+        fontSize: '0.875rem',
+        fontWeight: 400,
+      },
+      body2: {
+        fontSize: '0.75rem',
+        fontWeight: 400,
+      },
+      caption: {
+        fontSize: '0.6875rem',
+        fontWeight: 400,
+      },
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            borderRadius: 4,
+            fontWeight: 500,
+            fontSize: '0.875rem',
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            boxShadow: mode === "dark" 
+              ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
+              : '0 2px 8px rgba(0, 0, 0, 0.08)',
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            boxShadow: mode === "dark" 
+              ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
+              : '0 2px 8px rgba(0, 0, 0, 0.08)',
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& .MuiOutlinedInput-root': {
+              borderRadius: 4,
+              fontSize: '0.875rem',
+            },
+          },
+        },
+      },
+      MuiSelect: {
+        styleOverrides: {
+          root: {
+            borderRadius: 4,
+            fontSize: '0.875rem',
+          },
+        },
+      },
+    },
+  });
 
 function Options() {
   const [updateFrequency, setUpdateFrequency] = useState(5);
@@ -19,6 +159,8 @@ function Options() {
   const [dangerThreshold, setDangerThreshold] = useState(1);
   const [badgeDisplay, setBadgeDisplay] = useState<string>("healthFactor");
   const [preferSidePanel, setPreferSidePanel] = useState<boolean>(true);
+
+  const muiTheme = createAppTheme(theme);
 
   useEffect(() => {
     // Load saved settings
@@ -83,46 +225,10 @@ function Options() {
 
   // Apply theme to document
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
     // Set body and html to full height
     document.body.style.height = "100%";
     document.documentElement.style.height = "100%";
   }, [theme]);
-
-  const handleNetworkChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const networkKey = e.target.value;
-    setSelectedNetwork(networkKey);
-
-    // Update contract address and RPC URL based on selected network
-    if (networks[networkKey]) {
-      setContractAddress(networks[networkKey].contractAddress);
-      setRpcProvider(networks[networkKey].defaultRpcUrl);
-      setCustomRpc(false);
-    }
-  };
-
-  const handleRpcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRpcProvider(e.target.value);
-    setCustomRpc(true);
-  };
-
-  const handleContractChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setContractAddress(e.target.value);
-    // If user manually changes contract address, mark as custom
-    if (e.target.value !== networks[selectedNetwork]?.contractAddress) {
-      setCustomRpc(true);
-    }
-  };
-
-  const resetToNetworkDefaults = () => {
-    if (networks[selectedNetwork]) {
-      setContractAddress(networks[selectedNetwork].contractAddress);
-      setRpcProvider(networks[selectedNetwork].defaultRpcUrl);
-      setCustomRpc(false);
-      setStatus("Reset to network defaults");
-      setTimeout(() => setStatus(""), 3000);
-    }
-  };
 
   const resetAllSettings = () => {
     // Reset to default values
@@ -161,310 +267,288 @@ function Options() {
     setTimeout(() => setStatus(""), 3000);
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    browserAPI.storage.local.set({ theme: newTheme });
-  };
-
-  const handleBadgeDisplayChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newBadgeDisplay = e.target.value;
-    setBadgeDisplay(newBadgeDisplay);
-
-    // Save the badge display setting immediately to ensure it persists
-    console.log("Changing badge display to:", newBadgeDisplay);
-    browserAPI.storage.local.set({ badgeDisplay: newBadgeDisplay });
-
-    setStatus("Badge display updated");
-    setTimeout(() => setStatus(""), 3000);
-  };
-
-  const saveSettings = async () => {
+  const saveSetting = async (key: string, value: any) => {
     try {
-      console.log("Saving settings with badge display:", badgeDisplay);
-      await browserAPI.storage.local.set({
-        updateFrequency,
-        rpcProvider,
-        locale,
-        contractAddress,
-        selectedNetwork,
-        customRpc,
-        theme,
-        warningThreshold,
-        dangerThreshold,
-        badgeDisplay,
-        preferSidePanel,
-      });
-
-      // Update the alarm interval
-      await browserAPI.alarms.clear("healthCheck");
-      await browserAPI.alarms.create("healthCheck", {
-        periodInMinutes: updateFrequency,
-      });
-
-      setStatus("Settings saved successfully!");
-      setTimeout(() => setStatus(""), 3000);
+      await browserAPI.storage.local.set({ [key]: value });
+      setStatus(`${key} updated successfully`);
+      setTimeout(() => setStatus(""), 2000);
     } catch (error) {
-      setStatus("Error saving settings");
-      console.error("Error saving settings:", error);
+      console.error(`Error saving ${key}:`, error);
+      setStatus(`Error saving ${key}`);
+      setTimeout(() => setStatus(""), 3000);
     }
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    saveSetting("theme", newTheme);
+  };
+
+  const handleBadgeDisplayChange = (
+    e: any
+  ) => {
+    const newBadgeDisplay = e.target.value;
+    setBadgeDisplay(newBadgeDisplay);
+    saveSetting("badgeDisplay", newBadgeDisplay);
+  };
+
+  const handleWarningThresholdChange = (value: number) => {
+    setWarningThreshold(value);
+    saveSetting("warningThreshold", value);
+  };
+
+  const handleDangerThresholdChange = (value: number) => {
+    setDangerThreshold(value);
+    saveSetting("dangerThreshold", value);
+  };
+
+  const handleLocaleChange = (e: any) => {
+    const newLocale = e.target.value;
+    setLocale(newLocale);
+    saveSetting("locale", newLocale);
+  };
+
+  const handleSidePanelChange = (e: any) => {
+    const newPreferSidePanel = e.target.value === "sidepanel";
+    setPreferSidePanel(newPreferSidePanel);
+    saveSetting("preferSidePanel", newPreferSidePanel);
+  };
+
   return (
-    <div className="options-container">
-      <h1>Aave Monitor Settings</h1>
-
-      <div className="theme-section">
-        <h2>Appearance</h2>
-        <div className="theme-toggle-container">
-          <label>Theme:</label>
-          <div className="theme-toggle-wrapper">
-            <span className="theme-label">
-              {theme === "dark" ? "Dark Mode" : "Light Mode"}
-            </span>
-            <button
-              className={`theme-toggle-button ${theme === "light" ? "light" : ""}`}
-              onClick={toggleTheme}
-              title={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
-            >
-              <span className="toggle-icon sun-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="5"></circle>
-                  <line x1="12" y1="1" x2="12" y2="3"></line>
-                  <line x1="12" y1="21" x2="12" y2="23"></line>
-                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                  <line x1="1" y1="12" x2="3" y2="12"></line>
-                  <line x1="21" y1="12" x2="23" y2="12"></line>
-                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                </svg>
-              </span>
-              <span className="toggle-icon moon-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                </svg>
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* <div className="settings-section">
-        <h2>Network Settings</h2>
-        
-        <div className="setting-group">
-          <label htmlFor="network-select">Default Network:</label>
-          <select 
-            id="network-select"
-            value={selectedNetwork}
-            onChange={handleNetworkChange}
-            className="network-select"
-          >
-            {getAllNetworks().map(network => (
-              <option 
-                key={network.chainId} 
-                value={network.name.toLowerCase()}
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <Box sx={{ 
+        height: "100vh", 
+        bgcolor: "background.default",
+        py: 1,
+        overflow: "hidden"
+      }}>
+        <Container maxWidth="md" sx={{ height: "100%", overflow: "hidden" }}>
+          {/* Header */}
+          <Box sx={{ textAlign: "center", mb: 2 }}>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
+              Aave Monitor Settings
+            </Typography>
+            <Alert severity="success" sx={{ mb: 1, borderRadius: 2, bgcolor: 'success.light', color: 'success.dark', py: 0.5 }}>
+              Settings are saved automatically when you change them
+            </Alert>
+            {/* Status Message */}
+            {status && (
+              <Alert 
+                severity="success" 
+                onClose={() => setStatus("")}
+                sx={{ 
+                  mb: 1,
+                  borderRadius: 2, 
+                  py: 0.5,
+                  bgcolor: 'success.light',
+                  color: 'success.dark',
+                  '& .MuiAlert-message': {
+                    color: 'success.dark',
+                    fontWeight: 500
+                  }
+                }}
               >
-                {network.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="setting-group">
-          <label htmlFor="rpc-provider">Custom RPC Provider URL (optional):</label>
-          <input 
-            type="text" 
-            id="rpc-provider"
-            value={rpcProvider} 
-            onChange={handleRpcChange}
-            placeholder="e.g. https://mainnet.infura.io/v3/your-api-key"
-          />
-          <p className="help-text">Leave empty to use the default RPC provider for each network.</p>
-        </div>
-        
-        <div className="setting-group">
-          <label htmlFor="contract-address">Aave Pool Contract Address:</label>
-          <input 
-            type="text" 
-            id="contract-address"
-            value={contractAddress} 
-            onChange={handleContractChange}
-            placeholder="e.g. 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
-          />
-          <p className="help-text">The contract address is automatically set based on the selected network.</p>
-        </div>
-      </div> */}
+                {status}
+              </Alert>
+            )}
+            <Typography variant="caption" color="text.secondary">
+              Configure your monitoring preferences
+            </Typography>
+          </Box>
 
-      <div className="settings-section">
-        <h2>Health Factor Thresholds</h2>
+          <Stack spacing={1.5} sx={{ height: "calc(100vh - 120px)", overflow: "hidden" }}>
+            {/* Theme Section */}
+            <Card elevation={0}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Appearance
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={theme === "light"}
+                      onChange={toggleTheme}
+                      sx={{
+                        '& .MuiSwitch-switchBase.Mui-checked': {
+                          color: 'primary.main',
+                        },
+                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                          backgroundColor: 'primary.main',
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      {theme === "dark" ? <DarkMode fontSize="small" /> : <LightMode fontSize="small" />}
+                      <Typography variant="body1">
+                        {theme === "dark" ? "Dark Mode" : "Light Mode"}
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </CardContent>
+            </Card>
 
-        <div className="setting-group">
-          <label htmlFor="warning-threshold">Warning Threshold:</label>
-          <div className="threshold-input-container">
-            <input
-              type="number"
-              id="warning-threshold"
-              value={warningThreshold}
-              onChange={(e) => setWarningThreshold(parseFloat(e.target.value))}
-              min="0.1"
-              max="10"
-              step="0.1"
-            />
-            <div className="threshold-preview warning"></div>
-          </div>
-          <p className="help-text">
-            Health factor below this value will show as orange (default: 2.0)
-          </p>
-        </div>
+            {/* Health Factor Thresholds */}
+            <Card elevation={0}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Health Factor Thresholds
+                </Typography>
+                
+                <Stack direction="row" spacing={3}>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                      Warning Threshold
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <TextField
+                        type="number"
+                        value={warningThreshold}
+                        onChange={(e) => handleWarningThresholdChange(parseFloat(e.target.value))}
+                        inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+                        size="small"
+                        sx={{ width: 100 }}
+                      />
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          bgcolor: "warning.main",
+                        }}
+                      />
+                    </Box>
+                  </Box>
 
-        <div className="setting-group">
-          <label htmlFor="danger-threshold">Danger Threshold:</label>
-          <div className="threshold-input-container">
-            <input
-              type="number"
-              id="danger-threshold"
-              value={dangerThreshold}
-              onChange={(e) => setDangerThreshold(parseFloat(e.target.value))}
-              min="0.1"
-              max="10"
-              step="0.1"
-            />
-            <div className="threshold-preview danger"></div>
-          </div>
-          <p className="help-text">
-            Health factor below this value will show as red (default: 1.0)
-          </p>
-        </div>
-      </div>
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                      Danger Threshold
+                    </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <TextField
+                        type="number"
+                        value={dangerThreshold}
+                        onChange={(e) => handleDangerThresholdChange(parseFloat(e.target.value))}
+                        inputProps={{ min: 0.1, max: 10, step: 0.1 }}
+                        size="small"
+                        sx={{ width: 100 }}
+                      />
+                      <Box
+                        sx={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          bgcolor: "error.main",
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </Stack>
+              </CardContent>
+            </Card>
 
-      <div className="settings-section">
-        <h2>Display Settings</h2>
+            {/* Display Settings */}
+            <Card elevation={0}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Display Settings
+                </Typography>
+                
+                <Stack direction="row" spacing={2}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Badge Display</InputLabel>
+                    <Select
+                      value={badgeDisplay}
+                      onChange={handleBadgeDisplayChange}
+                      label="Badge Display"
+                    >
+                      <MenuItem value="healthFactor">Health Factor</MenuItem>
+                      <MenuItem value="totalCollateralBase">Total Collateral</MenuItem>
+                      <MenuItem value="totalDebtBase">Total Debt</MenuItem>
+                      <MenuItem value="availableBorrowsBase">Available to borrow</MenuItem>
+                      <MenuItem value="netWorth">Net Worth</MenuItem>
+                      <MenuItem value="currentLiquidationThreshold">Liquidation Threshold</MenuItem>
+                      <MenuItem value="ltv">Loan to Value</MenuItem>
+                    </Select>
+                  </FormControl>
 
-        <div className="setting-group">
-          <label htmlFor="badge-display">Badge Display:</label>
-          <div className="badge-display-container">
-            <select
-              id="badge-display"
-              value={badgeDisplay}
-              onChange={handleBadgeDisplayChange}
-              className="badge-display-select"
-            >
-              <option value="healthFactor">Health Factor</option>
-              <option value="totalCollateralBase">Total Collateral</option>
-              <option value="totalDebtBase">Total Debt</option>
-              <option value="availableBorrowsBase">Available to borrow</option>
-              <option value="netWorth">Net Worth</option>
-              <option value="currentLiquidationThreshold">
-                Liquidation Threshold
-              </option>
-              <option value="ltv">Loan to Value</option>
-            </select>
-          </div>
-          <p className="help-text">
-            Choose what information to display in the extension badge
-          </p>
-        </div>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Number Format</InputLabel>
+                    <Select
+                      value={locale}
+                      onChange={handleLocaleChange}
+                      label="Number Format"
+                    >
+                      <MenuItem value="en-US">, (Comma)</MenuItem>
+                      <MenuItem value="de-DE">. (Period)</MenuItem>
+                      <MenuItem value="fr-FR">Space</MenuItem>
+                      <MenuItem value="en-CH">' (Apostrophe)</MenuItem>
+                    </Select>
+                  </FormControl>
 
-        <div className="setting-group">
-          <label htmlFor="locale-select">Number Format Locale:</label>
-          <select
-            id="locale-select"
-            value={locale}
-            onChange={(e) => setLocale(e.target.value)}
-            className="locale-select"
-          >
-            <option value="en-US">,</option>
-            <option value="de-DE">.</option>
-            <option value="fr-FR">Space</option>
-            <option value="en-CH">'</option>
-          </select>
-        </div>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Click Behavior</InputLabel>
+                    <Select
+                      value={preferSidePanel ? "sidepanel" : "popup"}
+                      onChange={handleSidePanelChange}
+                      label="Click Behavior"
+                    >
+                      <MenuItem value="sidepanel">Side Panel</MenuItem>
+                      <MenuItem value="popup">Popup</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </CardContent>
+            </Card>
 
-        <div className="setting-group">
-          <label htmlFor="prefer-side-panel">
-            Extension Icon Click Behavior:
-          </label>
-          <div className="side-panel-preference-container">
-            <select
-              id="prefer-side-panel"
-              value={preferSidePanel ? "sidepanel" : "popup"}
-              onChange={(e) =>
-                setPreferSidePanel(e.target.value === "sidepanel")
-              }
-              className="side-panel-preference-select"
-            >
-              <option value="sidepanel">Open Side Panel</option>
-              <option value="popup">Open Popup</option>
-            </select>
-          </div>
-          <p className="help-text">
-            Choose what happens when you click the extension icon
-          </p>
-        </div>
-      </div>
+            {/* Action Buttons */}
+            <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 1 }}>
+              <Button
+                variant="outlined"
+                onClick={resetAllSettings}
+                startIcon={<Refresh />}
+                size="small"
+                sx={{ 
+                  borderColor: 'error.main',
+                  color: 'error.main',
+                  '&:hover': { 
+                    borderColor: 'error.main', 
+                    bgcolor: 'error.light',
+                    color: 'error.main'
+                  }
+                }}
+              >
+                Reset All Settings
+              </Button>
+            </Box>
 
-      <div className="button-group">
-        <button className="save-button" onClick={saveSettings}>
-          Save Settings
-        </button>
-        <button className="reset-button" onClick={resetAllSettings}>
-          Reset All Settings
-        </button>
-      </div>
-
-      {status && <div className="status-message">{status}</div>}
-
-      <div className="footer">
-        <hr className="footer-divider" />
-        <div className="footer-content">
-          Made with{" "}
-          <svg
-            className="heart-icon"
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-          >
-            <path
-              fill="#ff5252"
-              d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-            />
-          </svg>{" "}
-          by{" "}
-          <a
-            href="https://notrustverify.ch"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            No Trust Verify
-          </a>
-        </div>
-      </div>
-    </div>
+            {/* Footer */}
+            <Box sx={{ textAlign: "center", mt: 1, pt: 1, borderTop: 1, borderColor: "divider" }}>
+              <Typography variant="caption" color="text.secondary">
+                Made with{" "}
+                <Box component="span" sx={{ color: "error.main", mx: 0.5 }}>♥</Box>
+                by{" "}
+                <Typography
+                  component="a"
+                  href="https://notrustverify.ch"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="caption"
+                  color="primary.main"
+                  sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                >
+                  No Trust Verify
+                </Typography>
+              </Typography>
+            </Box>
+          </Stack>
+        </Container>
+      </Box>
+    </ThemeProvider>
   );
 }
 

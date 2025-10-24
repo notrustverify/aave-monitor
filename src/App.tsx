@@ -58,64 +58,78 @@ const createAppTheme = (mode: "light" | "dark") =>
     palette: {
       mode,
       primary: {
-        main: mode === "dark" ? "#ffffff" : "#212121",
+        main: mode === "dark" ? "#eaebf0" : "#383d50",
       },
       secondary: {
-        main: mode === "dark" ? "#ff5252" : "#c62828",
+        main: mode === "dark" ? "#00d4aa" : "#00d4aa",
       },
       background: {
-        default: mode === "dark" ? "#121212" : "#f5f5f5",
-        paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+        default: mode === "dark" ? "#1a2030" : "#f1f1f3",
+        paper: mode === "dark" ? "#292e42" : "#ffffff",
       },
       text: {
-        primary: mode === "dark" ? "#ffffff" : "#212121",
-        secondary: mode === "dark" ? "#b0b0b0" : "#757575",
+        primary: mode === "dark" ? "#eaebf0" : "#383d50",
+        secondary: mode === "dark" ? "#8b8b8b" : "#6b7280",
       },
       success: {
-        main: mode === "dark" ? "#4caf50" : "#2e7d32",
-        light: mode === "dark" ? "rgba(76, 175, 80, 0.2)" : "rgba(46, 125, 50, 0.1)",
-        dark: mode === "dark" ? "#4caf50" : "#2e7d32",
+        main: mode === "dark" ? "#00d4aa" : "#00d4aa",
+        light: mode === "dark" ? "rgba(0, 212, 170, 0.1)" : "rgba(0, 212, 170, 0.1)",
+        dark: mode === "dark" ? "#00d4aa" : "#00d4aa",
       },
       warning: {
-        main: mode === "dark" ? "#ff9800" : "#e65100",
-        light: mode === "dark" ? "rgba(255, 152, 0, 0.2)" : "rgba(230, 81, 0, 0.1)",
-        dark: mode === "dark" ? "#ff9800" : "#e65100",
+        main: mode === "dark" ? "#ffa726" : "#ffa726",
+        light: mode === "dark" ? "rgba(255, 167, 38, 0.1)" : "rgba(255, 167, 38, 0.1)",
+        dark: mode === "dark" ? "#ffa726" : "#ffa726",
       },
       error: {
-        main: mode === "dark" ? "#f44336" : "#c62828",
-        light: mode === "dark" ? "rgba(244, 67, 54, 0.2)" : "rgba(198, 40, 40, 0.1)",
-        dark: mode === "dark" ? "#f44336" : "#c62828",
+        main: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
+        light: mode === "dark" ? "rgba(255, 107, 107, 0.1)" : "rgba(255, 107, 107, 0.1)",
+        dark: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
       },
       info: {
-        main: mode === "dark" ? "#2196f3" : "#1565c0",
-        light: mode === "dark" ? "rgba(33, 150, 243, 0.2)" : "rgba(21, 101, 192, 0.1)",
-        dark: mode === "dark" ? "#2196f3" : "#1565c0",
+        main: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
+        light: mode === "dark" ? "rgba(79, 195, 247, 0.1)" : "rgba(79, 195, 247, 0.1)",
+        dark: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
       },
     },
     typography: {
-      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-      fontSize: 13,
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: 14,
       h6: {
-        fontSize: '1rem',
+        fontSize: '1.125rem',
+        fontWeight: 600,
       },
       body1: {
         fontSize: '0.875rem',
+        fontWeight: 400,
       },
       body2: {
         fontSize: '0.75rem',
+        fontWeight: 400,
       },
       caption: {
         fontSize: '0.6875rem',
+        fontWeight: 400,
       },
     },
     components: {
       MuiCard: {
         styleOverrides: {
           root: {
-            borderRadius: 12,
+            borderRadius: 16,
             boxShadow: mode === "dark" 
-              ? "0 4px 20px rgba(0, 0, 0, 0.3)" 
-              : "0 4px 20px rgba(0, 0, 0, 0.1)",
+              ? "0 2px 8px rgba(0, 0, 0, 0.3)" 
+              : "0 2px 8px rgba(0, 0, 0, 0.08)",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 16,
+            boxShadow: mode === "dark" 
+              ? "0 2px 8px rgba(0, 0, 0, 0.3)" 
+              : "0 2px 8px rgba(0, 0, 0, 0.08)",
           },
         },
       },
@@ -125,6 +139,7 @@ const createAppTheme = (mode: "light" | "dark") =>
             borderRadius: 8,
             textTransform: "none",
             fontWeight: 500,
+            fontSize: '0.875rem',
           },
         },
       },
@@ -133,7 +148,17 @@ const createAppTheme = (mode: "light" | "dark") =>
           root: {
             "& .MuiOutlinedInput-root": {
               borderRadius: 8,
+              fontSize: '0.875rem',
             },
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            fontSize: '0.75rem',
+            fontWeight: 500,
           },
         },
       },
@@ -562,12 +587,12 @@ function App() {
           message={toast.message}
         />
 
-        <Container maxWidth={false} sx={{ py: 0, px: 0, width: "100%", mt: 0 }}>
+        <Container maxWidth={false} sx={{ py: 2, px: 2, width: "100%", mt: 0 }}>
           {/* Header with input and actions */}
-          <Paper elevation={3} sx={{ p: 1, mb: 1, mt: 0 }}>
-            <Stack spacing={1}>
+          <Paper elevation={0} sx={{ p: 3, mb: 3, mt: 0, bgcolor: "background.paper" }}>
+            <Stack spacing={2}>
               {/* Input section */}
-              <Stack direction="row" spacing={1} alignItems="center">
+              <Stack direction="row" spacing={2} alignItems="center">
                 <TextField
                   fullWidth
                   placeholder="Enter wallet address"
@@ -575,6 +600,12 @@ function App() {
                   onChange={(e) => setNewAddress(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && addAddress()}
                   size="small"
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': {
+                      bgcolor: 'background.default',
+                      height: 40,
+                    }
+                  }}
                 />
                 <FormControl size="small" sx={{ minWidth: 100 }}>
                   <InputLabel>Network</InputLabel>
@@ -582,6 +613,10 @@ function App() {
                     value={selectedNetwork}
                     onChange={(e) => setSelectedNetwork(e.target.value)}
                     label="Network"
+                    sx={{ 
+                      bgcolor: 'background.default',
+                      height: 40,
+                    }}
                   >
                     {Object.keys(networks).map((key) => (
                       <MenuItem key={key} value={key}>
@@ -595,7 +630,16 @@ function App() {
                   onClick={addAddress}
                   disabled={!newAddress}
                   size="small"
-                  sx={{ minWidth: "auto", px: 1 }}
+                  sx={{ 
+                    minWidth: 40, 
+                    height: 40,
+                    borderRadius: 2,
+                    bgcolor: 'primary.main',
+                    '&:hover': {
+                      bgcolor: 'primary.main',
+                      opacity: 0.9,
+                    }
+                  }}
                 >
                   +
                 </Button>
@@ -604,8 +648,17 @@ function App() {
               {/* Action buttons */}
               <Stack direction="row" spacing={1} justifyContent="flex-end">
                 <Tooltip title="Refresh data">
-                  <IconButton onClick={refreshData} color="primary">
-                    <RefreshIcon />
+                  <IconButton 
+                    onClick={refreshData} 
+                    size="small"
+                    sx={{ 
+                      bgcolor: 'background.default',
+                      width: 32,
+                      height: 32,
+                      '&:hover': { bgcolor: 'background.default', opacity: 0.8 }
+                    }}
+                  >
+                    <RefreshIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
                 <Tooltip title={privacyMode ? "Show values" : "Hide values"}>
@@ -615,9 +668,15 @@ function App() {
                       setPrivacyMode(newPrivacyMode);
                       browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
                     }}
-                    color="primary"
+                    size="small"
+                    sx={{ 
+                      bgcolor: 'background.default',
+                      width: 32,
+                      height: 32,
+                      '&:hover': { bgcolor: 'background.default', opacity: 0.8 }
+                    }}
                   >
-                    {privacyMode ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                    {privacyMode ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                   </IconButton>
                 </Tooltip>
                 <Tooltip title="Settings">
@@ -625,9 +684,15 @@ function App() {
                     onClick={() =>
                       window.open(browserAPI.runtime.getURL("public/options.html"))
                     }
-                    color="primary"
+                    size="small"
+                    sx={{ 
+                      bgcolor: 'background.default',
+                      width: 32,
+                      height: 32,
+                      '&:hover': { bgcolor: 'background.default', opacity: 0.8 }
+                    }}
                   >
-                    <SettingsIcon />
+                    <SettingsIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Stack>
@@ -660,24 +725,25 @@ function App() {
                   const isStarred = starredAddress === addressKey;
 
                   return (
-                    <Card key={addressKey} elevation={2} sx={{ mb: 2 }}>
-                      <CardContent sx={{ p: 2 }}>
+                    <Card key={addressKey} elevation={0} sx={{ mb: 3, bgcolor: "background.paper" }}>
+                      <CardContent sx={{ p: 3 }}>
                         {/* Address Header */}
                         <Box
                           sx={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
-                            mb: 1.5,
+                            mb: 3,
                           }}
                         >
                           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                             <Typography
-                              variant="subtitle1"
+                              variant="h6"
                               sx={{ 
                                 fontFamily: "monospace",
-                                color: "primary.main",
-                                fontWeight: 600
+                                color: "text.primary",
+                                fontWeight: 600,
+                                fontSize: '1rem'
                               }}
                               title={address}
                             >
@@ -687,8 +753,14 @@ function App() {
                               <IconButton
                                 size="small"
                                 onClick={() => copyToClipboard(address)}
+                                sx={{ 
+                                  bgcolor: 'background.default',
+                                  width: 24,
+                                  height: 24,
+                                  '&:hover': { bgcolor: 'background.default', opacity: 0.8 }
+                                }}
                               >
-                                <CopyIcon fontSize="small" />
+                                <CopyIcon sx={{ fontSize: 14 }} />
                               </IconButton>
                             </Tooltip>
                           </Box>
@@ -696,14 +768,22 @@ function App() {
                             <Chip
                               label={networks[network]?.name || "Ethereum"}
                               size="small"
-                              color="primary"
-                              variant="outlined"
+                              sx={{ 
+                                bgcolor: 'background.default',
+                                color: 'text.primary',
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                fontWeight: 500
+                              }}
                             />
                             <Tooltip title={isStarred ? "Unstar" : "Star"}>
                               <IconButton
                                 size="small"
                                 onClick={() => toggleStar(address, network)}
-                                color={isStarred ? "warning" : "default"}
+                                sx={{ 
+                                  color: isStarred ? "warning.main" : "text.secondary",
+                                  '&:hover': { bgcolor: 'background.default' }
+                                }}
                               >
                                 {isStarred ? <StarIcon /> : <StarBorderIcon />}
                               </IconButton>
@@ -712,7 +792,10 @@ function App() {
                               <IconButton
                                 size="small"
                                 onClick={() => removeAddress(address, network)}
-                                sx={{ color: "primary.main" }}
+                                sx={{ 
+                                  color: "text.secondary",
+                                  '&:hover': { bgcolor: 'background.default' }
+                                }}
                               >
                                 <DeleteIcon fontSize="small" />
                               </IconButton>
@@ -744,110 +827,141 @@ function App() {
                           </Alert>
                         ) : data ? (
                           <Box>
-                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                            <Box sx={{ 
+                              display: "grid", 
+                              gridTemplateColumns: { 
+                                xs: "repeat(2, 1fr)", 
+                                sm: "repeat(3, 1fr)", 
+                                md: "repeat(3, 1fr)" 
+                              }, 
+                              gap: 2, 
+                              mb: 3,
+                              width: "100%"
+                            }}>
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   Total Collateral
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "primary.main"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   ${formatAmount(data.totalCollateral)}
                                 </Typography>
                               </Box>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   Total Debt
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "primary.main"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   ${formatAmount(data.totalDebt)}
                                 </Typography>
                               </Box>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   Available to Borrow
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "primary.main"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   ${formatAmount(data.availableBorrows)}
                                 </Typography>
                               </Box>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   Net Worth
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "primary.main"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   ${formatAmount(data.netWorth)}
                                 </Typography>
                               </Box>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   Liquidation Threshold
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "primary.main"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   {data.liquidationThreshold}%
                                 </Typography>
                               </Box>
-                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
-                                <Typography variant="caption" color="text.secondary">
+                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0, fontWeight: 500 }}>
                                   LTV
                                 </Typography>
                                 <Typography 
-                                  variant="body1" 
+                                  variant="h6" 
                                   sx={{ 
                                     fontWeight: 600,
-                                    color: "text.primary"
+                                    color: "text.primary",
+                                    fontSize: '1.125rem',
+                                    wordBreak: "break-word"
                                   }}
                                 >
                                   {data.ltv}%
                                 </Typography>
                               </Box>
                             </Box>
-                            <Divider sx={{ my: 1.5 }} />
                             <Box
                               sx={{
-                                p: 1.5,
-                                borderRadius: 2,
+                                p: 1,
+                                borderRadius: 1,
+                                mt: 1,
                                 bgcolor: parseFloat(data.healthFactor) >= warningThreshold
-                                  ? "success.light"
+                                  ? "rgba(103, 173, 92, 0.1)"
                                   : parseFloat(data.healthFactor) >= dangerThreshold
-                                  ? "warning.light"
+                                  ? "rgba(236, 163, 64, 0.1)"
                                   : "error.light",
-                                color: parseFloat(data.healthFactor) >= warningThreshold
-                                  ? "success.dark"
+                                border: '1px solid',
+                                borderColor: parseFloat(data.healthFactor) >= warningThreshold
+                                  ? "#67ad5c"
                                   : parseFloat(data.healthFactor) >= dangerThreshold
-                                  ? "warning.dark"
-                                  : "error.dark",
+                                  ? "#eca340"
+                                  : "error.main",
                               }}
                             >
-                              <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>
+                              <Typography variant="h6" align="center" sx={{ 
+                                fontWeight: 600,
+                                color: parseFloat(data.healthFactor) >= warningThreshold
+                                  ? "#67ad5c"
+                                  : parseFloat(data.healthFactor) >= dangerThreshold
+                                  ? "#eca340"
+                                  : "error.main",
+                                fontSize: '1rem'
+                              }}>
                                 Health Factor:{" "}
                                 {parseFloat(data.totalDebt) === 0
                                   ? "No debt"
@@ -876,7 +990,7 @@ function App() {
         >
           <Typography variant="caption" color="text.secondary">
             Made with{" "}
-            <HeartIcon sx={{ fontSize: 12, color: "secondary.main", mx: 0.5 }} />
+            <HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
             by{" "}
             <Typography
               component="a"

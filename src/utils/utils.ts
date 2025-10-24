@@ -56,7 +56,7 @@ export const updateBadge = (data: any) => {
         case "totalDebtBase":
           if (parseFloat(userData.totalDebt) <= 0) {
             badgeText = "ND";
-            color = "#4CAF50";
+            color = "#67ad5c";
           } else {
             badgeText = formatLargeNumber(userData.totalDebt);
           }
@@ -88,7 +88,7 @@ export const updateBadge = (data: any) => {
           // Check for no debt
           if (parseFloat(userData.totalDebt) <= 0) {
             badgeText = "ND";
-            color = "#4CAF50";
+            color = "#67ad5c";
             break;
           }
 
@@ -98,7 +98,7 @@ export const updateBadge = (data: any) => {
           if (hf <= dangerThreshold) {
             color = "#f44336"; // Red for danger
           } else if (hf <= warningThreshold) {
-            color = "#FFA726"; // Orange for warning
+            color = "#eca340"; // Orange for warning
           }
           break;
       }

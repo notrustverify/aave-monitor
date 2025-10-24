@@ -118,10 +118,7 @@ body {
 }
 
 
-.MuiBox-root {
-  margin: 0 !important;
-  padding: 0 !important;
-}
+/* Removed overly aggressive Box margin override to allow proper spacing */
 
 /* Ensure App component has no margins */
 .App {
@@ -181,13 +178,3 @@ body.sidepanel-body {
 }
 
 /* Responsive adjustments for extension popup */
-@media (max-width: 400px) {
-  .MuiContainer-root {
-    padding-left: 4px !important;
-    padding-right: 4px !important;
-  }
-  
-  .MuiCardContent-root {
-    padding: 12px !important;
-  }
-}
