@@ -20,11 +20,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
-import {
-  LightMode,
-  DarkMode,
-  Refresh,
-} from "@mui/icons-material";
+import { LightMode, DarkMode, Refresh } from "@mui/icons-material";
 import browserAPI from "../utils/browserAPI";
 import networks from "../config/networks";
 
@@ -49,22 +45,34 @@ const createAppTheme = (mode: "light" | "dark") =>
       },
       success: {
         main: mode === "dark" ? "#67ad5c" : "#67ad5c",
-        light: mode === "dark" ? "rgba(103, 173, 92, 0.1)" : "rgba(103, 173, 92, 0.1)",
+        light:
+          mode === "dark"
+            ? "rgba(103, 173, 92, 0.1)"
+            : "rgba(103, 173, 92, 0.1)",
         dark: mode === "dark" ? "#67ad5c" : "#67ad5c",
       },
       warning: {
         main: mode === "dark" ? "#eca340" : "#eca340",
-        light: mode === "dark" ? "rgba(236, 163, 64, 0.1)" : "rgba(236, 163, 64, 0.1)",
+        light:
+          mode === "dark"
+            ? "rgba(236, 163, 64, 0.1)"
+            : "rgba(236, 163, 64, 0.1)",
         dark: mode === "dark" ? "#eca340" : "#eca340",
       },
       error: {
         main: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
-        light: mode === "dark" ? "rgba(255, 107, 107, 0.1)" : "rgba(255, 107, 107, 0.1)",
+        light:
+          mode === "dark"
+            ? "rgba(255, 107, 107, 0.1)"
+            : "rgba(255, 107, 107, 0.1)",
         dark: mode === "dark" ? "#ff6b6b" : "#ff6b6b",
       },
       info: {
         main: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
-        light: mode === "dark" ? "rgba(79, 195, 247, 0.1)" : "rgba(79, 195, 247, 0.1)",
+        light:
+          mode === "dark"
+            ? "rgba(79, 195, 247, 0.1)"
+            : "rgba(79, 195, 247, 0.1)",
         dark: mode === "dark" ? "#4fc3f7" : "#4fc3f7",
       },
     },
@@ -72,23 +80,23 @@ const createAppTheme = (mode: "light" | "dark") =>
       fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
       fontSize: 14,
       h4: {
-        fontSize: '1.5rem',
+        fontSize: "1.5rem",
         fontWeight: 600,
       },
       h6: {
-        fontSize: '1.125rem',
+        fontSize: "1.125rem",
         fontWeight: 600,
       },
       body1: {
-        fontSize: '0.875rem',
+        fontSize: "0.875rem",
         fontWeight: 400,
       },
       body2: {
-        fontSize: '0.75rem',
+        fontSize: "0.75rem",
         fontWeight: 400,
       },
       caption: {
-        fontSize: '0.6875rem',
+        fontSize: "0.6875rem",
         fontWeight: 400,
       },
     },
@@ -96,10 +104,10 @@ const createAppTheme = (mode: "light" | "dark") =>
       MuiButton: {
         styleOverrides: {
           root: {
-            textTransform: 'none',
+            textTransform: "none",
             borderRadius: 4,
             fontWeight: 500,
-            fontSize: '0.875rem',
+            fontSize: "0.875rem",
           },
         },
       },
@@ -107,9 +115,10 @@ const createAppTheme = (mode: "light" | "dark") =>
         styleOverrides: {
           root: {
             borderRadius: 8,
-            boxShadow: mode === "dark" 
-              ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
-              : '0 2px 8px rgba(0, 0, 0, 0.08)',
+            boxShadow:
+              mode === "dark"
+                ? "0 2px 8px rgba(0, 0, 0, 0.3)"
+                : "0 2px 8px rgba(0, 0, 0, 0.08)",
           },
         },
       },
@@ -117,18 +126,19 @@ const createAppTheme = (mode: "light" | "dark") =>
         styleOverrides: {
           root: {
             borderRadius: 8,
-            boxShadow: mode === "dark" 
-              ? '0 2px 8px rgba(0, 0, 0, 0.3)' 
-              : '0 2px 8px rgba(0, 0, 0, 0.08)',
+            boxShadow:
+              mode === "dark"
+                ? "0 2px 8px rgba(0, 0, 0, 0.3)"
+                : "0 2px 8px rgba(0, 0, 0, 0.08)",
           },
         },
       },
       MuiTextField: {
         styleOverrides: {
           root: {
-            '& .MuiOutlinedInput-root': {
+            "& .MuiOutlinedInput-root": {
               borderRadius: 4,
-              fontSize: '0.875rem',
+              fontSize: "0.875rem",
             },
           },
         },
@@ -137,7 +147,7 @@ const createAppTheme = (mode: "light" | "dark") =>
         styleOverrides: {
           root: {
             borderRadius: 4,
-            fontSize: '0.875rem',
+            fontSize: "0.875rem",
           },
         },
       },
@@ -285,9 +295,7 @@ function Options() {
     saveSetting("theme", newTheme);
   };
 
-  const handleBadgeDisplayChange = (
-    e: any
-  ) => {
+  const handleBadgeDisplayChange = (e: any) => {
     const newBadgeDisplay = e.target.value;
     setBadgeDisplay(newBadgeDisplay);
     saveSetting("badgeDisplay", newBadgeDisplay);
@@ -318,36 +326,47 @@ function Options() {
   return (
     <ThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Box sx={{ 
-        height: "100vh", 
-        bgcolor: "background.default",
-        py: 1,
-        overflow: "hidden"
-      }}>
+      <Box
+        sx={{
+          height: "100vh",
+          bgcolor: "background.default",
+          py: 1,
+          overflow: "hidden",
+        }}
+      >
         <Container maxWidth="md" sx={{ height: "100%", overflow: "hidden" }}>
           {/* Header */}
           <Box sx={{ textAlign: "center", mb: 2 }}>
             <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
               Aave Monitor Settings
             </Typography>
-            <Alert severity="success" sx={{ mb: 1, borderRadius: 2, bgcolor: 'success.light', color: 'success.dark', py: 0.5 }}>
+            <Alert
+              severity="success"
+              sx={{
+                mb: 1,
+                borderRadius: 2,
+                bgcolor: "success.light",
+                color: "success.dark",
+                py: 0.5,
+              }}
+            >
               Settings are saved automatically when you change them
             </Alert>
             {/* Status Message */}
             {status && (
-              <Alert 
-                severity="success" 
+              <Alert
+                severity="success"
                 onClose={() => setStatus("")}
-                sx={{ 
+                sx={{
                   mb: 1,
-                  borderRadius: 2, 
+                  borderRadius: 2,
                   py: 0.5,
-                  bgcolor: 'success.light',
-                  color: 'success.dark',
-                  '& .MuiAlert-message': {
-                    color: 'success.dark',
-                    fontWeight: 500
-                  }
+                  bgcolor: "success.light",
+                  color: "success.dark",
+                  "& .MuiAlert-message": {
+                    color: "success.dark",
+                    fontWeight: 500,
+                  },
                 }}
               >
                 {status}
@@ -358,7 +377,10 @@ function Options() {
             </Typography>
           </Box>
 
-          <Stack spacing={1.5} sx={{ height: "calc(100vh - 120px)", overflow: "hidden" }}>
+          <Stack
+            spacing={1.5}
+            sx={{ height: "calc(100vh - 120px)", overflow: "hidden" }}
+          >
             {/* Theme Section */}
             <Card elevation={0}>
               <CardContent sx={{ p: 2 }}>
@@ -371,18 +393,23 @@ function Options() {
                       checked={theme === "light"}
                       onChange={toggleTheme}
                       sx={{
-                        '& .MuiSwitch-switchBase.Mui-checked': {
-                          color: 'primary.main',
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "primary.main",
                         },
-                        '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                          backgroundColor: 'primary.main',
-                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          {
+                            backgroundColor: "primary.main",
+                          },
                       }}
                     />
                   }
                   label={
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      {theme === "dark" ? <DarkMode fontSize="small" /> : <LightMode fontSize="small" />}
+                      {theme === "dark" ? (
+                        <DarkMode fontSize="small" />
+                      ) : (
+                        <LightMode fontSize="small" />
+                      )}
                       <Typography variant="body1">
                         {theme === "dark" ? "Dark Mode" : "Light Mode"}
                       </Typography>
@@ -398,17 +425,25 @@ function Options() {
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                   Health Factor Thresholds
                 </Typography>
-                
+
                 <Stack direction="row" spacing={3}>
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1, fontWeight: 500 }}
+                    >
                       Warning Threshold
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <TextField
                         type="number"
                         value={warningThreshold}
-                        onChange={(e) => handleWarningThresholdChange(parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          handleWarningThresholdChange(
+                            parseFloat(e.target.value)
+                          )
+                        }
                         inputProps={{ min: 0.1, max: 10, step: 0.1 }}
                         size="small"
                         sx={{ width: 100 }}
@@ -425,14 +460,22 @@ function Options() {
                   </Box>
 
                   <Box sx={{ flex: 1 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1, fontWeight: 500 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mb: 1, fontWeight: 500 }}
+                    >
                       Danger Threshold
                     </Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <TextField
                         type="number"
                         value={dangerThreshold}
-                        onChange={(e) => handleDangerThresholdChange(parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          handleDangerThresholdChange(
+                            parseFloat(e.target.value)
+                          )
+                        }
                         inputProps={{ min: 0.1, max: 10, step: 0.1 }}
                         size="small"
                         sx={{ width: 100 }}
@@ -457,7 +500,7 @@ function Options() {
                 <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
                   Display Settings
                 </Typography>
-                
+
                 <Stack direction="row" spacing={2}>
                   <FormControl fullWidth size="small">
                     <InputLabel>Badge Display</InputLabel>
@@ -467,11 +510,17 @@ function Options() {
                       label="Badge Display"
                     >
                       <MenuItem value="healthFactor">Health Factor</MenuItem>
-                      <MenuItem value="totalCollateralBase">Total Collateral</MenuItem>
+                      <MenuItem value="totalCollateralBase">
+                        Total Collateral
+                      </MenuItem>
                       <MenuItem value="totalDebtBase">Total Debt</MenuItem>
-                      <MenuItem value="availableBorrowsBase">Available to borrow</MenuItem>
+                      <MenuItem value="availableBorrowsBase">
+                        Available to borrow
+                      </MenuItem>
                       <MenuItem value="netWorth">Net Worth</MenuItem>
-                      <MenuItem value="currentLiquidationThreshold">Liquidation Threshold</MenuItem>
+                      <MenuItem value="currentLiquidationThreshold">
+                        Liquidation Threshold
+                      </MenuItem>
                       <MenuItem value="ltv">Loan to Value</MenuItem>
                     </Select>
                   </FormControl>
@@ -506,20 +555,22 @@ function Options() {
             </Card>
 
             {/* Action Buttons */}
-            <Box sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 1 }}>
+            <Box
+              sx={{ display: "flex", gap: 2, justifyContent: "center", mt: 1 }}
+            >
               <Button
                 variant="outlined"
                 onClick={resetAllSettings}
                 startIcon={<Refresh />}
                 size="small"
-                sx={{ 
-                  borderColor: 'error.main',
-                  color: 'error.main',
-                  '&:hover': { 
-                    borderColor: 'error.main', 
-                    bgcolor: 'error.light',
-                    color: 'error.main'
-                  }
+                sx={{
+                  borderColor: "error.main",
+                  color: "error.main",
+                  "&:hover": {
+                    borderColor: "error.main",
+                    bgcolor: "error.light",
+                    color: "error.main",
+                  },
                 }}
               >
                 Reset All Settings
@@ -527,10 +578,20 @@ function Options() {
             </Box>
 
             {/* Footer */}
-            <Box sx={{ textAlign: "center", mt: 1, pt: 1, borderTop: 1, borderColor: "divider" }}>
+            <Box
+              sx={{
+                textAlign: "center",
+                mt: 1,
+                pt: 1,
+                borderTop: 1,
+                borderColor: "divider",
+              }}
+            >
               <Typography variant="caption" color="text.secondary">
                 Made with{" "}
-                <Box component="span" sx={{ color: "error.main", mx: 0.5 }}>♥</Box>
+                <Box component="span" sx={{ color: "error.main", mx: 0.5 }}>
+                  ♥
+                </Box>
                 by{" "}
                 <Typography
                   component="a"
@@ -539,7 +600,10 @@ function Options() {
                   rel="noopener noreferrer"
                   variant="caption"
                   color="primary.main"
-                  sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                  sx={{
+                    textDecoration: "none",
+                    "&:hover": { textDecoration: "underline" },
+                  }}
                 >
                   No Trust Verify
                 </Typography>
