@@ -4,15 +4,141 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import browserAPI from "./utils/browserAPI";
-import networks, { NetworkConfig, getAllNetworks } from "./config/networks";
+import networks from "./config/networks";
 import { POOL_ABI } from "./config/abi";
-import { formatLargeNumber, updateBadge } from "./utils/utils";
+import { updateBadge } from "./utils/utils";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  Container,
+  Paper,
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  IconButton,
+  Chip,
+  Alert,
+  Snackbar,
+  CircularProgress,
+  Divider,
+  Tooltip,
+  Stack,
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  Refresh as RefreshIcon,
+  Visibility as VisibilityIcon,
+  VisibilityOff as VisibilityOffIcon,
+  Settings as SettingsIcon,
+  Star as StarIcon,
+  StarBorder as StarBorderIcon,
+  Close as CloseIcon,
+  ContentCopy as CopyIcon,
+  Delete as DeleteIcon,
+  Favorite as HeartIcon,
+} from "@mui/icons-material";
 
 // Interface for address data including network
 interface AddressData {
   address: string;
   network: string;
 }
+
+// Create theme
+const createAppTheme = (mode: "light" | "dark") =>
+  createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: mode === "dark" ? "#ffffff" : "#212121",
+      },
+      secondary: {
+        main: mode === "dark" ? "#ff5252" : "#c62828",
+      },
+      background: {
+        default: mode === "dark" ? "#121212" : "#f5f5f5",
+        paper: mode === "dark" ? "#1e1e1e" : "#ffffff",
+      },
+      text: {
+        primary: mode === "dark" ? "#ffffff" : "#212121",
+        secondary: mode === "dark" ? "#b0b0b0" : "#757575",
+      },
+      success: {
+        main: mode === "dark" ? "#4caf50" : "#2e7d32",
+        light: mode === "dark" ? "rgba(76, 175, 80, 0.2)" : "rgba(46, 125, 50, 0.1)",
+        dark: mode === "dark" ? "#4caf50" : "#2e7d32",
+      },
+      warning: {
+        main: mode === "dark" ? "#ff9800" : "#e65100",
+        light: mode === "dark" ? "rgba(255, 152, 0, 0.2)" : "rgba(230, 81, 0, 0.1)",
+        dark: mode === "dark" ? "#ff9800" : "#e65100",
+      },
+      error: {
+        main: mode === "dark" ? "#f44336" : "#c62828",
+        light: mode === "dark" ? "rgba(244, 67, 54, 0.2)" : "rgba(198, 40, 40, 0.1)",
+        dark: mode === "dark" ? "#f44336" : "#c62828",
+      },
+      info: {
+        main: mode === "dark" ? "#2196f3" : "#1565c0",
+        light: mode === "dark" ? "rgba(33, 150, 243, 0.2)" : "rgba(21, 101, 192, 0.1)",
+        dark: mode === "dark" ? "#2196f3" : "#1565c0",
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      fontSize: 13,
+      h6: {
+        fontSize: '1rem',
+      },
+      body1: {
+        fontSize: '0.875rem',
+      },
+      body2: {
+        fontSize: '0.75rem',
+      },
+      caption: {
+        fontSize: '0.6875rem',
+      },
+    },
+    components: {
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            boxShadow: mode === "dark" 
+              ? "0 4px 20px rgba(0, 0, 0, 0.3)" 
+              : "0 4px 20px rgba(0, 0, 0, 0.1)",
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            textTransform: "none",
+            fontWeight: 500,
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 8,
+            },
+          },
+        },
+      },
+    },
+  });
 
 function App() {
   const [addresses, setAddresses] = useState<AddressData[]>([]);
@@ -23,14 +149,8 @@ function App() {
   const [starredAddress, setStarredAddress] = useState<string>("");
   const [newAddress, setNewAddress] = useState<string>("");
   const [selectedNetwork, setSelectedNetwork] = useState<string>("ethereum");
-  const [rpcProvider, setRpcProvider] = useState("https://eth.public-rpc.com");
   const [privacyMode, setPrivacyMode] = useState(false);
   const [locale, setLocale] = useState(navigator.language);
-  const [contractAddress, setContractAddress] = useState(
-    "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
-  );
-  const [showContractInput, setShowContractInput] = useState(false);
-  const [showNetworkSelector, setShowNetworkSelector] = useState(false);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [warningThreshold, setWarningThreshold] = useState(2);
   const [dangerThreshold, setDangerThreshold] = useState(1);
@@ -39,61 +159,23 @@ function App() {
     visible: false,
   });
   const [isSidePanel, setIsSidePanel] = useState(false);
-  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
 
-  // Function to open the sidepanel
-  const openSidePanel = () => {
-    if (browserAPI.sidePanel) {
-      try {
-        // We need to get the current tab first
-        if (browserAPI.tabs && browserAPI.tabs.query) {
-          browserAPI.tabs.query(
-            { active: true, currentWindow: true },
-            (tabs: chrome.tabs.Tab[]) => {
-              if (tabs && tabs.length > 0) {
-                const currentTab = tabs[0];
-                // Now we can open the side panel with the correct parameters
-                if (currentTab.windowId) {
-                  browserAPI.sidePanel.open({ windowId: currentTab.windowId });
-                  // Close the popup after opening the side panel
-                  setTimeout(() => window.close(), 100);
-                } else {
-                  console.error("Tab has no windowId");
-                  setGlobalError(
-                    "Failed to open side panel: Tab has no windowId"
-                  );
-                }
-              } else {
-                console.error("No active tab found");
-                setGlobalError(
-                  "Failed to open side panel: No active tab found"
-                );
-              }
-            }
-          );
-        } else {
-          // Fallback if tabs API is not available
-          console.error("Tabs API not available");
-          setGlobalError("Failed to open side panel: Tabs API not available");
-        }
-      } catch (error: unknown) {
-        console.error("Error opening side panel:", error);
-        setGlobalError("Failed to open side panel");
-      }
-    } else {
-      setGlobalError("Side panel is not supported in this browser");
-    }
-  };
+  const muiTheme = createAppTheme(theme);
 
-  // Load initial addresses, starred address, rpcProvider, and locale from chrome storage
+  // Detect if running in side panel
+  useEffect(() => {
+    const isSidePanelContainer =
+      document.querySelector(".sidepanel-container") !== null;
+    setIsSidePanel(isSidePanelContainer);
+  }, []);
+
+  // Load initial addresses, starred address, and locale from chrome storage
   useEffect(() => {
     browserAPI.storage.local
       .get([
         "savedAddresses",
         "starredAddress",
-        "rpcProvider",
         "locale",
-        "contractAddress",
         "selectedNetwork",
         "theme",
         "warningThreshold",
@@ -126,17 +208,11 @@ function App() {
         if (result.starredAddress) {
           setStarredAddress(result.starredAddress);
         }
-        if (result.rpcProvider) {
-          setRpcProvider(result.rpcProvider);
-        }
         if (result.locale) {
           setLocale(result.locale);
         }
         if (result.selectedNetwork) {
           setSelectedNetwork(result.selectedNetwork);
-        }
-        if (result.contractAddress) {
-          setContractAddress(result.contractAddress);
         }
         if (result.theme) {
           setTheme(result.theme);
@@ -166,7 +242,6 @@ function App() {
         }
       });
 
-    console.log("Contract address:", contractAddress);
     // Add listener for visibility changes to detect when popup is opened
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
@@ -203,14 +278,8 @@ function App() {
     ) => {
       if (areaName !== "local") return;
 
-      if (changes.rpcProvider) {
-        setRpcProvider(changes.rpcProvider.newValue);
-      }
       if (changes.locale) {
         setLocale(changes.locale.newValue);
-      }
-      if (changes.contractAddress) {
-        setContractAddress(changes.contractAddress.newValue);
       }
       if (changes.selectedNetwork) {
         setSelectedNetwork(changes.selectedNetwork.newValue);
@@ -234,22 +303,6 @@ function App() {
     };
   }, []);
 
-  // Detect if running in side panel
-  useEffect(() => {
-    const isSidePanelContainer =
-      document.querySelector(".sidepanel-container") !== null;
-    setIsSidePanel(isSidePanelContainer);
-  }, []);
-
-  // Update last refresh time when data is refreshed
-  useEffect(() => {
-    if (
-      Object.keys(isLoading).length > 0 &&
-      !Object.values(isLoading).some((loading) => loading)
-    ) {
-      setLastRefreshTime(new Date());
-    }
-  }, [isLoading]);
 
   const formatNumber = (value: string | number) => {
     return new Intl.NumberFormat(locale, {
@@ -343,23 +396,6 @@ function App() {
     }
   };
 
-  const updateAddressNetwork = async (
-    address: string,
-    currentNetwork: string,
-    newNetwork: string
-  ) => {
-    const updatedAddresses = addresses.map((a) =>
-      a.address === address && a.network === currentNetwork
-        ? { ...a, network: newNetwork }
-        : a
-    );
-
-    setAddresses(updatedAddresses);
-    await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
-
-    // Refresh data for this address with the new network
-    getUserData(address, newNetwork);
-  };
 
   const getUserData = async (
     userAddress: string,
@@ -459,16 +495,6 @@ function App() {
     return privacyMode ? "****" : formatNumber(amount);
   };
 
-  // Get network for an address
-  const getAddressNetwork = (address: string): string => {
-    const addressData = addresses.find((a) => a.address === address);
-    return addressData ? addressData.network : "ethereum";
-  };
-
-  // Get network symbol
-  const getNetworkSymbol = (networkKey: string): string => {
-    return networks[networkKey]?.nativeCurrency.symbol || "ETH";
-  };
 
   // Truncate address for display
   const truncateAddress = (address: string): string => {
@@ -495,390 +521,378 @@ function App() {
       });
   };
 
-  const toggleTheme = () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-    browserAPI.storage.local.set({ theme: newTheme });
-  };
-
-  // Format the last refresh time
-  const formatLastRefreshTime = () => {
-    if (!lastRefreshTime) return "Never";
-
-    const now = new Date();
-    const diffSeconds = Math.floor(
-      (now.getTime() - lastRefreshTime.getTime()) / 1000
-    );
-
-    if (diffSeconds < 60) {
-      return `${diffSeconds} seconds ago`;
-    } else if (diffSeconds < 3600) {
-      return `${Math.floor(diffSeconds / 60)} minutes ago`;
-    } else {
-      return lastRefreshTime.toLocaleTimeString();
-    }
-  };
 
   console.log(selectedNetwork);
 
   return (
-    <div className="App">
-      {globalError && (
-        <div className="global-error">
-          <div className="error-message">
+    <ThemeProvider theme={muiTheme}>
+      <CssBaseline />
+      <Box sx={{ 
+        width: isSidePanel ? "100%" : "400px", 
+        maxHeight: isSidePanel ? "100vh" : "600px", 
+        bgcolor: "background.default",
+        margin: 0,
+        padding: 0
+      }}>
+        {/* Global Error Alert */}
+        {globalError && (
+          <Alert
+            severity="error"
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => setGlobalError("")}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            sx={{ m: 0, mt: 0 }}
+          >
             {globalError}
-            <button className="close-error" onClick={() => setGlobalError("")}>
-              ×
-            </button>
-          </div>
-        </div>
-      )}
+          </Alert>
+        )}
 
-      {/* Toast notification */}
-      {toast.visible && (
-        <div className="toast-notification">{toast.message}</div>
-      )}
+        {/* Toast notification */}
+        <Snackbar
+          open={toast.visible}
+          autoHideDuration={3000}
+          onClose={() => setToast({ message: "", visible: false })}
+          message={toast.message}
+        />
 
-      <div className="container">
-        <div className="input-container">
-          <div className="input-with-button">
-            <input
-              type="text"
-              placeholder="Enter address"
-              value={newAddress}
-              onChange={(e) => setNewAddress(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && addAddress()}
-            />
-            <select
-              className="network-select-small"
-              value={selectedNetwork}
-              onChange={(e) => setSelectedNetwork(e.target.value)}
-            >
-              {Object.keys(networks).map((key) => (
-                <option key={key} value={key}>
-                  {networks[key].name}
-                </option>
-              ))}
-            </select>
-            <button className="add-button" onClick={addAddress}>
-              Add
-            </button>
-          </div>
-          <div className="action-icons">
-            <img
-              src="../assets/refresh.svg"
-              alt="Refresh"
-              className="action-icon"
-              onClick={refreshData}
-              title="Refresh data"
-            />
-            <img
-              src="../assets/eye.svg"
-              alt="Toggle Privacy Mode"
-              className="action-icon"
-              onClick={() => {
-                const newPrivacyMode = !privacyMode;
-                setPrivacyMode(newPrivacyMode);
-                browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
-              }}
-              title={privacyMode ? "Show values" : "Hide values"}
-            />
-            <img
-              src="../assets/settings.svg"
-              alt="Settings"
-              className="action-icon"
-              onClick={() =>
-                window.open(browserAPI.runtime.getURL("public/options.html"))
-              }
-              title="Settings"
-            />
-          </div>
-        </div>
+        <Container maxWidth={false} sx={{ py: 0, px: 0, width: "100%", mt: 0 }}>
+          {/* Header with input and actions */}
+          <Paper elevation={3} sx={{ p: 1, mb: 1, mt: 0 }}>
+            <Stack spacing={1}>
+              {/* Input section */}
+              <Stack direction="row" spacing={1} alignItems="center">
+                <TextField
+                  fullWidth
+                  placeholder="Enter wallet address"
+                  value={newAddress}
+                  onChange={(e) => setNewAddress(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addAddress()}
+                  size="small"
+                />
+                <FormControl size="small" sx={{ minWidth: 100 }}>
+                  <InputLabel>Network</InputLabel>
+                  <Select
+                    value={selectedNetwork}
+                    onChange={(e) => setSelectedNetwork(e.target.value)}
+                    label="Network"
+                  >
+                    {Object.keys(networks).map((key) => (
+                      <MenuItem key={key} value={key}>
+                        {networks[key].name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Button
+                  variant="contained"
+                  onClick={addAddress}
+                  disabled={!newAddress}
+                  size="small"
+                  sx={{ minWidth: "auto", px: 1 }}
+                >
+                  +
+                </Button>
+              </Stack>
 
-        <div className="addresses-container">
-          {addresses.length === 0 ? (
-            <div className="error-container">
-              No addresses added yet. Add an address to monitor.
-            </div>
-          ) : (
-            // Sort addresses to keep starred address on top
-            [...addresses]
-              .sort((a, b) => {
-                const aKey = `${a.address}-${a.network}`;
-                const bKey = `${b.address}-${b.network}`;
-                if (aKey === starredAddress) return -1;
-                if (bKey === starredAddress) return 1;
-                return 0;
-              })
-              .map(({ address, network }) => {
-                return (
-                  <div key={`${address}-${network}`} className="address-data">
-                    {isLoading[`${address}-${network}`] ? (
-                      <div className="loading">Loading...</div>
-                    ) : errors[`${address}-${network}`] ? (
-                      <div className="error-container">
-                        <div className="address-header">
-                          <div className="address-header-left">
-                            <span className="truncated-address" title={address}>
-                              {truncateAddress(address)}
-                            </span>
-                            <div
-                              className="copy-icon-container"
-                              onClick={() => copyToClipboard(address)}
-                              title="Copy address to clipboard"
-                            >
-                              <svg
-                                className="copy-icon"
-                                viewBox="0 0 24 24"
-                                width="14"
-                                height="14"
-                              >
-                                <path
-                                  fill="currentColor"
-                                  d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"
-                                />
-                              </svg>
-                            </div>
-                          </div>
-                          <div className="address-header-right">
-                            <select
-                              value={network}
-                              onChange={(e) =>
-                                updateAddressNetwork(
-                                  address,
-                                  network,
-                                  e.target.value
-                                )
-                              }
-                              className="network-select-badge"
-                              title={networks[network]?.name || "Ethereum"}
-                            >
-                              {getAllNetworks().map((net) => (
-                                <option
-                                  key={net.chainId}
-                                  value={net.name.toLowerCase()}
-                                  title={net.name}
-                                >
-                                  {net.name}
-                                </option>
-                              ))}
-                            </select>
-                            <button
-                              className={`star-button ${starredAddress === `${address}-${network}` ? "starred" : ""}`}
-                              onClick={() => toggleStar(address, network)}
-                            >
-                              {starredAddress === `${address}-${network}`
-                                ? "★"
-                                : "☆"}
-                            </button>
-                            <button
-                              className="remove-button"
-                              onClick={() => removeAddress(address, network)}
-                            >
-                              ×
-                            </button>
-                          </div>
-                        </div>
-                        <div className="error-message">
-                          {errors[`${address}-${network}`]}
-                        </div>
-                        <button
-                          className="retry-button"
-                          onClick={() => getUserData(address, network)}
+              {/* Action buttons */}
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Tooltip title="Refresh data">
+                  <IconButton onClick={refreshData} color="primary">
+                    <RefreshIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={privacyMode ? "Show values" : "Hide values"}>
+                  <IconButton
+                    onClick={() => {
+                      const newPrivacyMode = !privacyMode;
+                      setPrivacyMode(newPrivacyMode);
+                      browserAPI.storage.local.set({ privacyMode: newPrivacyMode });
+                    }}
+                    color="primary"
+                  >
+                    {privacyMode ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Settings">
+                  <IconButton
+                    onClick={() =>
+                      window.open(browserAPI.runtime.getURL("public/options.html"))
+                    }
+                    color="primary"
+                  >
+                    <SettingsIcon />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
+            </Stack>
+          </Paper>
+
+          {/* Addresses List */}
+          <Stack>
+            {addresses.length === 0 ? (
+              <Paper elevation={1} sx={{ p: 3, textAlign: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                  No addresses added yet. Add an address to monitor.
+                </Typography>
+              </Paper>
+            ) : (
+              // Sort addresses to keep starred address on top
+              [...addresses]
+                .sort((a, b) => {
+                  const aKey = `${a.address}-${a.network}`;
+                  const bKey = `${b.address}-${b.network}`;
+                  if (aKey === starredAddress) return -1;
+                  if (bKey === starredAddress) return 1;
+                  return 0;
+                })
+                .map(({ address, network }) => {
+                  const addressKey = `${address}-${network}`;
+                  const isLoadingData = isLoading[addressKey];
+                  const error = errors[addressKey];
+                  const data = userData[addressKey];
+                  const isStarred = starredAddress === addressKey;
+
+                  return (
+                    <Card key={addressKey} elevation={2} sx={{ mb: 2 }}>
+                      <CardContent sx={{ p: 2 }}>
+                        {/* Address Header */}
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            mb: 1.5,
+                          }}
                         >
-                          Retry
-                        </button>
-                      </div>
-                    ) : (
-                      userData[`${address}-${network}`] && (
-                        <div className="container">
-                          <div className="address-header">
-                            <div className="address-header-left">
-                              <span
-                                className="truncated-address"
-                                title={address}
-                              >
-                                {truncateAddress(address)}
-                              </span>
-                              <div
-                                className="copy-icon-container"
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Typography
+                              variant="subtitle1"
+                              sx={{ 
+                                fontFamily: "monospace",
+                                color: "primary.main",
+                                fontWeight: 600
+                              }}
+                              title={address}
+                            >
+                              {truncateAddress(address)}
+                            </Typography>
+                            <Tooltip title="Copy address">
+                              <IconButton
+                                size="small"
                                 onClick={() => copyToClipboard(address)}
-                                title="Copy address to clipboard"
                               >
-                                <svg
-                                  className="copy-icon"
-                                  viewBox="0 0 24 24"
-                                  width="14"
-                                  height="14"
-                                >
-                                  <path
-                                    fill="currentColor"
-                                    d="M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1ZM19 5H8C6.9 5 6 5.9 6 7V21C6 22.1 6.9 23 8 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5ZM19 21H8V7H19V21Z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-                            <div className="address-header-right">
-                              <select
-                                value={
-                                  userData[`${address}-${network}`].network ||
-                                  network
-                                }
-                                onChange={(e) =>
-                                  updateAddressNetwork(
-                                    address,
-                                    userData[`${address}-${network}`].network ||
-                                      network,
-                                    e.target.value
-                                  )
-                                }
-                                className="network-select-badge"
-                                title={
-                                  networks[
-                                    userData[`${address}-${network}`].network ||
-                                      network
-                                  ]?.name || "Ethereum"
-                                }
-                              >
-                                {getAllNetworks().map((net) => (
-                                  <option
-                                    key={net.chainId}
-                                    value={net.name.toLowerCase()}
-                                    title={net.name}
-                                  >
-                                    {net.name}
-                                  </option>
-                                ))}
-                              </select>
-                              <button
-                                className={`star-button ${starredAddress === `${address}-${network}` ? "starred" : ""}`}
+                                <CopyIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            <Chip
+                              label={networks[network]?.name || "Ethereum"}
+                              size="small"
+                              color="primary"
+                              variant="outlined"
+                            />
+                            <Tooltip title={isStarred ? "Unstar" : "Star"}>
+                              <IconButton
+                                size="small"
                                 onClick={() => toggleStar(address, network)}
+                                color={isStarred ? "warning" : "default"}
                               >
-                                {starredAddress === `${address}-${network}`
-                                  ? "★"
-                                  : "☆"}
-                              </button>
-                              <button
-                                className="remove-button"
+                                {isStarred ? <StarIcon /> : <StarBorderIcon />}
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Remove">
+                              <IconButton
+                                size="small"
                                 onClick={() => removeAddress(address, network)}
+                                sx={{ color: "primary.main" }}
                               >
-                                ×
-                              </button>
-                            </div>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">Total Collateral</span>
-                            <span className="value">
-                              ${" "}
-                              {formatAmount(
-                                userData[`${address}-${network}`]
-                                  .totalCollateral
-                              )}
-                            </span>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">Total Debt</span>
-                            <span className="value">
-                              ${" "}
-                              {formatAmount(
-                                userData[`${address}-${network}`].totalDebt
-                              )}
-                            </span>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">Available to Borrow</span>
-                            <span className="value">
-                              ${" "}
-                              {formatAmount(
-                                userData[`${address}-${network}`]
-                                  .availableBorrows
-                              )}
-                            </span>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">Net Worth</span>
-                            <span className="value">
-                              ${" "}
-                              {formatAmount(
-                                userData[`${address}-${network}`].netWorth
-                              )}
-                            </span>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">Liquidation Threshold</span>
-                            <span className="value">
-                              {
-                                userData[`${address}-${network}`]
-                                  .liquidationThreshold
-                              }
-                              %
-                            </span>
-                          </div>
-                          <div className="data-row">
-                            <span className="label">LTV</span>
-                            <span className="value">
-                              {userData[`${address}-${network}`].ltv}%
-                            </span>
-                          </div>
-                          <div
-                            className={`health-factor ${
-                              parseFloat(
-                                userData[`${address}-${network}`].healthFactor
-                              ) >= warningThreshold
-                                ? "safe"
-                                : parseFloat(
-                                      userData[`${address}-${network}`]
-                                        .healthFactor
-                                    ) >= dangerThreshold
-                                  ? "warning"
-                                  : "danger"
-                            }`}
-                          >
-                            Health Factor:{" "}
-                            {parseFloat(
-                              userData[`${address}-${network}`].totalDebt
-                            ) === 0
-                              ? "No debt"
-                              : formatNumber(
-                                  userData[`${address}-${network}`].healthFactor
-                                )}
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                );
-              })
-          )}
-        </div>
-      </div>
+                                <DeleteIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
+                          </Box>
+                        </Box>
 
-      <div className="footer">
-        <hr className="footer-divider" />
-        <div className="footer-content">
-          Made with
-          <svg
-            className="heart-icon"
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-          >
-            <path
-              fill="#ff5252"
-              d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-            />
-          </svg>{" "}
-          by{" "}
-          <a
-            href="https://notrustverify.ch"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            No Trust Verify
-          </a>
-        </div>
-      </div>
-    </div>
+                        {/* Content */}
+                        {isLoadingData ? (
+                          <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+                            <CircularProgress size={24} />
+                            <Typography variant="body2" sx={{ ml: 2 }}>
+                              Loading...
+                            </Typography>
+                          </Box>
+                        ) : error ? (
+                          <Alert
+                            severity="error"
+                            action={
+                              <Button
+                                size="small"
+                                onClick={() => getUserData(address, network)}
+                              >
+                                Retry
+                              </Button>
+                            }
+                          >
+                            {error}
+                          </Alert>
+                        ) : data ? (
+                          <Box>
+                            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1.5 }}>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Total Collateral
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "primary.main"
+                                  }}
+                                >
+                                  ${formatAmount(data.totalCollateral)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Total Debt
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "primary.main"
+                                  }}
+                                >
+                                  ${formatAmount(data.totalDebt)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Available to Borrow
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "primary.main"
+                                  }}
+                                >
+                                  ${formatAmount(data.availableBorrows)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Net Worth
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "primary.main"
+                                  }}
+                                >
+                                  ${formatAmount(data.netWorth)}
+                                </Typography>
+                              </Box>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  Liquidation Threshold
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "primary.main"
+                                  }}
+                                >
+                                  {data.liquidationThreshold}%
+                                </Typography>
+                              </Box>
+                              <Box sx={{ flex: "1 1 180px", minWidth: 0 }}>
+                                <Typography variant="caption" color="text.secondary">
+                                  LTV
+                                </Typography>
+                                <Typography 
+                                  variant="body1" 
+                                  sx={{ 
+                                    fontWeight: 600,
+                                    color: "text.primary"
+                                  }}
+                                >
+                                  {data.ltv}%
+                                </Typography>
+                              </Box>
+                            </Box>
+                            <Divider sx={{ my: 1.5 }} />
+                            <Box
+                              sx={{
+                                p: 1.5,
+                                borderRadius: 2,
+                                bgcolor: parseFloat(data.healthFactor) >= warningThreshold
+                                  ? "success.light"
+                                  : parseFloat(data.healthFactor) >= dangerThreshold
+                                  ? "warning.light"
+                                  : "error.light",
+                                color: parseFloat(data.healthFactor) >= warningThreshold
+                                  ? "success.dark"
+                                  : parseFloat(data.healthFactor) >= dangerThreshold
+                                  ? "warning.dark"
+                                  : "error.dark",
+                              }}
+                            >
+                              <Typography variant="body1" align="center" sx={{ fontWeight: 600 }}>
+                                Health Factor:{" "}
+                                {parseFloat(data.totalDebt) === 0
+                                  ? "No debt"
+                                  : formatNumber(data.healthFactor)}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        ) : null}
+                      </CardContent>
+                    </Card>
+                  );
+                })
+            )}
+          </Stack>
+        </Container>
+
+        {/* Footer */}
+        <Box
+          sx={{
+            mt: 2,
+            py: 1,
+            textAlign: "center",
+            borderTop: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Typography variant="caption" color="text.secondary">
+            Made with{" "}
+            <HeartIcon sx={{ fontSize: 12, color: "secondary.main", mx: 0.5 }} />
+            by{" "}
+            <Typography
+              component="a"
+              href="https://notrustverify.ch"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="caption"
+              color="primary.main"
+              sx={{ textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+            >
+              No Trust Verify
+            </Typography>
+          </Typography>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
 
