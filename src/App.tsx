@@ -1316,7 +1316,16 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            Made with<HeartIcon sx={{ fontSize: 12, color: "red", marginRight: "3px", marginLeft: "2px" }} />by{" "}
+            Made with
+            <HeartIcon
+              sx={{
+                fontSize: 12,
+                color: "red",
+                marginRight: "3px",
+                marginLeft: "2px",
+              }}
+            />
+            by{" "}
             <Typography
               component="a"
               href="https://notrustverify.ch"
