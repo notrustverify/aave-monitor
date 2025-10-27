@@ -262,8 +262,16 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
             browserAPI.storage.local.set({
               savedAddresses: convertedAddresses,
             });
+            // Auto-collapse if addresses exist
+            if (convertedAddresses.length > 0) {
+              setIsHeaderCollapsed(true);
+            }
           } else {
             setAddresses(result.savedAddresses);
+            // Auto-collapse if addresses exist
+            if (result.savedAddresses.length > 0) {
+              setIsHeaderCollapsed(true);
+            }
           }
         }
         if (result.starredAddress) {
@@ -419,6 +427,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
     await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
     getUserData(newAddress, selectedNetwork);
     setNewAddress("");
+    setIsHeaderCollapsed(true);
   };
 
   const removeAddress = async (
@@ -1282,7 +1291,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                               >
                                 Health Factor:{" "}
                                 {parseFloat(data.totalDebt) === 0
-                                  ? "No debt"
+                                  ? "No Debt"
                                   : formatNumber(data.healthFactor)}
                               </Typography>
                             </Box>
@@ -1307,9 +1316,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            Made with
-            <HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
-            by{" "}
+            Made with<HeartIcon sx={{ fontSize: 12, color: "red", marginRight: "3px", marginLeft: "2px" }} />by{" "}
             <Typography
               component="a"
               href="https://notrustverify.ch"
