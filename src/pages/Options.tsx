@@ -169,6 +169,7 @@ function Options() {
   const [dangerThreshold, setDangerThreshold] = useState(1);
   const [badgeDisplay, setBadgeDisplay] = useState<string>("healthFactor");
   const [preferSidePanel, setPreferSidePanel] = useState<boolean>(true);
+  const [hideDetails, setHideDetails] = useState(false);
 
   const muiTheme = createAppTheme(theme);
 
@@ -187,6 +188,7 @@ function Options() {
         "dangerThreshold",
         "badgeDisplay",
         "preferSidePanel",
+        "hideDetails",
       ],
       (result) => {
         if (result.updateFrequency) {
@@ -229,6 +231,9 @@ function Options() {
         if (result.preferSidePanel !== undefined) {
           setPreferSidePanel(result.preferSidePanel);
         }
+        if (result.hideDetails !== undefined) {
+          setHideDetails(result.hideDetails);
+        }
       }
     );
   }, []);
@@ -252,6 +257,7 @@ function Options() {
     setWarningThreshold(2);
     setDangerThreshold(1);
     setBadgeDisplay("healthFactor");
+    setHideDetails(false);
 
     // Save the reset settings to storage
     browserAPI.storage.local.set({
@@ -265,6 +271,7 @@ function Options() {
       warningThreshold: 2,
       dangerThreshold: 1,
       badgeDisplay: "healthFactor",
+      hideDetails: false,
     });
 
     // Update the alarm interval
@@ -381,6 +388,46 @@ function Options() {
             spacing={1.5}
             sx={{ height: "calc(100vh - 120px)", overflow: "hidden" }}
           >
+            {/* Compact View Section */}
+            <Card elevation={0}>
+              <CardContent sx={{ p: 2 }}>
+                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+                  Display Mode
+                </Typography>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={hideDetails}
+                      onChange={(e) => {
+                        const newHideDetails = e.target.checked;
+                        setHideDetails(newHideDetails);
+                        saveSetting("hideDetails", newHideDetails);
+                      }}
+                      sx={{
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "primary.main",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          {
+                            backgroundColor: "primary.main",
+                          },
+                      }}
+                    />
+                  }
+                  label={
+                    <Box>
+                      <Typography variant="body1">
+                        Compact View
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Hide detailed metrics and show only health factor
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </CardContent>
+            </Card>
+
             {/* Theme Section */}
             <Card elevation={0}>
               <CardContent sx={{ p: 2 }}>

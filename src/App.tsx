@@ -44,6 +44,12 @@ import {
   ContentCopy as CopyIcon,
   Delete as DeleteIcon,
   Favorite as HeartIcon,
+  ViewAgenda as ViewAgendaIcon,
+  ViewStream as ViewStreamIcon,
+  KeyboardArrowUp as KeyboardArrowUpIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
+  Edit as EditIcon,
+  Check as CheckIcon,
 } from "@mui/icons-material";
 
 // Interface for address data including network
@@ -177,7 +183,12 @@ const createAppTheme = (mode: "light" | "dark") =>
     },
   });
 
-function App() {
+interface AppProps {
+  closeSidePanel?: () => void;
+  isSidePanel?: boolean;
+}
+
+function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
   const [addresses, setAddresses] = useState<AddressData[]>([]);
   const [userData, setUserData] = useState<{ [key: string]: any }>({});
   const [isLoading, setIsLoading] = useState<{ [key: string]: boolean }>({});
@@ -187,6 +198,11 @@ function App() {
   const [newAddress, setNewAddress] = useState<string>("");
   const [selectedNetwork, setSelectedNetwork] = useState<string>("ethereum");
   const [privacyMode, setPrivacyMode] = useState(false);
+  const [hideDetails, setHideDetails] = useState(false);
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+  const [addressLabels, setAddressLabels] = useState<{ [key: string]: string }>({});
+  const [editingLabel, setEditingLabel] = useState<string>("");
+  const [labelInput, setLabelInput] = useState<string>("");
   const [locale, setLocale] = useState(navigator.language);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [warningThreshold, setWarningThreshold] = useState(2);
@@ -201,10 +217,14 @@ function App() {
 
   // Detect if running in side panel
   useEffect(() => {
-    const isSidePanelContainer =
-      document.querySelector(".sidepanel-container") !== null;
-    setIsSidePanel(isSidePanelContainer);
-  }, []);
+    if (isSidePanelProp !== undefined) {
+      setIsSidePanel(isSidePanelProp);
+    } else {
+      const isSidePanelContainer =
+        document.querySelector(".sidepanel-container") !== null;
+      setIsSidePanel(isSidePanelContainer);
+    }
+  }, [isSidePanelProp]);
 
   // Load initial addresses, starred address, and locale from chrome storage
   useEffect(() => {
@@ -217,6 +237,8 @@ function App() {
         "theme",
         "warningThreshold",
         "dangerThreshold",
+        "hideDetails",
+        "addressLabels",
       ])
       .then((result) => {
         if (result.savedAddresses) {
@@ -260,6 +282,12 @@ function App() {
         if (result.dangerThreshold !== undefined) {
           setDangerThreshold(result.dangerThreshold);
         }
+        if (result.hideDetails !== undefined) {
+          setHideDetails(result.hideDetails);
+        }
+        if (result.addressLabels) {
+          setAddressLabels(result.addressLabels);
+        }
 
         // If addresses exist, fetch data for them
         if (result.savedAddresses && result.savedAddresses.length > 0) {
@@ -302,9 +330,12 @@ function App() {
 
   useEffect(() => {
     // Load privacy mode state from storage
-    browserAPI.storage.local.get("privacyMode", (result) => {
+    browserAPI.storage.local.get(["privacyMode", "hideDetails"], (result) => {
       if (result.privacyMode !== undefined) {
         setPrivacyMode(result.privacyMode);
+      }
+      if (result.hideDetails !== undefined) {
+        setHideDetails(result.hideDetails);
       }
     });
 
@@ -329,6 +360,9 @@ function App() {
       }
       if (changes.dangerThreshold) {
         setDangerThreshold(changes.dangerThreshold.newValue);
+      }
+      if (changes.hideDetails) {
+        setHideDetails(changes.hideDetails.newValue);
       }
     };
 
@@ -598,136 +632,205 @@ function App() {
         />
 
         <Container maxWidth={false} sx={{ py: 2, px: 2, width: "100%", mt: 0 }}>
-          {/* Header with input and actions */}
-          <Paper
-            elevation={0}
-            sx={{ p: 3, mb: 3, mt: 0, bgcolor: "background.paper" }}
-          >
-            <Stack spacing={2}>
-              {/* Input section */}
-              <Stack direction="row" spacing={2} alignItems="center">
-                <TextField
-                  fullWidth
-                  placeholder="Enter wallet address"
-                  value={newAddress}
-                  onChange={(e) => setNewAddress(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addAddress()}
+          {/* Action buttons - always visible */}
+          <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1, mb: 1.5 }}>
+            <Tooltip title={isHeaderCollapsed ? "Show add address" : "Hide add address"}>
+              <IconButton
+                onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+                size="small"
+                sx={{
+                  bgcolor: "background.default",
+                  width: 32,
+                  height: 32,
+                  "&:hover": {
+                    bgcolor: "background.default",
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                {isHeaderCollapsed ? (
+                  <KeyboardArrowDownIcon fontSize="small" />
+                ) : (
+                  <KeyboardArrowUpIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Refresh data">
+              <IconButton
+                onClick={refreshData}
+                size="small"
+                sx={{
+                  bgcolor: "background.default",
+                  width: 32,
+                  height: 32,
+                  "&:hover": {
+                    bgcolor: "background.default",
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                <RefreshIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={privacyMode ? "Show values" : "Hide values"}>
+              <IconButton
+                onClick={() => {
+                  const newPrivacyMode = !privacyMode;
+                  setPrivacyMode(newPrivacyMode);
+                  browserAPI.storage.local.set({
+                    privacyMode: newPrivacyMode,
+                  });
+                }}
+                size="small"
+                sx={{
+                  bgcolor: "background.default",
+                  width: 32,
+                  height: 32,
+                  "&:hover": {
+                    bgcolor: "background.default",
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                {privacyMode ? (
+                  <VisibilityOffIcon fontSize="small" />
+                ) : (
+                  <VisibilityIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={hideDetails ? "Show details" : "Hide details"}>
+              <IconButton
+                onClick={() => {
+                  const newHideDetails = !hideDetails;
+                  setHideDetails(newHideDetails);
+                  browserAPI.storage.local.set({
+                    hideDetails: newHideDetails,
+                  });
+                }}
+                size="small"
+                sx={{
+                  bgcolor: "background.default",
+                  width: 32,
+                  height: 32,
+                  "&:hover": {
+                    bgcolor: "background.default",
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                {hideDetails ? (
+                  <ViewStreamIcon fontSize="small" />
+                ) : (
+                  <ViewAgendaIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Settings">
+              <IconButton
+                onClick={() =>
+                  window.open(
+                    browserAPI.runtime.getURL("public/options.html")
+                  )
+                }
+                size="small"
+                sx={{
+                  bgcolor: "background.default",
+                  width: 32,
+                  height: 32,
+                  "&:hover": {
+                    bgcolor: "background.default",
+                    opacity: 0.8,
+                  },
+                }}
+              >
+                <SettingsIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+            {closeSidePanel && (
+              <Tooltip title="Close">
+                <IconButton
+                  onClick={closeSidePanel}
                   size="small"
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      bgcolor: "background.default",
-                      height: 40,
-                    },
-                  }}
-                />
-                <FormControl size="small" sx={{ minWidth: 100 }}>
-                  <InputLabel>Network</InputLabel>
-                  <Select
-                    value={selectedNetwork}
-                    onChange={(e) => setSelectedNetwork(e.target.value)}
-                    label="Network"
-                    sx={{
-                      bgcolor: "background.default",
-                      height: 40,
-                    }}
-                  >
-                    {Object.keys(networks).map((key) => (
-                      <MenuItem key={key} value={key}>
-                        {networks[key].name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <Button
-                  variant="contained"
-                  onClick={addAddress}
-                  disabled={!newAddress}
-                  size="small"
-                  sx={{
-                    minWidth: 40,
-                    height: 40,
-                    borderRadius: 2,
-                    bgcolor: "primary.main",
+                    bgcolor: "background.default",
+                    width: 32,
+                    height: 32,
                     "&:hover": {
-                      bgcolor: "primary.main",
-                      opacity: 0.9,
+                      bgcolor: "background.default",
+                      opacity: 0.8,
                     },
                   }}
                 >
-                  +
-                </Button>
-              </Stack>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
 
-              {/* Action buttons */}
-              <Stack direction="row" spacing={1} justifyContent="flex-end">
-                <Tooltip title="Refresh data">
-                  <IconButton
-                    onClick={refreshData}
+          {/* Header with input - conditionally shown */}
+          {!isHeaderCollapsed && (
+            <Paper
+              elevation={0}
+              sx={{ p: 3, mb: 3, bgcolor: "background.paper" }}
+            >
+              <Stack spacing={2}>
+                {/* Input section */}
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <TextField
+                    fullWidth
+                    placeholder="Enter wallet address"
+                    value={newAddress}
+                    onChange={(e) => setNewAddress(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addAddress()}
                     size="small"
                     sx={{
-                      bgcolor: "background.default",
-                      width: 32,
-                      height: 32,
-                      "&:hover": {
+                      "& .MuiOutlinedInput-root": {
                         bgcolor: "background.default",
-                        opacity: 0.8,
+                        height: 40,
+                      },
+                    }}
+                  />
+                  <FormControl size="small" sx={{ minWidth: 100 }}>
+                    <InputLabel>Network</InputLabel>
+                    <Select
+                      value={selectedNetwork}
+                      onChange={(e) => setSelectedNetwork(e.target.value)}
+                      label="Network"
+                      sx={{
+                        bgcolor: "background.default",
+                        height: 40,
+                      }}
+                    >
+                      {Object.keys(networks).map((key) => (
+                        <MenuItem key={key} value={key}>
+                          {networks[key].name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <Button
+                    variant="contained"
+                    onClick={addAddress}
+                    disabled={!newAddress}
+                    size="small"
+                    sx={{
+                      minWidth: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      bgcolor: "primary.main",
+                      "&:hover": {
+                        bgcolor: "primary.main",
+                        opacity: 0.9,
                       },
                     }}
                   >
-                    <RefreshIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title={privacyMode ? "Show values" : "Hide values"}>
-                  <IconButton
-                    onClick={() => {
-                      const newPrivacyMode = !privacyMode;
-                      setPrivacyMode(newPrivacyMode);
-                      browserAPI.storage.local.set({
-                        privacyMode: newPrivacyMode,
-                      });
-                    }}
-                    size="small"
-                    sx={{
-                      bgcolor: "background.default",
-                      width: 32,
-                      height: 32,
-                      "&:hover": {
-                        bgcolor: "background.default",
-                        opacity: 0.8,
-                      },
-                    }}
-                  >
-                    {privacyMode ? (
-                      <VisibilityOffIcon fontSize="small" />
-                    ) : (
-                      <VisibilityIcon fontSize="small" />
-                    )}
-                  </IconButton>
-                </Tooltip>
-                <Tooltip title="Settings">
-                  <IconButton
-                    onClick={() =>
-                      window.open(
-                        browserAPI.runtime.getURL("public/options.html")
-                      )
-                    }
-                    size="small"
-                    sx={{
-                      bgcolor: "background.default",
-                      width: 32,
-                      height: 32,
-                      "&:hover": {
-                        bgcolor: "background.default",
-                        opacity: 0.8,
-                      },
-                    }}
-                  >
-                    <SettingsIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                    +
+                  </Button>
+                </Stack>
               </Stack>
-            </Stack>
-          </Paper>
+            </Paper>
+          )}
 
           {/* Addresses List */}
           <Stack>
@@ -777,18 +880,45 @@ function App() {
                               gap: 1,
                             }}
                           >
-                            <Typography
-                              variant="h6"
-                              sx={{
-                                fontFamily: "monospace",
-                                color: "text.primary",
-                                fontWeight: 600,
-                                fontSize: "1rem",
-                              }}
-                              title={address}
-                            >
-                              {truncateAddress(address)}
-                            </Typography>
+                            {editingLabel === addressKey ? (
+                              <TextField
+                                value={labelInput}
+                                onChange={(e) => setLabelInput(e.target.value)}
+                                onKeyPress={(e) => {
+                                  if (e.key === "Enter") {
+                                    const updatedLabels = { ...addressLabels, [addressKey]: labelInput };
+                                    setAddressLabels(updatedLabels);
+                                    browserAPI.storage.local.set({ addressLabels: updatedLabels });
+                                    setEditingLabel("");
+                                    setLabelInput("");
+                                  } else if (e.key === "Escape") {
+                                    setEditingLabel("");
+                                    setLabelInput("");
+                                  }
+                                }}
+                                size="small"
+                                autoFocus
+                                sx={{
+                                  width: 150,
+                                  "& .MuiOutlinedInput-root": {
+                                    bgcolor: "background.default",
+                                    height: 32,
+                                  },
+                                }}
+                              />
+                            ) : (
+                              <Typography
+                                variant="h6"
+                                sx={{
+                                  color: "text.primary",
+                                  fontWeight: 600,
+                                  fontSize: "1rem",
+                                }}
+                                title={addressLabels[addressKey] || address}
+                              >
+                                {addressLabels[addressKey] || truncateAddress(address)}
+                              </Typography>
+                            )}
                             <Tooltip title="Copy address">
                               <IconButton
                                 size="small"
@@ -806,6 +936,74 @@ function App() {
                                 <CopyIcon sx={{ fontSize: 14 }} />
                               </IconButton>
                             </Tooltip>
+                            {editingLabel === addressKey ? (
+                              <>
+                                <Tooltip title="Save label">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      const updatedLabels = { ...addressLabels, [addressKey]: labelInput };
+                                      setAddressLabels(updatedLabels);
+                                      browserAPI.storage.local.set({ addressLabels: updatedLabels });
+                                      setEditingLabel("");
+                                      setLabelInput("");
+                                    }}
+                                    sx={{
+                                      bgcolor: "background.default",
+                                      width: 24,
+                                      height: 24,
+                                      "&:hover": {
+                                        bgcolor: "success.main",
+                                        opacity: 0.8,
+                                      },
+                                    }}
+                                  >
+                                    <CheckIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Cancel">
+                                  <IconButton
+                                    size="small"
+                                    onClick={() => {
+                                      setEditingLabel("");
+                                      setLabelInput("");
+                                    }}
+                                    sx={{
+                                      bgcolor: "background.default",
+                                      width: 24,
+                                      height: 24,
+                                      "&:hover": {
+                                        bgcolor: "error.main",
+                                        opacity: 0.8,
+                                      },
+                                    }}
+                                  >
+                                    <CloseIcon sx={{ fontSize: 14 }} />
+                                  </IconButton>
+                                </Tooltip>
+                              </>
+                            ) : (
+                              <Tooltip title="Edit label">
+                                <IconButton
+                                  size="small"
+                                  onClick={() => {
+                                    setEditingLabel(addressKey);
+                                    setLabelInput(addressLabels[addressKey] || "");
+                                  }}
+                                  sx={{
+                                    bgcolor: "background.default",
+                                    width: 24,
+                                    height: 24,
+                                    "&:hover": {
+                                      bgcolor: "background.default",
+                                      opacity: 0.8,
+                                    },
+                                  }}
+                                >
+                                  <EditIcon sx={{ fontSize: 14 }} />
+                                </IconButton>
+                              </Tooltip>
+                            )}
                           </Box>
                           <Box
                             sx={{
@@ -884,20 +1082,21 @@ function App() {
                           </Alert>
                         ) : data ? (
                           <Box>
-                            <Box
-                              sx={{
-                                display: "grid",
-                                gridTemplateColumns: {
-                                  xs: "repeat(2, 1fr)",
-                                  sm: "repeat(3, 1fr)",
-                                  md: "repeat(3, 1fr)",
-                                },
-                                gap: 2,
-                                mb: 3,
-                                width: "100%",
-                              }}
-                            >
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
+                            {!hideDetails && (
+                              <Box
+                                sx={{
+                                  display: "grid",
+                                  gridTemplateColumns: {
+                                    xs: "repeat(2, 1fr)",
+                                    sm: "repeat(3, 1fr)",
+                                    md: "repeat(3, 1fr)",
+                                  },
+                                  gap: 2,
+                                  mb: 3,
+                                  width: "100%",
+                                }}
+                              >
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
                                 <Typography
                                   variant="body2"
                                   color="text.secondary"
@@ -1017,7 +1216,8 @@ function App() {
                                   {data.ltv}%
                                 </Typography>
                               </Box>
-                            </Box>
+                              </Box>
+                            )}
                             <Box
                               sx={{
                                 p: 1,
@@ -1085,7 +1285,7 @@ function App() {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            Made with <HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
+            Made with<HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
             by{" "}
             <Typography
               component="a"

@@ -60,30 +60,8 @@ const SidePanel: React.FC = () => {
       className="sidepanel-container"
       style={{ width: "100%", height: "100vh", margin: 0, padding: 0 }}
     >
-      <div
-        className="sidepanel-header"
-        style={{ position: "absolute", top: 0, right: 0, zIndex: 1000 }}
-      >
-        <button
-          className="close-button"
-          onClick={closeSidePanel}
-          title="Close side panel"
-          style={{
-            background: "none",
-            border: "none",
-            padding: "8px",
-            cursor: "pointer",
-          }}
-        >
-          <img
-            src="../assets/close.svg"
-            alt="Close"
-            style={{ width: "16px", height: "16px" }}
-          />
-        </button>
-      </div>
       <div style={{ width: "100%", height: "100vh", margin: 0, padding: 0 }}>
-        <App />
+        <App closeSidePanel={closeSidePanel} isSidePanel={true} />
       </div>
     </div>
   );
