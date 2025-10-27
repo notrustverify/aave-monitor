@@ -416,9 +416,7 @@ function Options() {
                   }
                   label={
                     <Box>
-                      <Typography variant="body1">
-                        Compact View
-                      </Typography>
+                      <Typography variant="body1">Compact View</Typography>
                       <Typography variant="caption" color="text.secondary">
                         Hide detailed metrics and show only health factor
                       </Typography>

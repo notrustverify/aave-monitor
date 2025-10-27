@@ -200,7 +200,9 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
   const [privacyMode, setPrivacyMode] = useState(false);
   const [hideDetails, setHideDetails] = useState(false);
   const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-  const [addressLabels, setAddressLabels] = useState<{ [key: string]: string }>({});
+  const [addressLabels, setAddressLabels] = useState<{ [key: string]: string }>(
+    {}
+  );
   const [editingLabel, setEditingLabel] = useState<string>("");
   const [labelInput, setLabelInput] = useState<string>("");
   const [locale, setLocale] = useState(navigator.language);
@@ -633,8 +635,17 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
 
         <Container maxWidth={false} sx={{ py: 2, px: 2, width: "100%", mt: 0 }}>
           {/* Action buttons - always visible */}
-          <Stack direction="row" spacing={1} justifyContent="flex-end" sx={{ mt: 1, mb: 1.5 }}>
-            <Tooltip title={isHeaderCollapsed ? "Show add address" : "Hide add address"}>
+          <Stack
+            direction="row"
+            spacing={1}
+            justifyContent="flex-end"
+            sx={{ mt: 1, mb: 1.5 }}
+          >
+            <Tooltip
+              title={
+                isHeaderCollapsed ? "Show add address" : "Hide add address"
+              }
+            >
               <IconButton
                 onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
                 size="small"
@@ -729,9 +740,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
             <Tooltip title="Settings">
               <IconButton
                 onClick={() =>
-                  window.open(
-                    browserAPI.runtime.getURL("public/options.html")
-                  )
+                  window.open(browserAPI.runtime.getURL("public/options.html"))
                 }
                 size="small"
                 sx={{
@@ -886,9 +895,14 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                 onChange={(e) => setLabelInput(e.target.value)}
                                 onKeyPress={(e) => {
                                   if (e.key === "Enter") {
-                                    const updatedLabels = { ...addressLabels, [addressKey]: labelInput };
+                                    const updatedLabels = {
+                                      ...addressLabels,
+                                      [addressKey]: labelInput,
+                                    };
                                     setAddressLabels(updatedLabels);
-                                    browserAPI.storage.local.set({ addressLabels: updatedLabels });
+                                    browserAPI.storage.local.set({
+                                      addressLabels: updatedLabels,
+                                    });
                                     setEditingLabel("");
                                     setLabelInput("");
                                   } else if (e.key === "Escape") {
@@ -916,7 +930,8 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                 }}
                                 title={addressLabels[addressKey] || address}
                               >
-                                {addressLabels[addressKey] || truncateAddress(address)}
+                                {addressLabels[addressKey] ||
+                                  truncateAddress(address)}
                               </Typography>
                             )}
                             <Tooltip title="Copy address">
@@ -942,9 +957,14 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                   <IconButton
                                     size="small"
                                     onClick={() => {
-                                      const updatedLabels = { ...addressLabels, [addressKey]: labelInput };
+                                      const updatedLabels = {
+                                        ...addressLabels,
+                                        [addressKey]: labelInput,
+                                      };
                                       setAddressLabels(updatedLabels);
-                                      browserAPI.storage.local.set({ addressLabels: updatedLabels });
+                                      browserAPI.storage.local.set({
+                                        addressLabels: updatedLabels,
+                                      });
                                       setEditingLabel("");
                                       setLabelInput("");
                                     }}
@@ -988,7 +1008,9 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                   size="small"
                                   onClick={() => {
                                     setEditingLabel(addressKey);
-                                    setLabelInput(addressLabels[addressKey] || "");
+                                    setLabelInput(
+                                      addressLabels[addressKey] || ""
+                                    );
                                   }}
                                   sx={{
                                     bgcolor: "background.default",
@@ -1097,125 +1119,125 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                 }}
                               >
                                 <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  Total Collateral
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  ${formatAmount(data.totalCollateral)}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  Total Debt
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  ${formatAmount(data.totalDebt)}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  Available to Borrow
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  ${formatAmount(data.availableBorrows)}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  Net Worth
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  ${formatAmount(data.netWorth)}
-                                </Typography>
-                              </Box>
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  Liquidation Threshold
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  {data.liquidationThreshold}%
-                                </Typography>
-                              </Box>
-                              <Box sx={{ width: "100%", minWidth: 0 }}>
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{ mb: 0, fontWeight: 500 }}
-                                >
-                                  LTV
-                                </Typography>
-                                <Typography
-                                  variant="h6"
-                                  sx={{
-                                    fontWeight: 600,
-                                    color: "text.primary",
-                                    fontSize: "1.125rem",
-                                    wordBreak: "break-word",
-                                  }}
-                                >
-                                  {data.ltv}%
-                                </Typography>
-                              </Box>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    Total Collateral
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    ${formatAmount(data.totalCollateral)}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    Total Debt
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    ${formatAmount(data.totalDebt)}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    Available to Borrow
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    ${formatAmount(data.availableBorrows)}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    Net Worth
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    ${formatAmount(data.netWorth)}
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    Liquidation Threshold
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    {data.liquidationThreshold}%
+                                  </Typography>
+                                </Box>
+                                <Box sx={{ width: "100%", minWidth: 0 }}>
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{ mb: 0, fontWeight: 500 }}
+                                  >
+                                    LTV
+                                  </Typography>
+                                  <Typography
+                                    variant="h6"
+                                    sx={{
+                                      fontWeight: 600,
+                                      color: "text.primary",
+                                      fontSize: "1.125rem",
+                                      wordBreak: "break-word",
+                                    }}
+                                  >
+                                    {data.ltv}%
+                                  </Typography>
+                                </Box>
                               </Box>
                             )}
                             <Box
@@ -1285,7 +1307,8 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
           }}
         >
           <Typography variant="caption" color="text.secondary">
-            Made with<HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
+            Made with
+            <HeartIcon sx={{ fontSize: 12, color: "red", mx: 0.5 }} />
             by{" "}
             <Typography
               component="a"
