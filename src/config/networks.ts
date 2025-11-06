@@ -260,7 +260,7 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18,
     },
     blockExplorerUrl: "https://explorer.inkonchain.com/",
-  }
+  },
 };
 
 // Add Polygon zkEVM if available in the package
