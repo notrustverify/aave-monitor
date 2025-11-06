@@ -15,6 +15,8 @@ import {
   AaveV3EthereumEtherFi,
   AaveV3Celo,
   AaveV3Plasma,
+  AaveV3Soneium,
+  AaveV3InkWhitelabel,
 } from "@bgd-labs/aave-address-book";
 
 export interface NetworkConfig {
@@ -235,6 +237,30 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://plasmascan.to/",
   },
+  soneium: {
+    name: "Soneium",
+    chainId: AaveV3Soneium.CHAIN_ID,
+    contractAddress: AaveV3Soneium.POOL, // Aave V3 Pool on Plasma from address book
+    defaultRpcUrl: "https://rpc.soneium.org/",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://soneium.blockscout.com/",
+  },
+  ink: {
+    name: "Ink",
+    chainId: AaveV3InkWhitelabel.CHAIN_ID,
+    contractAddress: AaveV3InkWhitelabel.POOL, // Aave V3 Pool on Plasma from address book
+    defaultRpcUrl: "https://rpc-gel.inkonchain.com",
+    nativeCurrency: {
+      name: "Ethereum",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://explorer.inkonchain.com/",
+  }
 };
 
 // Add Polygon zkEVM if available in the package

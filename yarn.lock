@@ -187,10 +187,10 @@
     "@babel/helper-string-parser" "^7.27.1"
     "@babel/helper-validator-identifier" "^7.27.1"
 
-"@bgd-labs/aave-address-book@^4.32.0":
-  version "4.32.0"
-  resolved "https://registry.npmjs.org/@bgd-labs/aave-address-book/-/aave-address-book-4.32.0.tgz"
-  integrity sha512-Vk0m9Pvd6oIEO2N3QTXvBnMyrhMg9fv6/CrV62Cb/BEUrQKH8MHjtPbLvn7DoaqeSClO8Ur8Coo/SieUrO56ew==
+"@bgd-labs/aave-address-book@^4.36.0":
+  version "4.36.0"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-address-book/-/aave-address-book-4.36.0.tgz#c850f5b235675006ae92c2f2918040abd86b99e1"
+  integrity sha512-9vpDl3SYJyxVronEIEmh3B1Z58o87A5b98DCvsDmeochD1UMdsi8GmptgQ5fDwHFyiqRGwlbA1uy0YCExdz+Zg==
 
 "@devicefarmer/adbkit-logcat@^2.1.2":
   version "2.1.3"

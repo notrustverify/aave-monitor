@@ -5,7 +5,7 @@
   "license": "GPL-3.0-only",
   "type": "module",
   "dependencies": {
-    "@bgd-labs/aave-address-book": "^4.32.0",
+    "@bgd-labs/aave-address-book": "^4.36.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@ethersproject/bytes": "^5.8.0",
