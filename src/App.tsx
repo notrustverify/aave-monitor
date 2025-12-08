@@ -212,7 +212,9 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
   const [modalRpcUrl, setModalRpcUrl] = useState<string>("");
   const [modalVersion, setModalVersion] = useState<number>(3);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [editingAddressKey, setEditingAddressKey] = useState<string | null>(null);
+  const [editingAddressKey, setEditingAddressKey] = useState<string | null>(
+    null
+  );
   const [hideDetails, setHideDetails] = useState(false);
   const [addressLabels, setAddressLabels] = useState<{ [key: string]: string }>(
     {}
@@ -317,11 +319,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
           } else {
             // New format with network
             result.savedAddresses.forEach((addrData: AddressData) => {
-              getUserData(
-                addrData.address,
-                addrData.network,
-                addrData.rpcUrl
-              );
+              getUserData(addrData.address, addrData.network, addrData.rpcUrl);
             });
           }
         }
@@ -421,11 +419,17 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
   const handleOpenModal = (addressDataToEdit?: AddressData) => {
     if (addressDataToEdit) {
       // Edit mode
-      setEditingAddressKey(`${addressDataToEdit.address}-${addressDataToEdit.network}`);
+      setEditingAddressKey(
+        `${addressDataToEdit.address}-${addressDataToEdit.network}`
+      );
       setModalAddress(addressDataToEdit.address);
       setModalLabel(addressDataToEdit.label || "");
       setModalNetwork(addressDataToEdit.network);
-      setModalRpcUrl(addressDataToEdit.rpcUrl || networks[addressDataToEdit.network]?.defaultRpcUrl || "");
+      setModalRpcUrl(
+        addressDataToEdit.rpcUrl ||
+          networks[addressDataToEdit.network]?.defaultRpcUrl ||
+          ""
+      );
       setModalVersion(addressDataToEdit.version || 3);
       setShowAdvanced(true); // Show advanced settings when editing
     } else {
@@ -460,7 +464,10 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
       // When editing, preserve the existing RPC URL
       if (!editingAddressKey) {
         setModalRpcUrl(networkConfig.defaultRpcUrl);
-      } else if (!modalRpcUrl || modalRpcUrl === networks[modalNetwork]?.defaultRpcUrl) {
+      } else if (
+        !modalRpcUrl ||
+        modalRpcUrl === networks[modalNetwork]?.defaultRpcUrl
+      ) {
         // If editing and RPC is empty or matches old network default, update to new default
         setModalRpcUrl(networkConfig.defaultRpcUrl);
       }
@@ -493,7 +500,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
       });
       setAddresses(updatedAddresses);
       await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
-      
+
       // Update label in addressLabels
       if (modalLabel) {
         const updatedLabels = { ...addressLabels, [addressKey]: modalLabel };
@@ -519,7 +526,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
       const updatedAddresses = [...addresses, addressData];
       setAddresses(updatedAddresses);
       await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
-      
+
       // Also save label to addressLabels for backward compatibility
       if (modalLabel) {
         const updatedLabels = { ...addressLabels, [addressKey]: modalLabel };
@@ -527,7 +534,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
         await browserAPI.storage.local.set({ addressLabels: updatedLabels });
       }
     }
-    
+
     getUserData(modalAddress, modalNetwork, addressData.rpcUrl);
     handleCloseModal();
   };
@@ -602,7 +609,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
 
       // Use custom RPC URL if provided, otherwise check if address has custom RPC stored
       let rpcUrl = customRpcUrl || networkConfig.defaultRpcUrl;
-      
+
       // If customRpcUrl is not provided, check if address has custom RPC stored
       if (!customRpcUrl) {
         const addressData = addresses.find(
@@ -683,11 +690,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
     // Clear global error when refreshing
     setGlobalError("");
     addresses.forEach((addressData) => {
-      getUserData(
-        addressData.address,
-        addressData.network,
-        addressData.rpcUrl
-      );
+      getUserData(addressData.address, addressData.network, addressData.rpcUrl);
     });
   };
 
