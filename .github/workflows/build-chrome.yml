@@ -12,17 +12,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: |
           corepack enable
-          yarn install --frozen-lockfile
+          bun install --frozen-lockfile
 
       - name: build chrome
-        run: yarn build
+        run: bun run build
 
       - name: build firefox
-        run: yarn build:firefox
+        run: bun run build:firefox
 
       - name: Upload chrome extension as artifact
         uses: actions/upload-artifact@v4
