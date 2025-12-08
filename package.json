@@ -38,7 +38,7 @@
     "@vitejs/plugin-react": "^4.3.3",
     "prettier": "3.6.2",
     "vite": "^6.0.3",
-    "vite-plugin-web-extension": "^4.1.1",
-    "web-ext": "^8.4.0"
+    "vite-plugin-web-extension": "^4.5.0",
+    "web-ext": "^9.2.0"
   }
 }
