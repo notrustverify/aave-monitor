@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import browserAPI from "./utils/browserAPI";
 import networks from "./config/networks";
 import { POOL_ABI } from "./config/abi";
-import { formatLargeNumber, updateBadge } from "./utils/utils";
+import { updateBadge } from "./utils/utils";
 
 // Track side panel state
 let isSidePanelOpen = false;
@@ -125,7 +125,7 @@ async function updateHealthFactor() {
         const networkPart = parts[parts.length - 1];
         actualAddress = parts.slice(0, -1).join("-");
 
-        // Find the network key from the saved addresses
+        // Find the network key and custom RPC from the saved addresses
         if (savedAddresses && Array.isArray(savedAddresses)) {
           const addressData = savedAddresses.find(
             (item) =>
@@ -163,8 +163,19 @@ async function updateHealthFactor() {
       return;
     }
 
-    // Use network-specific RPC provider and contract address
-    const provider = new ethers.JsonRpcProvider(networkConfig.defaultRpcUrl);
+    // Find address data to get custom RPC URL if available
+    let rpcUrl = networkConfig.defaultRpcUrl;
+    if (savedAddresses && Array.isArray(savedAddresses)) {
+      const addressData = savedAddresses.find(
+        (item) => item.address === actualAddress && item.network === networkKey
+      );
+      if (addressData?.rpcUrl) {
+        rpcUrl = addressData.rpcUrl;
+      }
+    }
+
+    // Use network-specific RPC provider and contract address (or custom RPC if available)
+    const provider = new ethers.JsonRpcProvider(rpcUrl);
     const poolContract = new ethers.Contract(
       networkConfig.contractAddress,
       POOL_ABI,
@@ -189,7 +200,6 @@ async function setupHealthCheck() {
       warningThreshold,
       dangerThreshold,
       starredAddress,
-      savedAddresses,
     } = await browserAPI.storage.local.get([
       "updateFrequency",
       "badgeDisplay",
@@ -245,7 +255,7 @@ async function setupSidePanelAlarm(isOpen: boolean) {
 }
 
 // Listen for messages from the side panel
-browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+browserAPI.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.action === "sidePanelOpened") {
     isSidePanelOpen = true;
     updatePopupSetting();

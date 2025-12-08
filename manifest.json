@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Aave Monitor",
-  "version": "2.9.1",
+  "version": "2.10.0",
   "description": "Monitor Aave health factor and other metrics",
   "action": {
     "default_popup": "public/index.html"

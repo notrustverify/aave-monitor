@@ -28,9 +28,15 @@ import {
   Alert,
   Snackbar,
   CircularProgress,
-  Divider,
   Tooltip,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -46,16 +52,18 @@ import {
   Favorite as HeartIcon,
   ViewAgenda as ViewAgendaIcon,
   ViewStream as ViewStreamIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon,
   Edit as EditIcon,
   Check as CheckIcon,
+  ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
 
 // Interface for address data including network
 interface AddressData {
   address: string;
   network: string;
+  label?: string;
+  rpcUrl?: string;
+  version?: number;
 }
 
 // Create theme
@@ -195,11 +203,17 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [globalError, setGlobalError] = useState<string>("");
   const [starredAddress, setStarredAddress] = useState<string>("");
-  const [newAddress, setNewAddress] = useState<string>("");
   const [selectedNetwork, setSelectedNetwork] = useState<string>("ethereum");
   const [privacyMode, setPrivacyMode] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalAddress, setModalAddress] = useState<string>("");
+  const [modalLabel, setModalLabel] = useState<string>("");
+  const [modalNetwork, setModalNetwork] = useState<string>("ethereum");
+  const [modalRpcUrl, setModalRpcUrl] = useState<string>("");
+  const [modalVersion, setModalVersion] = useState<number>(3);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [editingAddressKey, setEditingAddressKey] = useState<string | null>(null);
   const [hideDetails, setHideDetails] = useState(false);
-  const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
   const [addressLabels, setAddressLabels] = useState<{ [key: string]: string }>(
     {}
   );
@@ -262,16 +276,8 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
             browserAPI.storage.local.set({
               savedAddresses: convertedAddresses,
             });
-            // Auto-collapse if addresses exist
-            if (convertedAddresses.length > 0) {
-              setIsHeaderCollapsed(true);
-            }
           } else {
             setAddresses(result.savedAddresses);
-            // Auto-collapse if addresses exist
-            if (result.savedAddresses.length > 0) {
-              setIsHeaderCollapsed(true);
-            }
           }
         }
         if (result.starredAddress) {
@@ -311,7 +317,11 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
           } else {
             // New format with network
             result.savedAddresses.forEach((addrData: AddressData) => {
-              getUserData(addrData.address, addrData.network);
+              getUserData(
+                addrData.address,
+                addrData.network,
+                addrData.rpcUrl
+              );
             });
           }
         }
@@ -408,26 +418,118 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
     }
   };
 
-  const addAddress = async () => {
-    if (
-      !newAddress ||
-      addresses.some(
-        (a) => a.address === newAddress && a.network === selectedNetwork
-      )
-    )
-      return;
+  const handleOpenModal = (addressDataToEdit?: AddressData) => {
+    if (addressDataToEdit) {
+      // Edit mode
+      setEditingAddressKey(`${addressDataToEdit.address}-${addressDataToEdit.network}`);
+      setModalAddress(addressDataToEdit.address);
+      setModalLabel(addressDataToEdit.label || "");
+      setModalNetwork(addressDataToEdit.network);
+      setModalRpcUrl(addressDataToEdit.rpcUrl || networks[addressDataToEdit.network]?.defaultRpcUrl || "");
+      setModalVersion(addressDataToEdit.version || 3);
+      setShowAdvanced(true); // Show advanced settings when editing
+    } else {
+      // Add mode
+      setEditingAddressKey(null);
+      setModalAddress("");
+      setModalLabel("");
+      setModalNetwork("ethereum");
+      setModalRpcUrl(networks.ethereum.defaultRpcUrl);
+      setModalVersion(3);
+      setShowAdvanced(false);
+    }
+    setModalOpen(true);
+  };
 
-    const newAddressData = {
-      address: newAddress,
-      network: selectedNetwork,
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setEditingAddressKey(null);
+    setModalAddress("");
+    setModalLabel("");
+    setModalNetwork("ethereum");
+    setModalRpcUrl("");
+    setModalVersion(3);
+    setShowAdvanced(false);
+  };
+
+  const handleNetworkChange = (network: string) => {
+    setModalNetwork(network);
+    const networkConfig = networks[network];
+    if (networkConfig) {
+      // Only update RPC URL to default if we're in add mode (not editing)
+      // When editing, preserve the existing RPC URL
+      if (!editingAddressKey) {
+        setModalRpcUrl(networkConfig.defaultRpcUrl);
+      } else if (!modalRpcUrl || modalRpcUrl === networks[modalNetwork]?.defaultRpcUrl) {
+        // If editing and RPC is empty or matches old network default, update to new default
+        setModalRpcUrl(networkConfig.defaultRpcUrl);
+      }
+    }
+  };
+
+  const addAddress = async () => {
+    if (!modalAddress) return;
+
+    const networkConfig = networks[modalNetwork];
+    if (!networkConfig) return;
+
+    const addressKey = `${modalAddress}-${modalNetwork}`;
+    const addressData: AddressData = {
+      address: modalAddress,
+      network: modalNetwork,
+      label: modalLabel || undefined,
+      rpcUrl: modalRpcUrl || networkConfig.defaultRpcUrl,
+      version: modalVersion || 3,
     };
 
-    const updatedAddresses = [...addresses, newAddressData];
-    setAddresses(updatedAddresses);
-    await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
-    getUserData(newAddress, selectedNetwork);
-    setNewAddress("");
-    setIsHeaderCollapsed(true);
+    if (editingAddressKey) {
+      // Edit mode - update existing address
+      const updatedAddresses = addresses.map((addr) => {
+        const addrKey = `${addr.address}-${addr.network}`;
+        if (addrKey === editingAddressKey) {
+          return addressData;
+        }
+        return addr;
+      });
+      setAddresses(updatedAddresses);
+      await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
+      
+      // Update label in addressLabels
+      if (modalLabel) {
+        const updatedLabels = { ...addressLabels, [addressKey]: modalLabel };
+        setAddressLabels(updatedLabels);
+        await browserAPI.storage.local.set({ addressLabels: updatedLabels });
+      } else {
+        // Remove label if it was cleared
+        const updatedLabels = { ...addressLabels };
+        delete updatedLabels[addressKey];
+        setAddressLabels(updatedLabels);
+        await browserAPI.storage.local.set({ addressLabels: updatedLabels });
+      }
+    } else {
+      // Add mode - check for duplicates
+      if (
+        addresses.some(
+          (a) => a.address === modalAddress && a.network === modalNetwork
+        )
+      ) {
+        return;
+      }
+
+      const updatedAddresses = [...addresses, addressData];
+      setAddresses(updatedAddresses);
+      await browserAPI.storage.local.set({ savedAddresses: updatedAddresses });
+      
+      // Also save label to addressLabels for backward compatibility
+      if (modalLabel) {
+        const updatedLabels = { ...addressLabels, [addressKey]: modalLabel };
+        setAddressLabels(updatedLabels);
+        await browserAPI.storage.local.set({ addressLabels: updatedLabels });
+      }
+    }
+    
+    getUserData(modalAddress, modalNetwork, addressData.rpcUrl);
+    handleCloseModal();
   };
 
   const removeAddress = async (
@@ -479,7 +581,8 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
 
   const getUserData = async (
     userAddress: string,
-    networkKey: string = "ethereum"
+    networkKey: string = "ethereum",
+    customRpcUrl?: string
   ) => {
     if (!userAddress) return;
 
@@ -497,7 +600,20 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
         throw new Error(`Network configuration not found for ${networkKey}`);
       }
 
-      const provider = new ethers.JsonRpcProvider(networkConfig.defaultRpcUrl);
+      // Use custom RPC URL if provided, otherwise check if address has custom RPC stored
+      let rpcUrl = customRpcUrl || networkConfig.defaultRpcUrl;
+      
+      // If customRpcUrl is not provided, check if address has custom RPC stored
+      if (!customRpcUrl) {
+        const addressData = addresses.find(
+          (a) => a.address === userAddress && a.network === networkKey
+        );
+        if (addressData?.rpcUrl) {
+          rpcUrl = addressData.rpcUrl;
+        }
+      }
+
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
 
       const poolContract = new ethers.Contract(
         networkConfig.contractAddress,
@@ -567,7 +683,11 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
     // Clear global error when refreshing
     setGlobalError("");
     addresses.forEach((addressData) => {
-      getUserData(addressData.address, addressData.network);
+      getUserData(
+        addressData.address,
+        addressData.network,
+        addressData.rpcUrl
+      );
     });
   };
 
@@ -650,13 +770,9 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
             justifyContent="flex-end"
             sx={{ mt: 1, mb: 1.5 }}
           >
-            <Tooltip
-              title={
-                isHeaderCollapsed ? "Show add address" : "Hide add address"
-              }
-            >
+            <Tooltip title="Add address">
               <IconButton
-                onClick={() => setIsHeaderCollapsed(!isHeaderCollapsed)}
+                onClick={() => handleOpenModal()}
                 size="small"
                 sx={{
                   bgcolor: "background.default",
@@ -668,11 +784,7 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                   },
                 }}
               >
-                {isHeaderCollapsed ? (
-                  <KeyboardArrowDownIcon fontSize="small" />
-                ) : (
-                  <KeyboardArrowUpIcon fontSize="small" />
-                )}
+                <AddIcon fontSize="small" />
               </IconButton>
             </Tooltip>
             <Tooltip title="Refresh data">
@@ -786,69 +898,150 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
             )}
           </Stack>
 
-          {/* Header with input - conditionally shown */}
-          {!isHeaderCollapsed && (
-            <Paper
-              elevation={0}
-              sx={{ p: 3, mb: 3, bgcolor: "background.paper" }}
-            >
-              <Stack spacing={2}>
-                {/* Input section */}
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <TextField
-                    fullWidth
-                    placeholder="Enter wallet address"
-                    value={newAddress}
-                    onChange={(e) => setNewAddress(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addAddress()}
-                    size="small"
+          {/* Add Address Modal */}
+          <Dialog
+            open={modalOpen}
+            onClose={handleCloseModal}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+              sx: {
+                borderRadius: 2,
+                bgcolor: "background.paper",
+              },
+            }}
+          >
+            <DialogTitle>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Typography variant="h6">
+                  {editingAddressKey ? "Edit Address" : "Add New Address"}
+                </Typography>
+                <IconButton
+                  onClick={handleCloseModal}
+                  size="small"
+                  sx={{
+                    bgcolor: "background.default",
+                    "&:hover": {
+                      bgcolor: "background.default",
+                      opacity: 0.8,
+                    },
+                  }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Box>
+            </DialogTitle>
+            <DialogContent>
+              <Stack spacing={3} sx={{ mt: 1 }}>
+                <TextField
+                  fullWidth
+                  label="Address"
+                  placeholder="Enter wallet address"
+                  value={modalAddress}
+                  onChange={(e) => setModalAddress(e.target.value)}
+                  size="small"
+                  required
+                />
+                <TextField
+                  fullWidth
+                  label="Label"
+                  placeholder="Optional label for this address"
+                  value={modalLabel}
+                  onChange={(e) => setModalLabel(e.target.value)}
+                  size="small"
+                />
+                <FormControl fullWidth size="small">
+                  <InputLabel>Network</InputLabel>
+                  <Select
+                    value={modalNetwork}
+                    onChange={(e) => handleNetworkChange(e.target.value)}
+                    label="Network"
+                  >
+                    {Object.keys(networks).map((key) => (
+                      <MenuItem key={key} value={key}>
+                        {networks[key].name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Stack>
+
+              {/* Advanced Settings */}
+              <Box sx={{ mt: 2 }}>
+                <Accordion
+                  expanded={showAdvanced}
+                  onChange={(_e, expanded) => setShowAdvanced(expanded)}
+                  sx={{
+                    bgcolor: "background.default",
+                    "&:before": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
                     sx={{
-                      "& .MuiOutlinedInput-root": {
-                        bgcolor: "background.default",
-                        height: 40,
-                      },
-                    }}
-                  />
-                  <FormControl size="small" sx={{ minWidth: 100 }}>
-                    <InputLabel>Network</InputLabel>
-                    <Select
-                      value={selectedNetwork}
-                      onChange={(e) => setSelectedNetwork(e.target.value)}
-                      label="Network"
-                      sx={{
-                        bgcolor: "background.default",
-                        height: 40,
-                      }}
-                    >
-                      {Object.keys(networks).map((key) => (
-                        <MenuItem key={key} value={key}>
-                          {networks[key].name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <Button
-                    variant="contained"
-                    onClick={addAddress}
-                    disabled={!newAddress}
-                    size="small"
-                    sx={{
-                      minWidth: 40,
-                      height: 40,
-                      borderRadius: 2,
-                      bgcolor: "primary.main",
-                      "&:hover": {
-                        bgcolor: "primary.main",
-                        opacity: 0.9,
+                      "& .MuiAccordionSummary-content": {
+                        my: 1,
                       },
                     }}
                   >
-                    +
-                  </Button>
-                </Stack>
-              </Stack>
-            </Paper>
-          )}
+                    <Typography variant="body2" fontWeight={500}>
+                      Advanced Settings
+                    </Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack spacing={2}>
+                      <TextField
+                        fullWidth
+                        label="RPC URL"
+                        placeholder="Enter custom RPC URL"
+                        value={modalRpcUrl}
+                        onChange={(e) => setModalRpcUrl(e.target.value)}
+                        size="small"
+                        helperText={
+                          networks[modalNetwork]
+                            ? `Default: ${networks[modalNetwork].defaultRpcUrl}`
+                            : ""
+                        }
+                      />
+                      <FormControl fullWidth size="small" disabled>
+                        <InputLabel>Aave Version</InputLabel>
+                        <Select
+                          value={modalVersion}
+                          onChange={(e) =>
+                            setModalVersion(Number(e.target.value))
+                          }
+                          label="Aave Version"
+                          disabled
+                        >
+                          <MenuItem value={3}>Version 3</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              </Box>
+            </DialogContent>
+            <DialogActions sx={{ p: 2, pt: 1 }}>
+              <Button onClick={handleCloseModal} color="inherit">
+                Cancel
+              </Button>
+              <Button
+                onClick={addAddress}
+                variant="contained"
+                disabled={!modalAddress}
+              >
+                {editingAddressKey ? "Save Changes" : "Add Address"}
+              </Button>
+            </DialogActions>
+          </Dialog>
 
           {/* Addresses List */}
           <Stack>
@@ -868,12 +1061,15 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                   if (bKey === starredAddress) return 1;
                   return 0;
                 })
-                .map(({ address, network }) => {
+                .map((addressData) => {
+                  const { address, network, label } = addressData;
                   const addressKey = `${address}-${network}`;
                   const isLoadingData = isLoading[addressKey];
                   const error = errors[addressKey];
                   const data = userData[addressKey];
                   const isStarred = starredAddress === addressKey;
+                  // Use label from AddressData if available, otherwise use addressLabels
+                  const displayLabel = label || addressLabels[addressKey];
 
                   return (
                     <Card
@@ -937,10 +1133,9 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                   fontWeight: 600,
                                   fontSize: "1rem",
                                 }}
-                                title={addressLabels[addressKey] || address}
+                                title={displayLabel || address}
                               >
-                                {addressLabels[addressKey] ||
-                                  truncateAddress(address)}
+                                {displayLabel || truncateAddress(address)}
                               </Typography>
                             )}
                             <Tooltip title="Copy address">
@@ -1012,15 +1207,10 @@ function App({ closeSidePanel, isSidePanel: isSidePanelProp }: AppProps = {}) {
                                 </Tooltip>
                               </>
                             ) : (
-                              <Tooltip title="Edit label">
+                              <Tooltip title="Edit address">
                                 <IconButton
                                   size="small"
-                                  onClick={() => {
-                                    setEditingLabel(addressKey);
-                                    setLabelInput(
-                                      addressLabels[addressKey] || ""
-                                    );
-                                  }}
+                                  onClick={() => handleOpenModal(addressData)}
                                   sx={{
                                     bgcolor: "background.default",
                                     width: 24,
