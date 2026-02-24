@@ -20,6 +20,7 @@ import {
   AaveV3Mantle,
   AaveV3EthereumHorizon,
   AaveV3EthereumLido,
+  AaveV3MegaEth,
 } from "@bgd-labs/aave-address-book";
 
 export interface NetworkConfig {
@@ -56,7 +57,7 @@ const networks: Record<string, NetworkConfig> = {
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
-      decimals: 18,
+      decimals: 18, 
     },
     blockExplorerUrl: "https://etherscan.io",
   },
@@ -68,21 +69,9 @@ const networks: Record<string, NetworkConfig> = {
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
-      decimals: 18,
+      decimals: 18, 
     },
     blockExplorerUrl: "https://etherscan.io",
-  },
-  polygon: {
-    name: "Polygon",
-    chainId: AaveV3Polygon.CHAIN_ID,
-    contractAddress: AaveV3Polygon.POOL, // Aave V3 Pool on Polygon from address book
-    defaultRpcUrl: "https://polygon-rpc.com",
-    nativeCurrency: {
-      name: "MATIC",
-      symbol: "MATIC",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://polygonscan.com",
   },
   avalanche: {
     name: "Avalanche",
@@ -96,18 +85,6 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://snowtrace.io",
   },
-  optimism: {
-    name: "Optimism",
-    chainId: AaveV3Optimism.CHAIN_ID,
-    contractAddress: AaveV3Optimism.POOL, // Aave V3 Pool on Optimism from address book
-    defaultRpcUrl: "https://mainnet.optimism.io",
-    nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://optimistic.etherscan.io",
-  },
   arbitrum: {
     name: "Arbitrum",
     chainId: AaveV3Arbitrum.CHAIN_ID,
@@ -119,6 +96,54 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18,
     },
     blockExplorerUrl: "https://arbiscan.io",
+  },
+  base: {
+    name: "Base",
+    chainId: AaveV3Base.CHAIN_ID,
+    contractAddress: AaveV3Base.POOL, // Aave V3 Pool on Base from address book
+    defaultRpcUrl: "https://mainnet.base.org",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://basescan.org",
+  },
+  "bnb chain": {
+    name: "BNB Chain",
+    chainId: AaveV3BNB.CHAIN_ID,
+    contractAddress: AaveV3BNB.POOL, // Aave V3 Pool on BNB Chain from address book
+    defaultRpcUrl: "https://bsc-dataseed.binance.org",
+    nativeCurrency: {
+      name: "BNB",
+      symbol: "BNB",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://bscscan.com",
+  },
+  celo: {
+    name: "Celo",
+    chainId: AaveV3Celo.CHAIN_ID,
+    contractAddress: AaveV3Celo.POOL, // Aave V3 Pool on Celo from address book
+    defaultRpcUrl: "https://celo-rpc.publicnode.com",
+    nativeCurrency: {
+      name: "Celo",
+      symbol: "CELO",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://celoscan.io/",
+  },
+  etherfi: {
+    name: "EtherFi",
+    chainId: AaveV3EthereumEtherFi.CHAIN_ID,
+    contractAddress: AaveV3EthereumEtherFi.POOL, // Aave V3 Pool for EtherFi from address book
+    defaultRpcUrl: "https://eth.public-rpc.com",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://etherscan.io",
   },
   gnosis: {
     name: "Gnosis",
@@ -144,53 +169,17 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://gnosisscan.io",
   },
-  base: {
-    name: "Base",
-    chainId: AaveV3Base.CHAIN_ID,
-    contractAddress: AaveV3Base.POOL, // Aave V3 Pool on Base from address book
-    defaultRpcUrl: "https://mainnet.base.org",
+  ink: {
+    name: "Ink",
+    chainId: AaveV3InkWhitelabel.CHAIN_ID,
+    contractAddress: AaveV3InkWhitelabel.POOL, // Aave V3 Pool on Plasma from address book
+    defaultRpcUrl: "https://rpc-gel.inkonchain.com",
     nativeCurrency: {
-      name: "Ether",
+      name: "Ethereum",
       symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrl: "https://basescan.org",
-  },
-  metis: {
-    name: "Metis",
-    chainId: AaveV3Metis.CHAIN_ID,
-    contractAddress: AaveV3Metis.POOL, // Aave V3 Pool on Metis from address book
-    defaultRpcUrl: "https://andromeda.metis.io/?owner=1088",
-    nativeCurrency: {
-      name: "Metis",
-      symbol: "METIS",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://andromeda-explorer.metis.io",
-  },
-  "bnb chain": {
-    name: "BNB Chain",
-    chainId: AaveV3BNB.CHAIN_ID,
-    contractAddress: AaveV3BNB.POOL, // Aave V3 Pool on BNB Chain from address book
-    defaultRpcUrl: "https://bsc-dataseed.binance.org",
-    nativeCurrency: {
-      name: "BNB",
-      symbol: "BNB",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://bscscan.com",
-  },
-  scroll: {
-    name: "Scroll",
-    chainId: AaveV3Scroll.CHAIN_ID,
-    contractAddress: AaveV3Scroll.POOL, // Aave V3 Pool on Scroll from address book
-    defaultRpcUrl: "https://rpc.scroll.io",
-    nativeCurrency: {
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://scrollscan.com",
+    blockExplorerUrl: "https://explorer.inkonchain.com/",
   },
   linea: {
     name: "Linea",
@@ -204,53 +193,53 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://lineascan.build",
   },
-  sonic: {
-    name: "Sonic",
-    chainId: AaveV3Sonic.CHAIN_ID,
-    contractAddress: AaveV3Sonic.POOL, // Aave V3 Pool on Sonic from address book
-    defaultRpcUrl: "https://sonic-rpc.publicnode.com",
+  mantle: {
+    name: "Mantle",
+    chainId: AaveV3Mantle.CHAIN_ID,
+    contractAddress: AaveV3Mantle.POOL, // Aave V3 Pool on Mantle from address book
+    defaultRpcUrl: "https://rpc.mantle.xyz",
     nativeCurrency: {
-      name: "Fantom",
-      symbol: "FTM",
+      name: "Mantle",
+      symbol: "MNT",
       decimals: 18,
     },
-    blockExplorerUrl: "https://explorer.sonic.fantom.network",
+    blockExplorerUrl: "https://explorer.mantle.xyz",
   },
-  zksync: {
-    name: "zkSync Era",
-    chainId: AaveV3ZkSync.CHAIN_ID,
-    contractAddress: AaveV3ZkSync.POOL, // Aave V3 Pool on zkSync from address book
-    defaultRpcUrl: "https://mainnet.era.zksync.io",
+  metis: {
+    name: "Metis",
+    chainId: AaveV3Metis.CHAIN_ID,
+    contractAddress: AaveV3Metis.POOL, // Aave V3 Pool on Metis from address book
+    defaultRpcUrl: "https://andromeda.metis.io/?owner=1088",
+    nativeCurrency: {
+      name: "Metis",
+      symbol: "METIS",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://andromeda-explorer.metis.io",
+  },
+  megaeth: {
+    name: "MegaETH",
+    chainId: AaveV3MegaEth.CHAIN_ID,
+    contractAddress: AaveV3MegaEth.POOL, // Aave V3 Pool on MegaETH from address book
+    defaultRpcUrl: "https://mainnet.megaeth.com/rpc",
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrl: "https://explorer.zksync.io",
+    blockExplorerUrl: "https://megaeth.blockscout.com/",
   },
-  etherfi: {
-    name: "EtherFi",
-    chainId: AaveV3EthereumEtherFi.CHAIN_ID,
-    contractAddress: AaveV3EthereumEtherFi.POOL, // Aave V3 Pool for EtherFi from address book
-    defaultRpcUrl: "https://eth.public-rpc.com",
+  optimism: {
+    name: "Optimism",
+    chainId: AaveV3Optimism.CHAIN_ID,
+    contractAddress: AaveV3Optimism.POOL, // Aave V3 Pool on Optimism from address book
+    defaultRpcUrl: "https://mainnet.optimism.io",
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrl: "https://etherscan.io",
-  },
-  celo: {
-    name: "Celo",
-    chainId: AaveV3Celo.CHAIN_ID,
-    contractAddress: AaveV3Celo.POOL, // Aave V3 Pool on Celo from address book
-    defaultRpcUrl: "https://celo-rpc.publicnode.com",
-    nativeCurrency: {
-      name: "Celo",
-      symbol: "CELO",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://celoscan.io/",
+    blockExplorerUrl: "https://optimistic.etherscan.io",
   },
   plasma: {
     name: "Plasma",
@@ -264,6 +253,42 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://plasmascan.to/",
   },
+  polygon: {
+    name: "Polygon",
+    chainId: AaveV3Polygon.CHAIN_ID,
+    contractAddress: AaveV3Polygon.POOL, // Aave V3 Pool on Polygon from address book
+    defaultRpcUrl: "https://polygon-rpc.com",
+    nativeCurrency: {
+      name: "MATIC",
+      symbol: "MATIC",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://polygonscan.com",
+  },
+  scroll: {
+    name: "Scroll",
+    chainId: AaveV3Scroll.CHAIN_ID,
+    contractAddress: AaveV3Scroll.POOL, // Aave V3 Pool on Scroll from address book
+    defaultRpcUrl: "https://rpc.scroll.io",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://scrollscan.com",
+  },
+  sonic: {
+    name: "Sonic",
+    chainId: AaveV3Sonic.CHAIN_ID,
+    contractAddress: AaveV3Sonic.POOL, // Aave V3 Pool on Sonic from address book
+    defaultRpcUrl: "https://sonic-rpc.publicnode.com",
+    nativeCurrency: {
+      name: "Fantom",
+      symbol: "FTM",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://explorer.sonic.fantom.network",
+  },
   soneium: {
     name: "Soneium",
     chainId: AaveV3Soneium.CHAIN_ID,
@@ -276,29 +301,17 @@ const networks: Record<string, NetworkConfig> = {
     },
     blockExplorerUrl: "https://soneium.blockscout.com/",
   },
-  ink: {
-    name: "Ink",
-    chainId: AaveV3InkWhitelabel.CHAIN_ID,
-    contractAddress: AaveV3InkWhitelabel.POOL, // Aave V3 Pool on Plasma from address book
-    defaultRpcUrl: "https://rpc-gel.inkonchain.com",
+  zksync: {
+    name: "zkSync Era",
+    chainId: AaveV3ZkSync.CHAIN_ID,
+    contractAddress: AaveV3ZkSync.POOL, // Aave V3 Pool on zkSync from address book
+    defaultRpcUrl: "https://mainnet.era.zksync.io",
     nativeCurrency: {
-      name: "Ethereum",
+      name: "Ether",
       symbol: "ETH",
       decimals: 18,
     },
-    blockExplorerUrl: "https://explorer.inkonchain.com/",
-  },
-  mantle: {
-    name: "Mantle",
-    chainId: AaveV3Mantle.CHAIN_ID,
-    contractAddress: AaveV3Mantle.POOL, // Aave V3 Pool on Mantle from address book
-    defaultRpcUrl: "https://rpc.mantle.xyz",
-    nativeCurrency: {
-      name: "Mantle",
-      symbol: "MNT",
-      decimals: 18,
-    },
-    blockExplorerUrl: "https://explorer.mantle.xyz",
+    blockExplorerUrl: "https://explorer.zksync.io",
   },
 };
 
