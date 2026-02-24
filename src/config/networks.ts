@@ -57,7 +57,7 @@ const networks: Record<string, NetworkConfig> = {
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
-      decimals: 18, 
+      decimals: 18,
     },
     blockExplorerUrl: "https://etherscan.io",
   },
@@ -69,7 +69,7 @@ const networks: Record<string, NetworkConfig> = {
     nativeCurrency: {
       name: "Ether",
       symbol: "ETH",
-      decimals: 18, 
+      decimals: 18,
     },
     blockExplorerUrl: "https://etherscan.io",
   },
