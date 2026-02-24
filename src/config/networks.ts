@@ -17,6 +17,9 @@ import {
   AaveV3Plasma,
   AaveV3Soneium,
   AaveV3InkWhitelabel,
+  AaveV3Mantle,
+  AaveV3EthereumHorizon,
+  AaveV3EthereumLido,
 } from "@bgd-labs/aave-address-book";
 
 export interface NetworkConfig {
@@ -42,6 +45,30 @@ const networks: Record<string, NetworkConfig> = {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
+    },
+    blockExplorerUrl: "https://etherscan.io",
+  },
+  ethereumPrime: {
+    name: "Ethereum Prime",
+    chainId: AaveV3EthereumLido.CHAIN_ID,
+    contractAddress: AaveV3EthereumLido.POOL, // Aave V3 Pool on Ethereum Prime from address book
+    defaultRpcUrl: "https://eth.llamarpc.com",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18, 
+    },
+    blockExplorerUrl: "https://etherscan.io",
+  },
+  ethereumHorizon: {
+    name: "Ethereum Horizon",
+    chainId: AaveV3EthereumHorizon.CHAIN_ID,
+    contractAddress: AaveV3EthereumHorizon.POOL, // Aave V3 Pool on Ethereum Horizon from address book
+    defaultRpcUrl: "https://eth.llamarpc.com",
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18, 
     },
     blockExplorerUrl: "https://etherscan.io",
   },
@@ -260,6 +287,18 @@ const networks: Record<string, NetworkConfig> = {
       decimals: 18,
     },
     blockExplorerUrl: "https://explorer.inkonchain.com/",
+  },
+  mantle: {
+    name: "Mantle",
+    chainId: AaveV3Mantle.CHAIN_ID,
+    contractAddress: AaveV3Mantle.POOL, // Aave V3 Pool on Mantle from address book
+    defaultRpcUrl: "https://rpc.mantle.xyz",
+    nativeCurrency: {
+      name: "Mantle",
+      symbol: "MNT",
+      decimals: 18,
+    },
+    blockExplorerUrl: "https://explorer.mantle.xyz",
   },
 };
 
